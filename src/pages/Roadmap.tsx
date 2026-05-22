@@ -53,12 +53,12 @@ const Roadmap = () => {
   
   const { roadmapTaskState } = useProgression();
 
-  const toggleMilestone = (id: string) => {
-    roadmapStore.toggleMilestone(id);
+  const setMilestoneDone = (id: string, done: boolean) => {
+    roadmapStore.setMilestoneDone(id, done);
   };
 
-  const togglePlannerTask = (id: string) => {
-    roadmapStore.togglePlannerTask(id);
+  const setPlannerTaskDone = (id: string, done: boolean) => {
+    roadmapStore.setPlannerTaskDone(id, done);
   };
 
   const regenerateAIPlan = async () => {
@@ -213,24 +213,29 @@ const Roadmap = () => {
                         <motion.li
                           layout
                           key={m.id}
-                          onClick={() => toggleMilestone(m.id)}
                           whileHover={{ scale: 1.01, x: 2 }}
-                          whileTap={{ scale: 0.99 }}
                           className={cn(
-                            "flex items-start justify-between rounded-xl border-2 p-3.5 bg-background cursor-pointer hover:border-foreground/20 transition-all",
+                            "flex items-start justify-between rounded-xl border-2 p-3.5 bg-background hover:border-foreground/20 transition-all",
                             m.done ? "border-border/40 opacity-70" : "border-border shadow-sm",
                           )}
                         >
                           <div className="flex items-start gap-3 flex-1 min-w-0">
-                            <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
-                              <Checkbox checked={m.done} onCheckedChange={() => toggleMilestone(m.id)} />
+                            <div className="pt-0.5">
+                              <Checkbox
+                                checked={m.done}
+                                onCheckedChange={(v) => setMilestoneDone(m.id, v === true)}
+                              />
                             </div>
-                            <div className="min-w-0">
+                            <button
+                              type="button"
+                              onClick={() => setMilestoneDone(m.id, !m.done)}
+                              className="min-w-0 flex-1 text-left cursor-pointer"
+                            >
                               <span className={cn("text-sm font-bold leading-snug block text-foreground", m.done && "text-muted-foreground line-through")}>
                                 {m.title}
                               </span>
                               <span className="text-xs text-muted-foreground block mt-0.5">{m.desc}</span>
-                            </div>
+                            </button>
                           </div>
                           {m.aiSuggested && (
                             <span className="shrink-0 ml-3 inline-flex items-center gap-1 rounded-full bg-coral/10 border border-coral/20 px-2 py-0.5 text-[9px] font-black text-coral uppercase">
@@ -303,21 +308,28 @@ const Roadmap = () => {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
                           key={pt.id}
-                          onClick={() => togglePlannerTask(pt.id)}
                           whileHover={{ scale: 1.01, x: 2 }}
-                          whileTap={{ scale: 0.99 }}
                           className={cn(
-                            "flex items-center justify-between rounded-xl border-2 p-3.5 bg-background cursor-pointer hover:border-foreground/20 transition-all",
+                            "flex items-center justify-between rounded-xl border-2 p-3.5 bg-background hover:border-foreground/20 transition-all",
                             pt.done ? "border-border/40 opacity-70" : "border-border shadow-sm",
                           )}
                         >
-                          <div className="flex items-center gap-3">
-                            <div onClick={(e) => e.stopPropagation()}>
-                              <Checkbox checked={pt.done} onCheckedChange={() => togglePlannerTask(pt.id)} />
-                            </div>
-                            <span className={cn("text-sm font-bold text-foreground", pt.done && "text-muted-foreground line-through")}>
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <Checkbox
+                              checked={pt.done}
+                              onCheckedChange={(v) => setPlannerTaskDone(pt.id, v === true)}
+                              aria-label={`Mark "${pt.task}" as ${pt.done ? "incomplete" : "complete"}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setPlannerTaskDone(pt.id, !pt.done)}
+                              className={cn(
+                                "text-sm font-bold text-left text-foreground cursor-pointer",
+                                pt.done && "text-muted-foreground line-through",
+                              )}
+                            >
                               {pt.task}
-                            </span>
+                            </button>
                           </div>
                           <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
                             <Clock className="h-3 w-3" /> {pt.dueDate}
