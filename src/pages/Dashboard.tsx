@@ -49,8 +49,11 @@ const itemVariants = {
 const Dashboard = () => {
   const [currentStep, setCurrentStep] = useState(2); // Start at Networker
   const [userName, setUserName] = useState("Explorer");
-  const { xp, level, streakDays, roadmapTaskState = {} } = useProgression();
+  const progression = useProgression();
+  const { xp, level, streakDays, roadmapTaskState = {} } = progression;
+  const experiences = useExperiences();
   const checklistDone = mockChecklist.filter((t) => roadmapTaskState[t.id] ?? t.done).length;
+  const nudge = getGamificationNudge(progression, experiences);
 
   const plannerTasks = usePlannerTasks();
   const discoverStates = useDiscoverStates();
