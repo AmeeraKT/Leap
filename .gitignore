@@ -147,8 +147,3 @@ vite.config.ts.timestamp-*
 *.sln
 *.sw?
 
-# Local environment / config files
-.env
-.env.*
-!.env.example
-*.local
