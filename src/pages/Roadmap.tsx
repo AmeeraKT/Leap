@@ -1,14 +1,13 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { 
-  Sparkles, ArrowRight, Brain, Clock, ShieldCheck, RefreshCw, 
-  ChevronRight, Check, ChevronDown, Trophy, Lock, Linkedin, Calendar, TrendingUp 
+  ArrowRight, Brain, Clock, ShieldCheck, RefreshCw, 
+  ChevronRight, Linkedin, Calendar, TrendingUp 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Jumpy } from "@/components/Jumpy";
+import { MilestoneGamePath } from "@/components/MilestoneGamePath";
 import { JumpyNudge } from "@/components/JumpyNudge";
 import { useExperiences } from "@/lib/experiences-store";
 import { useToast } from "@/hooks/use-toast";
@@ -17,7 +16,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { AnimatedPage } from "@/components/AnimatedPage";
 import { useMilestones, usePlannerTasks, roadmapStore } from "@/lib/roadmap-store";
 import { progressionStore, useProgression } from "@/lib/progression-store";
-import { mockRoadmap, type RoadmapPhase } from "@/lib/mock-data";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -35,7 +33,7 @@ const cardVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 90,
       damping: 14,
     },
@@ -50,15 +48,13 @@ const Roadmap = () => {
 
   const milestones = useMilestones();
   const plannerTasks = usePlannerTasks();
-  
-  const { roadmapTaskState } = useProgression();
 
-  const toggleMilestone = (id: string) => {
-    roadmapStore.toggleMilestone(id);
+  const toggleMilestone = (id: string, done?: boolean) => {
+    roadmapStore.toggleMilestone(id, done);
   };
 
-  const togglePlannerTask = (id: string) => {
-    roadmapStore.togglePlannerTask(id);
+  const togglePlannerTask = (id: string, done?: boolean) => {
+    roadmapStore.togglePlannerTask(id, done);
   };
 
   const regenerateAIPlan = async () => {
@@ -169,9 +165,7 @@ const Roadmap = () => {
         </motion.div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        {/* Main Column */}
-        <div className="space-y-6">
+      <div className="space-y-6">
           <Tabs defaultValue="milestones" className="w-full">
             <TabsList className="flex w-full justify-start gap-1 rounded-2xl border-2 border-border bg-surface p-1 flex-wrap font-display font-bold">
               <TabsTrigger value="milestones" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
@@ -183,68 +177,72 @@ const Roadmap = () => {
               <TabsTrigger value="brand" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
                 Personal Brand Coaching ⭐
               </TabsTrigger>
-              <TabsTrigger value="application" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
-                Application Journey
-              </TabsTrigger>
             </TabsList>
 
-            {/* Milestones Content */}
-            <TabsContent value="milestones" className="mt-6 space-y-4 focus-visible:outline-none">
-              {/* Phases */}
-              {Array.from(new Set(milestones.map(m => m.phase))).map((phase) => (
-                <motion.div 
-                  key={phase} 
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ type: "spring", stiffness: 100, damping: 15 }}
-                  className="rounded-3xl border-2 border-border bg-surface p-5 space-y-3 shadow-sm hover:shadow-md transition-shadow duration-250"
-                >
-                  <div className="flex items-center justify-between pb-2 border-b border-border">
-                    <h3 className="font-display text-lg font-black text-foreground">{phase}</h3>
-                    <span className="text-xs font-bold text-muted-foreground">
-                      {milestones.filter(m => m.phase === phase && m.done).length} / {milestones.filter(m => m.phase === phase).length} Done
-                    </span>
-                  </div>
+            {/* Milestones Content — game-style quest path */}
+            <TabsContent value="milestones" className="mt-6 space-y-6 focus-visible:outline-none">
+              <MilestoneGamePath milestones={milestones} onToggle={toggleMilestone} />
 
-                  <motion.ul layout className="space-y-2">
-                    {milestones
-                      .filter(m => m.phase === phase)
-                      .map((m) => (
-                        <motion.li
-                          layout
-                          key={m.id}
-                          onClick={() => toggleMilestone(m.id)}
-                          whileHover={{ scale: 1.01, x: 2 }}
-                          whileTap={{ scale: 0.99 }}
-                          className={cn(
-                            "flex items-start justify-between rounded-xl border-2 p-3.5 bg-background cursor-pointer hover:border-foreground/20 transition-all",
-                            m.done ? "border-border/40 opacity-70" : "border-border shadow-sm",
-                          )}
-                        >
-                          <div className="flex items-start gap-3 flex-1 min-w-0">
-                            <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
-                              <Checkbox
-                                checked={m.done}
-                                onCheckedChange={(v) => toggleMilestone(m.id, v === true)}
-                              />
-                            </div>
-                            <div className="min-w-0">
-                              <span className={cn("text-sm font-bold leading-snug block text-foreground", m.done && "text-muted-foreground line-through")}>
-                                {m.title}
-                              </span>
-                              <span className="text-xs text-muted-foreground block mt-0.5">{m.desc}</span>
-                            </div>
-                          </div>
-                          {m.aiSuggested && (
-                            <span className="shrink-0 ml-3 inline-flex items-center gap-1 rounded-full bg-coral/10 border border-coral/20 px-2 py-0.5 text-[9px] font-black text-coral uppercase">
-                              <Sparkles className="h-2.5 w-2.5" /> AI Custom
-                            </span>
-                          )}
-                        </motion.li>
-                      ))}
-                  </motion.ul>
+              {/* Matched Job Predictions — below quest map */}
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 80, damping: 15 }}
+                className="rounded-3xl border-2 border-border bg-surface p-5 md:p-6 space-y-4 shadow-sm"
+              >
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-secondary" />
+                    <h3 className="font-display text-lg font-extrabold text-foreground">Matched Job Predictions</h3>
+                  </div>
+                  <Link to="/career-vision">
+                    <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                      <Button variant="outline" size="sm" className="text-xs font-black gap-1.5">
+                        Career Vision Simulator <ChevronRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </motion.div>
+                  </Link>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Based on your logged workshop skills, volunteering, projects, and fair attendance, our predictor calculates your career inclinations.
+                </p>
+
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+                >
+                  {predictedJobs.map((job) => (
+                    <motion.div
+                      key={job.name}
+                      variants={cardVariants}
+                      whileHover={{ y: -2 }}
+                      className="space-y-2 rounded-2xl border-2 border-border bg-background p-4"
+                    >
+                      <div className="flex justify-between items-start gap-2 text-xs font-extrabold">
+                        <span className="text-foreground leading-snug">{job.name}</span>
+                        <span className="shrink-0 text-secondary">{job.totalScore}%</span>
+                      </div>
+
+                      <div className="h-2 overflow-hidden rounded-full bg-muted">
+                        <motion.div
+                          className="h-full rounded-full bg-secondary"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${job.totalScore}%` }}
+                          transition={{ duration: 0.8, ease: "easeOut" }}
+                        />
+                      </div>
+
+                      <p className="text-[11px] text-muted-foreground leading-snug">{job.description}</p>
+
+                      <div className="flex items-center gap-1 text-[9px] font-black text-coral uppercase tracking-wider">
+                        <ShieldCheck className="h-3 w-3 shrink-0" /> {job.factor}
+                      </div>
+                    </motion.div>
+                  ))}
                 </motion.div>
-              ))}
+              </motion.section>
             </TabsContent>
 
             {/* Time Planner Content */}
@@ -419,178 +417,9 @@ const Roadmap = () => {
                 />
               </div>
             </TabsContent>
-
-            {/* Application Journey Content */}
-            <TabsContent value="application" className="mt-6 focus-visible:outline-none">
-              <div className="grid gap-6 md:grid-cols-[180px_1fr]">
-                <aside className="hidden md:block">
-                  <div className="sticky top-20 space-y-1 rounded-3xl border-2 border-border bg-surface p-4">
-                    {mockRoadmap.map((p, i) => {
-                      const isDone = (taskId: string, fallback: boolean) => roadmapTaskState[taskId] ?? fallback;
-                      const done = p.tasks.filter((t) => isDone(t.id, t.done)).length;
-                      const isPhaseDone = done === p.tasks.length;
-                      const phaseStatus = isPhaseDone ? "done" : (p.status === "current" ? "current" : "upcoming");
-
-                      return (
-                        <div key={p.id} className="flex items-center gap-3 py-1">
-                          <div
-                            className={cn(
-                              "flex h-8 w-8 items-center justify-center rounded-full border-2 font-display text-xs font-black shrink-0",
-                              phaseStatus === "done" && "border-secondary bg-secondary text-foreground",
-                              phaseStatus === "current" && "border-coral bg-coral text-coral-foreground",
-                              phaseStatus === "upcoming" && "border-border bg-background text-muted-foreground",
-                            )}
-                          >
-                            {phaseStatus === "done" ? <Check className="h-4 w-4" /> : i + 1}
-                          </div>
-                          <div className={cn("text-sm font-bold truncate", phaseStatus === "current" ? "text-foreground" : "text-muted-foreground")}>{p.title}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </aside>
-
-                <div className="space-y-4">
-                  {mockRoadmap.map((phase, i) => (
-                    <PhaseCard key={phase.id} phase={phase} index={i + 1} />
-                  ))}
-                </div>
-              </div>
-            </TabsContent>
           </Tabs>
-        </div>
-
-        {/* Side Rail: Job Match Predictor */}
-        <aside className="space-y-4">
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ type: "spring", stiffness: 80, damping: 15 }}
-            className="rounded-3xl border-2 border-border bg-surface p-5 space-y-4 shadow-sm"
-          >
-            <div className="flex items-center gap-2 pb-2 border-b border-border">
-              <Brain className="h-5 w-5 text-secondary" />
-              <h3 className="font-display text-base font-extrabold text-foreground">Matched Job Predictions</h3>
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Based on your logged workshop skills, volunteering, projects, and fair attendance, our predictor calculates your career inclinations.
-            </p>
-
-            <motion.div 
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="space-y-4"
-            >
-              {predictedJobs.map((job) => (
-                <motion.div 
-                  key={job.name}
-                  variants={cardVariants}
-                  whileHover={{ y: -2 }}
-                  className="space-y-1.5 p-3 rounded-2xl bg-background border border-border"
-                >
-                  <div className="flex justify-between items-center text-xs font-extrabold">
-                    <span className="text-foreground">{job.name}</span>
-                    <span className="text-secondary">{job.totalScore}% match</span>
-                  </div>
-                  
-                  {/* Animated Progress bar */}
-                  <div className="h-2 overflow-hidden rounded-full bg-muted">
-                    <motion.div
-                      className="h-full rounded-full bg-secondary"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${job.totalScore}%` }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
-                    />
-                  </div>
-
-                  <p className="text-[10px] text-muted-foreground leading-tight">{job.description}</p>
-                  
-                  <div className="pt-1.5 flex items-center gap-1 text-[9px] font-black text-coral uppercase tracking-wider">
-                    <ShieldCheck className="h-3 w-3" /> {job.factor}
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            <div className="pt-2">
-              <Link to="/career-vision">
-                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                  <Button className="w-full text-xs font-black gap-1.5 py-4" variant="outline">
-                    Launch Career Vision Simulator <ChevronRight className="h-3.5 w-3.5" />
-                  </Button>
-                </motion.div>
-              </Link>
-            </div>
-          </motion.div>
-        </aside>
       </div>
     </AnimatedPage>
-  );
-};
-
-const PhaseCard = ({ phase, index }: { phase: RoadmapPhase; index: number }) => {
-  const { roadmapTaskState } = useProgression();
-  const isDone = (taskId: string, fallback: boolean) => roadmapTaskState[taskId] ?? fallback;
-  const done = phase.tasks.filter((t) => isDone(t.id, t.done)).length;
-  return (
-    <Collapsible defaultOpen={phase.status === "current"}>
-      <article
-        className={cn(
-          "rounded-3xl border-2 bg-surface",
-          phase.status === "current" ? "border-coral" : "border-border",
-        )}
-      >
-        <CollapsibleTrigger className="group flex w-full items-center justify-between gap-4 p-5 text-left font-display">
-          <div className="flex items-center gap-4">
-            <div
-              className={cn(
-                "flex h-11 w-11 items-center justify-center rounded-2xl font-display text-lg font-black",
-                phase.status === "done" && "bg-secondary text-foreground",
-                phase.status === "current" && "bg-coral text-coral-foreground",
-                phase.status === "upcoming" && "bg-muted text-muted-foreground",
-              )}
-            >
-              {phase.status === "done" ? <Check className="h-5 w-5" /> : index}
-            </div>
-            <div>
-              <div className="font-display text-xl font-extrabold">{phase.title}</div>
-              <div className="text-xs text-muted-foreground">{done}/{phase.tasks.length} complete</div>
-            </div>
-          </div>
-          <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
-        </CollapsibleTrigger>
-
-        <CollapsibleContent>
-          <div className="space-y-3 px-5 pb-5">
-            <div className="flex items-center gap-3 rounded-2xl bg-background p-3">
-              <Jumpy size="xs" animate="float" />
-              <div className="text-sm font-semibold text-foreground">{phase.encouragement}</div>
-            </div>
-            <ul className="space-y-2">
-              {phase.tasks.map((t) => {
-                const checked = isDone(t.id, t.done);
-                return (
-                  <li key={t.id} className="flex items-center justify-between rounded-xl border-2 border-border bg-background px-3 py-2.5">
-                    <div className="flex items-center gap-3">
-                      <Checkbox
-                        checked={checked}
-                        onCheckedChange={(v) => progressionStore.toggleRoadmapTask(t.id, v === true, t.done)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      <span className={cn("text-sm font-semibold", checked && "text-muted-foreground line-through")}>
-                        {t.label}
-                      </span>
-                    </div>
-                    {t.due && <span className="text-xs text-muted-foreground">{t.due}</span>}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </CollapsibleContent>
-      </article>
-    </Collapsible>
   );
 };
 
