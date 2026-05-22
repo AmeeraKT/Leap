@@ -1,5 +1,6 @@
 // This file is modified to use a local-storage based mock client.
 // All Supabase database calls run in offline-mode.
+import { DEMO_EMAIL, DEMO_PROFILE, DEMO_USER_ID } from "@/lib/demo-account";
 import type { Database } from './types';
 
 const SESSION_KEY = "leap.mock.session";
@@ -85,28 +86,46 @@ export const supabase = {
     },
 
     signInWithPassword: async ({ email }: any) => {
-      const existingProfile = getLocalProfile();
+      const isDemo = email === DEMO_EMAIL;
+      const existingProfile = isDemo ? null : getLocalProfile();
+      const profile = isDemo
+        ? DEMO_PROFILE
+        : existingProfile ?? {
+            id: "mock-user-id",
+            name: "Explorer",
+            age: 22,
+            location: "Sydney, Australia",
+            current_education: "none",
+            desired_field: "",
+            interests: [],
+          };
+
       const mockUser = {
-        id: existingProfile?.id || "mock-user-id",
+        id: profile.id ?? existingProfile?.id ?? "mock-user-id",
         email,
         user_metadata: {
-          name: existingProfile?.name || "Explorer",
-        }
+          name: profile.name ?? "Explorer",
+        },
       };
       const mockSession = { user: mockUser };
 
       localStorage.setItem(SESSION_KEY, JSON.stringify(mockSession));
-      if (!existingProfile) {
-        localStorage.setItem(PROFILE_KEY, JSON.stringify({
-          id: mockUser.id,
-          name: "Explorer",
-          age: 22,
-          location: "Sydney, Australia",
-          current_education: "none",
-          desired_field: "",
-          interests: [],
-        }));
-      }
+      localStorage.setItem(PROFILE_KEY, JSON.stringify({ ...profile, id: mockUser.id }));
+
+      notifyAuthChange("SIGNED_IN", mockSession);
+      return { data: { user: mockUser, session: mockSession }, error: null };
+    },
+
+    signInAsDemo: async () => {
+      const mockUser = {
+        id: DEMO_USER_ID,
+        email: DEMO_EMAIL,
+        user_metadata: { name: DEMO_PROFILE.name },
+      };
+      const mockSession = { user: mockUser };
+
+      localStorage.setItem(SESSION_KEY, JSON.stringify(mockSession));
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(DEMO_PROFILE));
 
       notifyAuthChange("SIGNED_IN", mockSession);
       return { data: { user: mockUser, session: mockSession }, error: null };

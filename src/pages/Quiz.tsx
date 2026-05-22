@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Mail, Lock, User, MapPin, ChevronDown, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Mail, Lock, User, MapPin, ChevronDown, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { defaultQuiz, type QuizState } from "@/lib/quiz-types";
 import { progressionStore } from "@/lib/progression-store";
+import { DEMO_QUIZ } from "@/lib/demo-account";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { AnimatedPage } from "@/components/AnimatedPage";
@@ -73,6 +74,25 @@ const Quiz = () => {
 
   const update = <K extends keyof QuizState>(k: K, v: QuizState[K]) =>
     setData((d) => ({ ...d, [k]: v }));
+
+  const signInAsDemo = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInAsDemo();
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      sessionStorage.setItem("leap-quiz", JSON.stringify(DEMO_QUIZ));
+      progressionStore.grantQuizComplete();
+      toast.success("Welcome, Alex! You're using the demo account. 🐸");
+      navigate("/dashboard");
+    } catch {
+      toast.error("Could not start the demo. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const validateAndSubmit = async () => {
     if (!email.trim() || !email.includes("@")) {
@@ -201,6 +221,27 @@ const Quiz = () => {
             {mode === "signUp"
               ? "Create your account and build your personalized roadmap in seconds."
               : "Log in to your account and track your brand milestones."}
+          </p>
+        </div>
+
+        <div className="mb-6">
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+            className="w-full h-12 rounded-xl border-2 font-display font-bold"
+            onClick={signInAsDemo}
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            ) : (
+              <Sparkles className="mr-2 h-5 w-5 text-secondary" />
+            )}
+            Continue with demo account
+          </Button>
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Instantly sign in as Alex Chen — no form needed
           </p>
         </div>
 
