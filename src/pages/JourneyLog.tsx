@@ -4,6 +4,7 @@ import { Plus, Calendar, Mic } from "lucide-react";
 import { useExperiences, type Experience } from "@/lib/experiences-store";
 import { ExperienceCard } from "@/components/ExperienceCard";
 import { JumpyNudge } from "@/components/JumpyNudge";
+import { StreakPanel } from "@/components/StreakPanel";
 import { cn } from "@/lib/utils";
 
 const FILTERS: Array<{ label: string; value: "All" | Experience["type"] | "People" }> = [
@@ -28,7 +29,6 @@ const JourneyLog = () => {
   const unsharedCount = experiences.filter(
     (e) => !Object.values(e.posted).some(Boolean),
   ).length;
-  const thisMonth = experiences.filter((e) => e.date.includes("2026")).length;
   const firstUnshared = experiences.find((e) => !Object.values(e.posted).some(Boolean));
 
   return (
@@ -109,22 +109,12 @@ const JourneyLog = () => {
             </div>
           </button>
 
-          <div className="rounded-3xl border-2 border-border bg-surface p-4">
-            <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Brand streak</div>
-            <div className="mt-2 font-display text-3xl font-black">{thisMonth}</div>
-            <div className="text-xs text-muted-foreground">experiences logged in 2026</div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-              <div
-                className="h-full rounded-full bg-secondary"
-                style={{ width: `${Math.min(100, thisMonth * 12)}%` }}
-              />
-            </div>
-            {unsharedCount > 0 && (
-              <p className="mt-3 text-xs text-muted-foreground">
-                <span className="font-bold text-coral">{unsharedCount} unshared</span> · turn them into content
-              </p>
-            )}
-          </div>
+          <StreakPanel />
+          {unsharedCount > 0 && (
+            <p className="rounded-2xl border-2 border-border bg-surface px-3 py-2 text-xs text-muted-foreground">
+              <span className="font-bold text-coral">{unsharedCount} unshared</span> · turn them into content
+            </p>
+          )}
 
           <div className="rounded-3xl border-2 border-border bg-surface p-4">
             <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">

@@ -198,6 +198,10 @@ function save(items: Experience[]) {
 
 // Simple pub/sub so multiple components stay in sync.
 const listeners = new Set<() => void>();
+
+function notify() {
+  listeners.forEach((l) => l());
+}
 let cache: Experience[] | null = null;
 
 function getAll(): Experience[] {
@@ -208,10 +212,16 @@ function getAll(): Experience[] {
 function setAll(next: Experience[]) {
   cache = next;
   save(next);
-  listeners.forEach((l) => l());
+  notify();
+}
+
+function subscribeExperiences(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
 }
 
 export const experiencesStore = {
+  subscribe: subscribeExperiences,
   list: () => getAll(),
   get: (id: string) => getAll().find((e) => e.id === id),
   add: (exp: Experience) => {

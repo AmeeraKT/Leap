@@ -2,8 +2,11 @@ import { Link } from "react-router-dom";
 import { Check, ChevronRight, Newspaper, Flame, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Jumpy } from "@/components/Jumpy";
+import { AchievementBadges } from "@/components/AchievementBadges";
+import { JumpyNudge } from "@/components/JumpyNudge";
 import { mockChecklist, mockNews, mockPathways, mockUser } from "@/lib/mock-data";
+import { getGamificationNudge } from "@/lib/gamification-nudges";
+import { useExperiences } from "@/lib/experiences-store";
 import { progressionStore, useProgression } from "@/lib/progression-store";
 import { cn } from "@/lib/utils";
 
@@ -12,8 +15,11 @@ const currentStep = 1;
 
 const Dashboard = () => {
   const plan = mockPathways[0];
-  const { roadmapTaskState, xp, level, streakDays } = useProgression();
+  const progression = useProgression();
+  const experiences = useExperiences();
+  const { roadmapTaskState, xp, level, streakDays } = progression;
   const checklistDone = mockChecklist.filter((t) => roadmapTaskState[t.id] ?? t.done).length;
+  const nudge = getGamificationNudge(progression, experiences);
 
   return (
     <div className="container py-8 md:py-10">
@@ -125,16 +131,16 @@ const Dashboard = () => {
             ))}
           </ul>
         </Card>
+
+        <Card title="Achievements" emoji="🏆" action={<Link to="/about-me" className="text-xs font-bold text-coral">View all →</Link>}>
+          <div className="mt-3">
+            <AchievementBadges compact />
+          </div>
+        </Card>
       </div>
 
-      {/* Jumpy nudge */}
-      <div className="mt-8 flex items-center gap-4 rounded-3xl border-2 border-border bg-surface p-5">
-        <Jumpy size="sm" animate="float" />
-        <div className="flex-1">
-          <div className="font-display text-lg font-extrabold">Need a hand with anything?</div>
-          <div className="text-sm text-muted-foreground">I can draft your personal statement or compare scholarships in seconds.</div>
-        </div>
-        <Link to="/chat"><Button variant="hero" size="sm">Chat now</Button></Link>
+      <div className="mt-8">
+        <JumpyNudge message={nudge.message} ctaLabel={nudge.ctaLabel} to={nudge.to} />
       </div>
     </div>
   );
