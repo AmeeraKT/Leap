@@ -12,7 +12,6 @@ import {
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Jumpy } from "@/components/Jumpy";
-import { JumpyLauncher } from "@/components/JumpyLauncher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion } from "framer-motion";
 import { AnimatedPage } from "@/components/AnimatedPage";
@@ -331,7 +330,6 @@ const Home = () => {
           <div>© {new Date().getFullYear()} Leap. Built with 🐸 for students building their brand.</div>
         </div>
       </footer>
-      <JumpyLauncher />
     </AnimatedPage>
   );
 };
