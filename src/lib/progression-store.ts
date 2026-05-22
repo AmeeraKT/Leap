@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { mockRoadmap } from "@/lib/mock-data";
+import { mockChecklist, mockRoadmap } from "@/lib/mock-data";
 
 export const XP_RULES = {
   quizComplete: 100,
@@ -20,9 +20,22 @@ export interface ProgressionState {
   achievementsUnlocked: string[];
   roadmapTaskState: Record<string, boolean>;
   xpGrants: Record<string, boolean>;
+  weeklyLogWeekKey: string;
+  weeklyLogCount: number;
+  streakFreezeMonth: string | null;
 }
 
-const STORAGE_KEY = "leap.progression.v1";
+export type CelebrationKind = "level_up" | "achievement";
+
+export interface CelebrationEvent {
+  id: string;
+  kind: CelebrationKind;
+  title: string;
+  message: string;
+  emoji?: string;
+}
+
+const STORAGE_KEY = "leap.progression.v2";
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
@@ -32,6 +45,19 @@ function yesterdayIso(): string {
   const d = new Date();
   d.setDate(d.getDate() - 1);
   return d.toISOString().slice(0, 10);
+}
+
+function currentWeekKey(): string {
+  const d = new Date();
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(d);
+  monday.setDate(diff);
+  return monday.toISOString().slice(0, 10);
+}
+
+function currentMonthKey(): string {
+  return new Date().toISOString().slice(0, 7);
 }
 
 export function levelFromXp(xp: number): number {
@@ -65,6 +91,9 @@ function seedRoadmapTaskState(): Record<string, boolean> {
       state[task.id] = task.done;
     }
   }
+  for (const item of mockChecklist) {
+    state[item.id] = item.done;
+  }
   return state;
 }
 
@@ -75,13 +104,41 @@ const DEFAULT: ProgressionState = {
   achievementsUnlocked: [],
   roadmapTaskState: seedRoadmapTaskState(),
   xpGrants: { quiz_complete: true },
+  weeklyLogWeekKey: currentWeekKey(),
+  weeklyLogCount: 0,
+  streakFreezeMonth: null,
 };
+
+function migrateV1(): ProgressionState | null {
+  try {
+    const raw = localStorage.getItem("leap.progression.v1");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as ProgressionState;
+    return {
+      ...DEFAULT,
+      ...parsed,
+      roadmapTaskState: { ...seedRoadmapTaskState(), ...parsed.roadmapTaskState },
+      weeklyLogWeekKey: currentWeekKey(),
+      weeklyLogCount: 0,
+      streakFreezeMonth: null,
+    };
+  } catch {
+    return null;
+  }
+}
 
 function load(): ProgressionState {
   if (typeof window === "undefined") return DEFAULT;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { ...DEFAULT, roadmapTaskState: seedRoadmapTaskState() };
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      const migrated = migrateV1();
+      if (migrated) {
+        save(migrated);
+        return migrated;
+      }
+      return { ...DEFAULT, roadmapTaskState: seedRoadmapTaskState() };
+    }
     const parsed = JSON.parse(raw) as ProgressionState;
     return {
       ...DEFAULT,
@@ -89,6 +146,9 @@ function load(): ProgressionState {
       roadmapTaskState: { ...seedRoadmapTaskState(), ...parsed.roadmapTaskState },
       achievementsUnlocked: parsed.achievementsUnlocked ?? [],
       xpGrants: parsed.xpGrants ?? {},
+      weeklyLogWeekKey: parsed.weeklyLogWeekKey ?? currentWeekKey(),
+      weeklyLogCount: parsed.weeklyLogCount ?? 0,
+      streakFreezeMonth: parsed.streakFreezeMonth ?? null,
     };
   } catch {
     return { ...DEFAULT, roadmapTaskState: seedRoadmapTaskState() };
@@ -101,6 +161,14 @@ function save(state: ProgressionState) {
   } catch {
     /* ignore quota errors */
   }
+}
+
+function bumpWeeklyLog(state: ProgressionState): ProgressionState {
+  const weekKey = currentWeekKey();
+  if (state.weeklyLogWeekKey === weekKey) {
+    return { ...state, weeklyLogCount: state.weeklyLogCount + 1 };
+  }
+  return { ...state, weeklyLogWeekKey: weekKey, weeklyLogCount: 1 };
 }
 
 function bumpStreak(state: ProgressionState): ProgressionState {
@@ -116,6 +184,7 @@ function bumpStreak(state: ProgressionState): ProgressionState {
 }
 
 const listeners = new Set<() => void>();
+const celebrationQueue: CelebrationEvent[] = [];
 let cache: ProgressionState | null = null;
 
 function getState(): ProgressionState {
@@ -129,24 +198,29 @@ function setState(next: ProgressionState) {
   listeners.forEach((l) => l());
 }
 
+function enqueueCelebration(event: CelebrationEvent) {
+  celebrationQueue.push(event);
+  listeners.forEach((l) => l());
+}
+
 export interface GrantXpOptions {
-  /** One-time grant id; skips if already granted */
   grantKey?: string;
-  /** Shown in toast, e.g. "Win logged" */
   label?: string;
   showToast?: boolean;
+  countAsWeeklyLog?: boolean;
 }
 
 function grantXp(amount: number, options: GrantXpOptions = {}): boolean {
   if (amount <= 0) return false;
 
-  const { grantKey, label, showToast = true } = options;
+  const { grantKey, label, showToast = true, countAsWeeklyLog = false } = options;
   let state = getState();
 
   if (grantKey && state.xpGrants[grantKey]) return false;
 
   const prevLevel = levelFromXp(state.xp);
   state = bumpStreak(state);
+  if (countAsWeeklyLog) state = bumpWeeklyLog(state);
   state = {
     ...state,
     xp: state.xp + amount,
@@ -159,9 +233,16 @@ function grantXp(amount: number, options: GrantXpOptions = {}): boolean {
   if (showToast) {
     const msg = label ? `+${amount} XP — ${label}` : `+${amount} XP`;
     toast.success(msg);
-    if (newLevel > prevLevel) {
-      toast.success(`Level up! You're now Lvl ${newLevel} 🐸`, { duration: 4000 });
-    }
+  }
+
+  if (newLevel > prevLevel) {
+    enqueueCelebration({
+      id: `level-${newLevel}-${Date.now()}`,
+      kind: "level_up",
+      title: `Level ${newLevel}!`,
+      message: "Jumpy is proud — you're hopping faster than ever.",
+      emoji: "🐸",
+    });
   }
 
   return true;
@@ -172,12 +253,21 @@ export const progressionStore = {
   getLevel: () => levelFromXp(getState().xp),
   getXp: () => getState().xp,
   getStreak: () => getState().streakDays,
+  subscribe: (listener: () => void) => {
+    listeners.add(listener);
+    return () => listeners.delete(listener);
+  },
+  consumeCelebration: (): CelebrationEvent | null => celebrationQueue.shift() ?? null,
   isRoadmapTaskDone: (taskId: string, fallback = false) =>
     getState().roadmapTaskState[taskId] ?? fallback,
   grantQuizComplete: () =>
     grantXp(XP_RULES.quizComplete, { grantKey: "quiz_complete", label: "Quiz complete" }),
   grantJourneyLog: (experienceId: string) =>
-    grantXp(XP_RULES.journeyLog, { grantKey: `journey:${experienceId}`, label: "Win logged" }),
+    grantXp(XP_RULES.journeyLog, {
+      grantKey: `journey:${experienceId}`,
+      label: "Win logged",
+      countAsWeeklyLog: true,
+    }),
   grantContentPosted: (experienceId: string, format: string) =>
     grantXp(XP_RULES.contentPosted, {
       grantKey: `posted:${experienceId}:${format}`,
@@ -201,14 +291,39 @@ export const progressionStore = {
       });
     }
   },
-  unlockAchievement: (id: string) => {
+  useStreakFreeze: () => {
+    const state = getState();
+    const month = currentMonthKey();
+    if (state.streakFreezeMonth === month) {
+      toast.error("Streak freeze already used this month.");
+      return;
+    }
+    setState({
+      ...state,
+      streakFreezeMonth: month,
+      lastActiveDate: todayIso(),
+    });
+    toast.success("Streak freeze applied — you're safe for today! ❄️");
+  },
+  unlockAchievement: (
+    id: string,
+    meta?: { title: string; emoji: string; silent?: boolean },
+  ) => {
     const state = getState();
     if (state.achievementsUnlocked.includes(id)) return;
     setState({
       ...state,
       achievementsUnlocked: [...state.achievementsUnlocked, id],
     });
-    toast.success(`Achievement unlocked: ${id} 🏆`);
+    if (!meta?.silent) {
+      enqueueCelebration({
+        id: `ach-${id}-${Date.now()}`,
+        kind: "achievement",
+        title: meta?.title ?? "Achievement unlocked",
+        message: "New badge added to your profile.",
+        emoji: meta?.emoji ?? "🏆",
+      });
+    }
   },
 };
 

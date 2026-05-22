@@ -213,6 +213,10 @@ function saveLocal(items: Experience[]) {
 }
 
 const listeners = new Set<() => void>();
+
+function notify() {
+  listeners.forEach((l) => l());
+}
 let cache: Experience[] | null = null;
 let currentUser: any = null;
 
@@ -225,8 +229,13 @@ function getAll(): Experience[] {
 
 function setAllLocal(next: Experience[]) {
   cache = next;
-  saveLocal(next);
-  listeners.forEach((l) => l());
+  save(next);
+  notify();
+}
+
+function subscribeExperiences(listener: () => void) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
 }
 
 async function syncFromDb() {
@@ -261,6 +270,7 @@ supabase.auth.getSession().then(({ data: { session } }) => {
 });
 
 export const experiencesStore = {
+  subscribe: subscribeExperiences,
   list: () => getAll(),
   get: (id: string) => getAll().find((e) => e.id === id),
   

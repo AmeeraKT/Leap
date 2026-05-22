@@ -4,10 +4,7 @@ import { Plus, Mic, Sparkles, Send, Copy, Laptop, Layout, FileText, Globe } from
 import { useExperiences, type Experience } from "@/lib/experiences-store";
 import { ExperienceCard } from "@/components/ExperienceCard";
 import { JumpyNudge } from "@/components/JumpyNudge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { StreakPanel } from "@/components/StreakPanel";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { AnimatedPage } from "@/components/AnimatedPage";
@@ -68,7 +65,6 @@ const JourneyLog = () => {
   const unsharedCount = experiences.filter(
     (e) => !Object.values(e.posted).some(Boolean),
   ).length;
-  const thisMonth = experiences.filter((e) => e.date.includes("2026")).length;
   const firstUnshared = experiences.find((e) => !Object.values(e.posted).some(Boolean));
 
   // Find the selected experience in Content Studio
@@ -423,35 +419,24 @@ const JourneyLog = () => {
                 Select one of your logged experiences to draft targeted, professional social media posts.
               </p>
 
-              <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-2">Select Win</label>
-                <select
-                  value={studioExpId}
-                  onChange={(e) => {
-                    setStudioExpId(e.target.value);
-                    setDrafts(null);
-                  }}
-                  className="w-full rounded-xl border-2 border-border bg-background px-3 py-2.5 text-xs font-bold focus-visible:outline-none focus-visible:border-secondary"
-                >
-                  {experiences.map((exp) => (
-                    <option key={exp.id} value={exp.id}>
-                      {exp.title} ({exp.type})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Button
-                  onClick={generateSocialPosts}
-                  disabled={isGenerating || !studioExpId}
-                  variant="hero"
-                  className="w-full font-black py-5"
-                >
-                  {isGenerating ? "Writing Drafts..." : "Generate AI Drafts"}
-                </Button>
-              </motion.div>
+        {/* Right rail */}
+        <aside className="hidden space-y-4 lg:block">
+          <button className="group flex w-full items-center gap-3 rounded-3xl border-2 border-border bg-surface p-4 text-left transition-colors hover:border-coral">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-coral text-coral-foreground">
+              <Mic className="h-5 w-5" />
             </div>
+            <div>
+              <div className="font-display text-sm font-extrabold">Quick voice log</div>
+              <div className="text-xs text-muted-foreground">Tap to record (coming soon)</div>
+            </div>
+          </button>
+
+          <StreakPanel />
+          {unsharedCount > 0 && (
+            <p className="rounded-2xl border-2 border-border bg-surface px-3 py-2 text-xs text-muted-foreground">
+              <span className="font-bold text-coral">{unsharedCount} unshared</span> · turn them into content
+            </p>
+          )}
 
             {/* Generated output */}
             <div className="space-y-5">

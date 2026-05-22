@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Pencil, Download, GraduationCap, Briefcase, Wallet, Brain, Accessibility, Sparkles, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AchievementBadges } from "@/components/AchievementBadges";
 import { Jumpy } from "@/components/Jumpy";
 import { mockProfile } from "@/lib/mock-data";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,10 +9,7 @@ import { useProgression } from "@/lib/progression-store";
 import { Progress } from "@/components/ui/progress";
 
 const AboutMe = () => {
-  const [profile, setProfile] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const { xp, level, levelProgress, streakDays } = useProgression();
+  const { xp, level, levelProgress, streakDays, achievementsUnlocked } = useProgression();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -111,6 +109,16 @@ const AboutMe = () => {
           <Button variant="hero" size="sm"><Pencil className="h-4 w-4" /> Edit profile</Button>
         </div>
       </div>
+
+      <section className="mb-8 rounded-3xl border-2 border-border bg-surface p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-display text-xl font-extrabold">Achievements</h2>
+          <span className="text-xs font-bold text-muted-foreground">
+            {achievementsUnlocked.length} / 8 unlocked
+          </span>
+        </div>
+        <AchievementBadges />
+      </section>
 
       {/* Sections */}
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">

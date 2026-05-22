@@ -3,7 +3,12 @@ import { Link } from "react-router-dom";
 import { Check, ChevronRight, Calendar, ListTodo, Bell, MapPin, Users, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Jumpy } from "@/components/Jumpy";
+import { AchievementBadges } from "@/components/AchievementBadges";
+import { JumpyNudge } from "@/components/JumpyNudge";
+import { mockChecklist, mockNews, mockPathways, mockUser } from "@/lib/mock-data";
+import { getGamificationNudge } from "@/lib/gamification-nudges";
+import { useExperiences } from "@/lib/experiences-store";
+import { progressionStore, useProgression } from "@/lib/progression-store";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { AnimatedPage } from "@/components/AnimatedPage";
@@ -371,41 +376,60 @@ const Dashboard = () => {
               ))}
             </motion.div>
           </div>
+        </Card>
 
-          <div className="mt-6 pt-4 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-            <span>Powered by your Jumpy Buddy recommendations</span>
+        {/* Checklist */}
+        <Card title="Checklist" emoji="✅" action={<span className="text-xs font-bold text-muted-foreground">{checklistDone}/{mockChecklist.length} done</span>}>
+          <ul className="mt-3 space-y-2">
+            {mockChecklist.map((t) => {
+              const checked = roadmapTaskState[t.id] ?? t.done;
+              return (
+              <li key={t.id} className="flex items-center justify-between rounded-xl border-2 border-border bg-background px-3 py-2">
+                <div className="flex items-center gap-3">
+                  <Checkbox
+                    checked={checked}
+                    onCheckedChange={(v) => progressionStore.toggleRoadmapTask(t.id, v === true)}
+                  />
+                  <span className={cn("text-sm font-semibold", checked && "text-muted-foreground line-through")}>{t.task}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {t.urgent && !checked && <span className="rounded-full bg-coral/15 px-2 py-0.5 text-[10px] font-bold uppercase text-coral">Urgent</span>}
+                  <span className="text-xs text-muted-foreground">{t.due}</span>
+                </div>
+              </li>
+            );
+            })}
+          </ul>
+        </Card>
+
+        {/* News */}
+        <Card title="Recent news" emoji="📰">
+          <ul className="mt-3 space-y-3">
+            {mockNews.map((n) => (
+              <li key={n.id} className="flex items-start gap-3 rounded-xl border-2 border-border bg-background p-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-foreground">
+                  <Newspaper className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-bold leading-snug">{n.title}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{n.source} • {n.time}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Card>
+
+        <Card title="Achievements" emoji="🏆" action={<Link to="/about-me" className="text-xs font-bold text-coral">View all →</Link>}>
+          <div className="mt-3">
+            <AchievementBadges compact />
           </div>
-        </section>
+        </Card>
       </div>
 
-      {/* Jumpy Nudge / Help */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        whileHover={{ y: -3 }}
-        className="flex flex-col sm:flex-row items-center gap-4 rounded-3xl border-2 border-border bg-surface p-6 shadow-sm"
-      >
-        <div className="shrink-0 flex items-center justify-center p-3 rounded-full bg-secondary/10">
-          <Jumpy size="sm" animate="float" />
-        </div>
-        <div className="flex-1 text-center sm:text-left space-y-1">
-          <h3 className="font-display text-lg font-black text-foreground">
-            Looking for tailored advice?
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Chat with Jumpy to get instant advice on Passion Mapping, LinkedIn branding, or creating custom roadmap steps.
-          </p>
-        </div>
-        <Link to="/career-vision" className="w-full sm:w-auto shrink-0">
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="hero" className="w-full sm:w-auto font-black px-6 py-5">
-              Talk to Jumpy Coach
-            </Button>
-          </motion.div>
-        </Link>
-      </motion.div>
-    </AnimatedPage>
+      <div className="mt-8">
+        <JumpyNudge message={nudge.message} ctaLabel={nudge.ctaLabel} to={nudge.to} />
+      </div>
+    </div>
   );
 };
 
