@@ -116,6 +116,27 @@
     font-family: 'Nunito', system-ui, sans-serif;
     @apply font-extrabold tracking-tight;
   }
+
+  /* Enforce a minimum font size of 16px across the application */
+  .text-xs,
+  .text-sm,
+  small,
+  [class*="text-[9px]"],
+  [class*="text-[10px]"],
+  [class*="text-[11px]"],
+  [class*="text-[12px]"],
+  [class*="text-[13px]"],
+  [class*="text-[14px]"],
+  [class*="text-[15px]"],
+  .text-\[9px\],
+  .text-\[10px\],
+  .text-\[11px\],
+  .text-\[12px\],
+  .text-\[13px\],
+  .text-\[14px\],
+  .text-\[15px\] {
+    font-size: 16px !important;
+  }
 }
 
 @layer utilities {
