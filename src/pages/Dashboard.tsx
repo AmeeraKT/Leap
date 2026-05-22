@@ -49,7 +49,8 @@ const itemVariants = {
 const Dashboard = () => {
   const [currentStep, setCurrentStep] = useState(2); // Start at Networker
   const [userName, setUserName] = useState("Explorer");
-  const { xp, level, streakDays } = useProgression();
+  const { xp, level, streakDays, roadmapTaskState = {} } = useProgression();
+  const checklistDone = mockChecklist.filter((t) => roadmapTaskState[t.id] ?? t.done).length;
 
   const plannerTasks = usePlannerTasks();
   const discoverStates = useDiscoverStates();
