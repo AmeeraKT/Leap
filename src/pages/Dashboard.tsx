@@ -1,16 +1,16 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Check, ChevronRight, Calendar, ListTodo, Bell, MapPin, Users, Sparkles, Newspaper } from "lucide-react";
+import { Check, ChevronRight, Calendar, ListTodo, Bell, MapPin, Users, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AchievementBadges } from "@/components/AchievementBadges";
+import { Jumpy } from "@/components/Jumpy";
 import { JumpyNudge } from "@/components/JumpyNudge";
-import { mockChecklist, mockNews, mockPathways, mockUser } from "@/lib/mock-data";
 import { getGamificationNudge } from "@/lib/gamification-nudges";
 import { useExperiences } from "@/lib/experiences-store";
 import { cn } from "@/lib/utils";
-import { progressionStore, useProgression } from "@/lib/progression-store";
-import { motion } from "framer-motion";
+import { useProgression } from "@/lib/progression-store";
+import { motion, useReducedMotion } from "framer-motion";
 import { AnimatedPage } from "@/components/AnimatedPage";
 import { usePlannerTasks, roadmapStore } from "@/lib/roadmap-store";
 import { useDiscoverStates, discoverStore } from "@/lib/discover-store";
@@ -46,13 +46,33 @@ const itemVariants = {
   },
 };
 
+const frogTravelHop = {
+  y: [0, -32, 6, -16, 0],
+  scaleX: [1, 0.92, 1.05, 0.98, 1],
+};
+
+const frogIdleHop = {
+  y: [0, -20, 3, -10, 0],
+  scaleX: [1, 0.96, 1.02, 0.99, 1],
+};
+
+const IDLE_HOP_MIN_MS = 2800;
+const IDLE_HOP_MAX_MS = 5800;
+
 const Dashboard = () => {
   const [currentStep, setCurrentStep] = useState(2); // Start at Networker
+  const [hopTrigger, setHopTrigger] = useState(0);
+  const [hopKind, setHopKind] = useState<"idle" | "travel">("travel");
+  const prefersReducedMotion = useReducedMotion();
+  const [frogTarget, setFrogTarget] = useState({ x: 0, y: 0 });
+  const [frogVisible, setFrogVisible] = useState(false);
+  const progressContainerRef = useRef<HTMLDivElement>(null);
+  const stepMarkerRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const resetIdleHopTimerRef = useRef<(() => void) | null>(null);
   const [userName, setUserName] = useState("Explorer");
   const progression = useProgression();
-  const { xp, level, streakDays, roadmapTaskState = {} } = progression;
+  const { xp, level, streakDays } = progression;
   const experiences = useExperiences();
-  const checklistDone = mockChecklist.filter((t) => roadmapTaskState[t.id] ?? t.done).length;
   const nudge = getGamificationNudge(progression, experiences);
 
   const plannerTasks = usePlannerTasks();
@@ -151,6 +171,61 @@ const Dashboard = () => {
 
   const completedCount = todos.filter((t) => t.done).length;
 
+  const updateFrogPosition = useCallback((stepIndex: number) => {
+    const container = progressContainerRef.current;
+    const marker = stepMarkerRefs.current[stepIndex];
+    if (!container || !marker) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const markerRect = marker.getBoundingClientRect();
+    setFrogTarget({
+      x: markerRect.left - containerRect.left + markerRect.width / 2,
+      y: markerRect.top - containerRect.top + markerRect.height / 2,
+    });
+    setFrogVisible(true);
+  }, []);
+
+  const handleStepClick = (index: number) => {
+    setCurrentStep(index);
+    setHopKind("travel");
+    setHopTrigger((t) => t + 1);
+    resetIdleHopTimerRef.current?.();
+    requestAnimationFrame(() => updateFrogPosition(index));
+  };
+
+  useEffect(() => {
+    const positionFrog = () => {
+      requestAnimationFrame(() => updateFrogPosition(currentStep));
+    };
+    positionFrog();
+    window.addEventListener("resize", positionFrog);
+    return () => window.removeEventListener("resize", positionFrog);
+  }, [currentStep, updateFrogPosition]);
+
+  useEffect(() => {
+    if (!frogVisible || prefersReducedMotion) return;
+
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    const scheduleIdleHop = () => {
+      clearTimeout(timeoutId);
+      const delay = IDLE_HOP_MIN_MS + Math.random() * (IDLE_HOP_MAX_MS - IDLE_HOP_MIN_MS);
+      timeoutId = setTimeout(() => {
+        setHopKind("idle");
+        setHopTrigger((t) => t + 1);
+        scheduleIdleHop();
+      }, delay);
+    };
+
+    resetIdleHopTimerRef.current = scheduleIdleHop;
+    scheduleIdleHop();
+
+    return () => {
+      clearTimeout(timeoutId);
+      resetIdleHopTimerRef.current = null;
+    };
+  }, [frogVisible, prefersReducedMotion]);
+
   return (
     <AnimatedPage className="container py-8 md:py-10 space-y-8 overflow-x-hidden">
       {/* Header */}
@@ -197,7 +272,7 @@ const Dashboard = () => {
           </span>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-4 relative">
+        <div ref={progressContainerRef} className="grid gap-6 md:grid-cols-4 relative min-h-[88px] md:min-h-[120px]">
           {/* Progress line connector */}
           <div className="absolute top-[18px] left-[12%] right-[12%] h-[2px] bg-border -z-10 hidden md:block" />
           <div
@@ -205,17 +280,43 @@ const Dashboard = () => {
             style={{ width: `${(currentStep / (steps.length - 1)) * 76}%` }}
           />
 
+          {/* Hopping frog mascot */}
+          {frogVisible && (
+            <motion.div
+              className="absolute z-20 pointer-events-none"
+              initial={false}
+              animate={{ left: frogTarget.x, top: frogTarget.y }}
+              transition={{ type: "spring", stiffness: 320, damping: 24 }}
+              style={{ x: "-50%", y: "-50%" }}
+            >
+              <motion.div
+                key={hopTrigger}
+                initial={{ y: 0, scaleX: 1 }}
+                animate={hopKind === "travel" ? frogTravelHop : frogIdleHop}
+                transition={{
+                  duration: hopKind === "travel" ? 0.55 : 0.42,
+                  ease: "easeOut",
+                }}
+              >
+                <Jumpy size="sm" animate="none" className="drop-shadow-md" />
+              </motion.div>
+            </motion.div>
+          )}
+
           {steps.map((s, i) => (
             <motion.div
               key={s.label}
-              onClick={() => setCurrentStep(i)}
+              onClick={() => handleStepClick(i)}
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.98 }}
               className="flex flex-row md:flex-col items-center md:text-center gap-4 md:gap-3 cursor-pointer group"
             >
               <div
+                ref={(el) => {
+                  stepMarkerRefs.current[i] = el;
+                }}
                 className={cn(
-                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 font-display text-sm font-black transition-all duration-300",
+                  "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 font-display text-sm font-black transition-all duration-300",
                   i < currentStep && "border-secondary bg-secondary text-foreground scale-105",
                   i === currentStep && "border-coral bg-coral text-coral-foreground ring-4 ring-coral/20 scale-110",
                   i > currentStep && "border-border bg-surface text-muted-foreground group-hover:border-foreground/30",
@@ -275,7 +376,10 @@ const Dashboard = () => {
                   >
                     <div className="flex items-start gap-3 flex-1 min-w-0">
                       <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
-                        <Checkbox checked={todo.done} onCheckedChange={() => toggleTodo(todo.id)} />
+                        <Checkbox
+                          checked={todo.done}
+                          onCheckedChange={(v) => roadmapStore.togglePlannerTask(todo.id, v === true)}
+                        />
                       </div>
                       <div className="min-w-0">
                         <span className={cn("text-sm font-bold leading-tight block text-foreground", todo.done && "text-muted-foreground line-through")}>
@@ -380,47 +484,6 @@ const Dashboard = () => {
             </motion.div>
           </div>
         </section>
-
-        {/* Checklist */}
-        <Card title="Checklist" emoji="✅" action={<span className="text-xs font-bold text-muted-foreground">{checklistDone}/{mockChecklist.length} done</span>}>
-          <ul className="mt-3 space-y-2">
-            {mockChecklist.map((t) => {
-              const checked = roadmapTaskState[t.id] ?? t.done;
-              return (
-              <li key={t.id} className="flex items-center justify-between rounded-xl border-2 border-border bg-background px-3 py-2">
-                <div className="flex items-center gap-3">
-                  <Checkbox
-                    checked={checked}
-                    onCheckedChange={(v) => progressionStore.toggleRoadmapTask(t.id, v === true)}
-                  />
-                  <span className={cn("text-sm font-semibold", checked && "text-muted-foreground line-through")}>{t.task}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {t.urgent && !checked && <span className="rounded-full bg-coral/15 px-2 py-0.5 text-[10px] font-bold uppercase text-coral">Urgent</span>}
-                  <span className="text-xs text-muted-foreground">{t.due}</span>
-                </div>
-              </li>
-            );
-            })}
-          </ul>
-        </Card>
-
-        {/* News */}
-        <Card title="Recent news" emoji="📰">
-          <ul className="mt-3 space-y-3">
-            {mockNews.map((n) => (
-              <li key={n.id} className="flex items-start gap-3 rounded-xl border-2 border-border bg-background p-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-foreground">
-                  <Newspaper className="h-4 w-4" />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-sm font-bold leading-snug">{n.title}</div>
-                  <div className="mt-1 text-xs text-muted-foreground">{n.source} • {n.time}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Card>
 
         <Card title="Achievements" emoji="🏆" action={<Link to="/about-me" className="text-xs font-bold text-coral">View all →</Link>}>
           <div className="mt-3">

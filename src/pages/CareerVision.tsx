@@ -389,52 +389,6 @@ const CareerVision = () => {
             Leverage Mistral AI to map your attended events to optimal job roles and consult with Jumpy, your career consultant buddy.
           </p>
         </div>
-
-        {/* API Settings */}
-        <div className="relative shrink-0">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowKeyInput(!showKeyInput)}
-            className="font-bold gap-2 text-xs"
-          >
-            <Key className="h-4 w-4 text-muted-foreground" />
-            {apiKey ? "Mistral API: Configured ✓" : "Configure Mistral API"}
-          </Button>
-          
-          {showKeyInput && (
-            <div className="absolute right-0 mt-2 p-4 bg-surface border-2 border-border rounded-2xl shadow-xl w-72 z-50 space-y-3">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-muted-foreground uppercase">Mistral API Key</label>
-                <Input
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Paste your Mistral Key..."
-                  className="h-9 text-xs"
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={handleSaveApiKey} size="sm" className="flex-1 font-bold text-xs">
-                  Save Key
-                </Button>
-                <Button
-                  onClick={() => {
-                    localStorage.removeItem("mistral_api_key");
-                    setApiKey("");
-                    setShowKeyInput(false);
-                    toast({ title: "Key Cleared", description: "Using built-in simulation fallback." });
-                  }}
-                  variant="outline"
-                  size="sm"
-                  className="font-bold text-xs"
-                >
-                  Clear
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Subsection Tabs */}
@@ -478,7 +432,11 @@ const CareerVision = () => {
                         selectedEventIds.includes(e.id) ? "border-secondary bg-secondary/5 text-foreground" : "border-border bg-background text-muted-foreground"
                       )}
                     >
-                      <Checkbox checked={selectedEventIds.includes(e.id)} />
+                      <Checkbox
+                        checked={selectedEventIds.includes(e.id)}
+                        onCheckedChange={() => toggleEventSelection(e.id)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
                       <span className="truncate flex-1">{e.title}</span>
                     </div>
                   ))

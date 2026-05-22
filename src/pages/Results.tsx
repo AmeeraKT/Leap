@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Jumpy } from "@/components/Jumpy";
-import { JumpyLauncher } from "@/components/JumpyLauncher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { defaultQuiz, type QuizState } from "@/lib/quiz-types";
 import { cn } from "@/lib/utils";
@@ -116,7 +115,6 @@ const Results = () => {
           </motion.div>
         </div>
       </motion.div>
-      <JumpyLauncher />
     </AnimatedPage>
   );
 };

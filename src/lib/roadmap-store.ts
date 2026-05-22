@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { progressionStore } from "@/lib/progression-store";
 
 export interface Milestone {
   id: string;

@@ -8,8 +8,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProgression } from "@/lib/progression-store";
 import { Progress } from "@/components/ui/progress";
 
+interface ProfileData {
+  name?: string;
+  age?: number;
+  location?: string;
+  current_education?: string;
+  desired_field?: string;
+  interests?: string[];
+}
+
 const AboutMe = () => {
   const { xp, level, levelProgress, streakDays, achievementsUnlocked } = useProgression();
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [user, setUser] = useState<{ email?: string } | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
