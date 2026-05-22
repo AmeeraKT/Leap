@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { progressionStore } from "@/lib/progression-store";
 
 export interface Milestone {
   id: string;
@@ -193,6 +194,8 @@ export const roadmapStore = {
     if (!item) return;
 
     const nextDone = done ?? !item.done;
+    if (nextDone === item.done) return;
+
     const next = list.map((m) => (m.id === id ? { ...m, done: nextDone } : m));
 
     if (currentUser) {
@@ -204,11 +207,13 @@ export const roadmapStore = {
       if (!error) {
         milestoneCache = next;
         milestoneListeners.forEach((l) => l());
+        if (nextDone) progressionStore.grantChecklistItem(`milestone:${id}`, "Milestone complete");
         return;
       }
     }
 
     setLocalMilestones(next);
+    if (nextDone) progressionStore.grantChecklistItem(`milestone:${id}`, "Milestone complete");
   },
 
   addMilestones: async (newMilestones: Milestone[]) => {
@@ -245,6 +250,8 @@ export const roadmapStore = {
     if (!item) return;
 
     const nextDone = done ?? !item.done;
+    if (nextDone === item.done) return;
+
     const next = list.map((pt) => (pt.id === id ? { ...pt, done: nextDone } : pt));
 
     if (currentUser) {
@@ -256,11 +263,13 @@ export const roadmapStore = {
       if (!error) {
         plannerCache = next;
         plannerListeners.forEach((l) => l());
+        if (nextDone) progressionStore.grantChecklistItem(`planner:${id}`, "Task complete");
         return;
       }
     }
 
     setLocalPlanner(next);
+    if (nextDone) progressionStore.grantChecklistItem(`planner:${id}`, "Task complete");
   },
 
   addPlannerTasks: async (newTasks: Omit<PlannerTask, "id" | "done">[]) => {

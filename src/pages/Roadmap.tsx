@@ -575,7 +575,7 @@ const PhaseCard = ({ phase, index }: { phase: RoadmapPhase; index: number }) => 
                     <div className="flex items-center gap-3">
                       <Checkbox
                         checked={checked}
-                        onCheckedChange={(v) => progressionStore.toggleRoadmapTask(t.id, v === true)}
+                        onCheckedChange={(v) => progressionStore.toggleRoadmapTask(t.id, v === true, t.done)}
                         onClick={(e) => e.stopPropagation()}
                       />
                       <span className={cn("text-sm font-semibold", checked && "text-muted-foreground line-through")}>
@@ -662,7 +662,7 @@ const Module = ({
               checked={item.checked}
               disabled={item.readOnly}
               onCheckedChange={(v) =>
-                progressionStore.toggleRoadmapTask(`brand-${item.id}`, v === true)
+                progressionStore.toggleRoadmapTask(`brand-${item.id}`, v === true, item.done)
               }
               onClick={(e) => e.stopPropagation()}
             />

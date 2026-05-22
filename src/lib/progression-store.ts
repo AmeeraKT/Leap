@@ -278,9 +278,11 @@ export const progressionStore = {
       grantKey: `generate:${experienceId}:${format}`,
       label: "Draft created",
     }),
-  toggleRoadmapTask: (taskId: string, done?: boolean) => {
+  grantChecklistItem: (grantKey: string, label = "Task complete") =>
+    grantXp(XP_RULES.roadmapTask, { grantKey, label }),
+  toggleRoadmapTask: (taskId: string, done?: boolean, fallbackDone = false) => {
     const state = getState();
-    const wasDone = state.roadmapTaskState[taskId] ?? false;
+    const wasDone = state.roadmapTaskState[taskId] ?? fallbackDone;
     const nextDone = done ?? !wasDone;
     const next = { ...state, roadmapTaskState: { ...state.roadmapTaskState, [taskId]: nextDone } };
     setState(bumpStreak(next));
