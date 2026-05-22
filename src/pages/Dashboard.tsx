@@ -1,15 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Check, ChevronRight, Calendar, ListTodo, Bell, MapPin, Users, Sparkles, Newspaper } from "lucide-react";
+import { Check, ChevronRight, Calendar, ListTodo, Bell, MapPin, Users, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AchievementBadges } from "@/components/AchievementBadges";
 import { JumpyNudge } from "@/components/JumpyNudge";
-import { mockChecklist, mockNews, mockPathways, mockUser } from "@/lib/mock-data";
 import { getGamificationNudge } from "@/lib/gamification-nudges";
 import { useExperiences } from "@/lib/experiences-store";
 import { cn } from "@/lib/utils";
-import { progressionStore, useProgression } from "@/lib/progression-store";
+import { useProgression } from "@/lib/progression-store";
 import { motion } from "framer-motion";
 import { AnimatedPage } from "@/components/AnimatedPage";
 import { usePlannerTasks, roadmapStore } from "@/lib/roadmap-store";
@@ -50,9 +49,8 @@ const Dashboard = () => {
   const [currentStep, setCurrentStep] = useState(2); // Start at Networker
   const [userName, setUserName] = useState("Explorer");
   const progression = useProgression();
-  const { xp, level, streakDays, roadmapTaskState = {} } = progression;
+  const { xp, level, streakDays } = progression;
   const experiences = useExperiences();
-  const checklistDone = mockChecklist.filter((t) => roadmapTaskState[t.id] ?? t.done).length;
   const nudge = getGamificationNudge(progression, experiences);
 
   const plannerTasks = usePlannerTasks();
@@ -380,47 +378,6 @@ const Dashboard = () => {
             </motion.div>
           </div>
         </section>
-
-        {/* Checklist */}
-        <Card title="Checklist" emoji="✅" action={<span className="text-xs font-bold text-muted-foreground">{checklistDone}/{mockChecklist.length} done</span>}>
-          <ul className="mt-3 space-y-2">
-            {mockChecklist.map((t) => {
-              const checked = roadmapTaskState[t.id] ?? t.done;
-              return (
-              <li key={t.id} className="flex items-center justify-between rounded-xl border-2 border-border bg-background px-3 py-2">
-                <div className="flex items-center gap-3">
-                  <Checkbox
-                    checked={checked}
-                    onCheckedChange={(v) => progressionStore.toggleRoadmapTask(t.id, v === true)}
-                  />
-                  <span className={cn("text-sm font-semibold", checked && "text-muted-foreground line-through")}>{t.task}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {t.urgent && !checked && <span className="rounded-full bg-coral/15 px-2 py-0.5 text-[10px] font-bold uppercase text-coral">Urgent</span>}
-                  <span className="text-xs text-muted-foreground">{t.due}</span>
-                </div>
-              </li>
-            );
-            })}
-          </ul>
-        </Card>
-
-        {/* News */}
-        <Card title="Recent news" emoji="📰">
-          <ul className="mt-3 space-y-3">
-            {mockNews.map((n) => (
-              <li key={n.id} className="flex items-start gap-3 rounded-xl border-2 border-border bg-background p-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-foreground">
-                  <Newspaper className="h-4 w-4" />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-sm font-bold leading-snug">{n.title}</div>
-                  <div className="mt-1 text-xs text-muted-foreground">{n.source} • {n.time}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Card>
 
         <Card title="Achievements" emoji="🏆" action={<Link to="/about-me" className="text-xs font-bold text-coral">View all →</Link>}>
           <div className="mt-3">
