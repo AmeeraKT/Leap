@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { progressionStore } from "@/lib/progression-store";
 
 export interface Person { name: string; role?: string; linkedin?: string; }
 export interface Experience {
@@ -264,6 +265,9 @@ export const experiencesStore = {
   get: (id: string) => getAll().find((e) => e.id === id),
   
   add: async (exp: Experience) => {
+    let resultExp = exp;
+    let didAdd = false;
+
     if (currentUser) {
       const dbRow = mapToDb(exp);
       dbRow.user_id = currentUser.id;
@@ -275,16 +279,21 @@ export const experiencesStore = {
         .single();
         
       if (!error && data) {
-        const newExp = mapFromDb(data);
-        cache = [newExp, ...getAll()];
+        resultExp = mapFromDb(data);
+        cache = [resultExp, ...getAll()];
         listeners.forEach((l) => l());
-        return newExp;
+        didAdd = true;
       }
     }
     
-    const newItems = [exp, ...getAll()];
-    setAllLocal(newItems);
-    return exp;
+    if (!didAdd) {
+      const newItems = [exp, ...getAll()];
+      setAllLocal(newItems);
+      resultExp = exp;
+    }
+
+    progressionStore.grantJourneyLog(resultExp.id);
+    return resultExp;
   },
 
   update: async (id: string, patch: Partial<Experience>) => {
@@ -310,7 +319,9 @@ export const experiencesStore = {
     const item = getAll().find((e) => e.id === id);
     if (!item) return;
     
+    const alreadyPosted = item.posted[format];
     const nextPosted = { ...item.posted, [format]: true };
+    let didUpdate = false;
     
     if (currentUser) {
       const { error } = await supabase
@@ -321,12 +332,18 @@ export const experiencesStore = {
       if (!error) {
         cache = getAll().map((e) => (e.id === id ? { ...e, posted: nextPosted } : e));
         listeners.forEach((l) => l());
+        didUpdate = true;
       }
-      return;
     }
 
-    const next = getAll().map((e) => (e.id === id ? { ...e, posted: nextPosted } : e));
-    setAllLocal(next);
+    if (!didUpdate) {
+      const next = getAll().map((e) => (e.id === id ? { ...e, posted: nextPosted } : e));
+      setAllLocal(next);
+    }
+
+    if (!alreadyPosted) {
+      progressionStore.grantContentPosted(id, format);
+    }
   },
 };
 

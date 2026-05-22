@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Jumpy } from "@/components/Jumpy";
 import { mockProfile } from "@/lib/mock-data";
 import { supabase } from "@/integrations/supabase/client";
+import { useProgression } from "@/lib/progression-store";
+import { Progress } from "@/components/ui/progress";
 
 const AboutMe = () => {
   const [profile, setProfile] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { xp, level, levelProgress, streakDays } = useProgression();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -42,13 +45,9 @@ const AboutMe = () => {
     }
   };
 
-  // Determine user display details
   const displayName = profile?.name || "Alex Chen";
   const displayEmail = user?.email || "alex.chen@example.com";
-  const displayLevel = user ? "1" : "4";
-  const displayXp = user ? "0" : "1240";
 
-  // Build profile sections based on whether user is logged in
   const academicsFields = profile
     ? [
         { label: "Education Level", value: formatEducation(profile.current_education) },
@@ -88,11 +87,22 @@ const AboutMe = () => {
             <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">About me</div>
             <h1 className="font-display text-3xl font-black">{displayName}</h1>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-              <span className="rounded-full bg-coral/15 px-2.5 py-0.5 font-bold text-coral">Lvl {displayLevel}</span>
+              <span className="rounded-full bg-coral/15 px-2.5 py-0.5 font-bold text-coral">Lvl {level}</span>
               <span>•</span>
-              <span>{displayXp} XP</span>
+              <span>{xp.toLocaleString()} XP</span>
+              <span>•</span>
+              <span>{streakDays}-day streak</span>
               <span>•</span>
               <span>{displayEmail}</span>
+            </div>
+            <div className="mt-3 max-w-md">
+              <div className="mb-1 flex justify-between text-[11px] font-bold text-muted-foreground">
+                <span>Progress to Lvl {level + 1}</span>
+                <span>
+                  {levelProgress.current} / {levelProgress.needed} XP
+                </span>
+              </div>
+              <Progress value={levelProgress.percent} className="h-2" />
             </div>
           </div>
         </div>

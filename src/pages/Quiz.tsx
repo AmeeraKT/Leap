@@ -8,6 +8,7 @@ import { Jumpy } from "@/components/Jumpy";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { defaultQuiz, type QuizState } from "@/lib/quiz-types";
+import { progressionStore } from "@/lib/progression-store";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { AnimatedPage } from "@/components/AnimatedPage";
@@ -121,6 +122,7 @@ const Quiz = () => {
 
         // Save user configuration to session storage for temporary results matching compatibility
         sessionStorage.setItem("leap-quiz", JSON.stringify(data));
+        progressionStore.grantQuizComplete();
         toast.success("Account created successfully! Finding your matches... 🐸");
         navigate("/results");
       } catch (err) {

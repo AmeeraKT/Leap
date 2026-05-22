@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useProgression } from "@/lib/progression-store";
 
 const links = [
   { to: "/dashboard", label: "Dashboard" },
@@ -23,6 +24,7 @@ export const Navbar = () => {
   const [profileName, setProfileName] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
+  const { level } = useProgression();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -102,7 +104,7 @@ export const Navbar = () => {
             <>
               <div className="hidden items-center gap-2 rounded-full border-2 border-border bg-surface px-3 py-1.5 lg:flex">
                 <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Lvl</span>
-                <span className="font-display text-sm font-black">4</span>
+                <span className="font-display text-sm font-black">{level}</span>
               </div>
               <Link to="/about-me" title="Profile Details">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary font-display text-sm font-black text-foreground hover:opacity-85 transition-opacity">

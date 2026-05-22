@@ -10,6 +10,7 @@ import { AnimatedPage } from "@/components/AnimatedPage";
 import { usePlannerTasks, roadmapStore } from "@/lib/roadmap-store";
 import { useDiscoverStates, discoverStore } from "@/lib/discover-store";
 import { supabase } from "@/integrations/supabase/client";
+import { useProgression } from "@/lib/progression-store";
 
 const steps = [
   { label: "Explorer", desc: "Discovering interests & matching paths" },
@@ -44,6 +45,7 @@ const itemVariants = {
 const Dashboard = () => {
   const [currentStep, setCurrentStep] = useState(2); // Start at Networker
   const [userName, setUserName] = useState("Explorer");
+  const { xp, level, streakDays } = useProgression();
 
   const plannerTasks = usePlannerTasks();
   const discoverStates = useDiscoverStates();
@@ -150,9 +152,11 @@ const Dashboard = () => {
           <h1 className="mt-1 font-display text-3xl font-black md:text-4xl">
             Welcome back, {userName} 🐸
           </h1>
-          <p className="text-sm text-muted-foreground">
-            You're currently in the <span className="font-bold text-foreground">{steps[currentStep].label}</span> phase. Let's make some moves!
-          </p>
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground font-bold">
+            <span>You're currently in the <span className="text-foreground">{steps[currentStep].label}</span> phase.</span>
+            <span>•</span>
+            <span className="text-coral">Lvl {level} · {xp.toLocaleString()} XP · {streakDays}-day streak</span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="relative">
