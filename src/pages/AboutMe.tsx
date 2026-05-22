@@ -1,22 +1,77 @@
-import { Pencil, Download, GraduationCap, Briefcase, Wallet, Brain, Accessibility, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Pencil, Download, GraduationCap, Briefcase, Wallet, Brain, Accessibility, Sparkles, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AchievementBadges } from "@/components/AchievementBadges";
 import { Jumpy } from "@/components/Jumpy";
-import { mockProfile, mockUser } from "@/lib/mock-data";
+import { mockProfile } from "@/lib/mock-data";
+import { supabase } from "@/integrations/supabase/client";
 import { useProgression } from "@/lib/progression-store";
 import { Progress } from "@/components/ui/progress";
 
-const sections = [
-  { key: "academics", title: "Academics", icon: GraduationCap, fields: mockProfile.academics },
-  { key: "career", title: "Career", icon: Briefcase, fields: mockProfile.career },
-  { key: "finance", title: "Finance", icon: Wallet, fields: mockProfile.finance },
-  { key: "personality", title: "Personality", icon: Brain, fields: mockProfile.personality },
-  { key: "accessibility", title: "Accessibility", icon: Accessibility, fields: mockProfile.accessibility },
-  { key: "lifestyle", title: "Lifestyle", icon: Sparkles, fields: mockProfile.lifestyle },
-];
-
 const AboutMe = () => {
   const { xp, level, levelProgress, streakDays, achievementsUnlocked } = useProgression();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+      if (session?.user) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        if (!error && data) {
+          setProfile(data);
+        }
+      }
+      setLoading(false);
+    };
+    fetchProfile();
+  }, []);
+
+  const formatEducation = (code: string) => {
+    switch (code) {
+      case "hs": return "High School";
+      case "diploma": return "Diploma / TAFE";
+      case "bachelor": return "Bachelor's Degree";
+      case "masters": return "Master's Degree";
+      case "phd": return "PhD / Doctorate";
+      case "none": return "None";
+      default: return code || "Not set";
+    }
+  };
+
+  const displayName = profile?.name || "Alex Chen";
+  const displayEmail = user?.email || "alex.chen@example.com";
+
+  const academicsFields = profile
+    ? [
+        { label: "Education Level", value: formatEducation(profile.current_education) },
+        { label: "Desired Field", value: profile.desired_field || "Not set" },
+        { label: "Interests", value: profile.interests?.join(", ") || "None" },
+      ]
+    : mockProfile.academics;
+
+  const locationFields = profile
+    ? [
+        { label: "Location", value: profile.location || "Not set" },
+        { label: "Age", value: profile.age?.toString() || "Not set" },
+      ]
+    : [
+        { label: "Location", value: "Sydney, Australia" },
+        { label: "Age", value: "22" },
+      ];
+
+  const sections = [
+    { key: "academics", title: "Academics & Goals", icon: GraduationCap, fields: academicsFields },
+    { key: "location", title: "Personal Details", icon: MapPin, fields: locationFields },
+    { key: "career", title: "Mock Career", icon: Briefcase, fields: mockProfile.career },
+    { key: "finance", title: "Mock Finance", icon: Wallet, fields: mockProfile.finance },
+    { key: "personality", title: "Mock Personality", icon: Brain, fields: mockProfile.personality },
+    { key: "lifestyle", title: "Mock Lifestyle", icon: Sparkles, fields: mockProfile.lifestyle },
+  ];
 
   return (
     <div className="container py-8 md:py-10">
@@ -28,7 +83,7 @@ const AboutMe = () => {
           </div>
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">About me</div>
-            <h1 className="font-display text-3xl font-black">{mockUser.name}</h1>
+            <h1 className="font-display text-3xl font-black">{displayName}</h1>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span className="rounded-full bg-coral/15 px-2.5 py-0.5 font-bold text-coral">Lvl {level}</span>
               <span>•</span>
@@ -36,7 +91,7 @@ const AboutMe = () => {
               <span>•</span>
               <span>{streakDays}-day streak</span>
               <span>•</span>
-              <span>{mockUser.email}</span>
+              <span>{displayEmail}</span>
             </div>
             <div className="mt-3 max-w-md">
               <div className="mb-1 flex justify-between text-[11px] font-bold text-muted-foreground">
