@@ -49,12 +49,12 @@ const Roadmap = () => {
   const milestones = useMilestones();
   const plannerTasks = usePlannerTasks();
 
-  const toggleMilestone = (id: string, done?: boolean) => {
-    roadmapStore.toggleMilestone(id, done);
+  const setMilestoneDone = (id: string, done: boolean) => {
+    roadmapStore.setMilestoneDone(id, done);
   };
 
-  const togglePlannerTask = (id: string, done?: boolean) => {
-    roadmapStore.togglePlannerTask(id, done);
+  const setPlannerTaskDone = (id: string, done: boolean) => {
+    roadmapStore.setPlannerTaskDone(id, done);
   };
 
   const regenerateAIPlan = async () => {
@@ -183,64 +183,45 @@ const Roadmap = () => {
             <TabsContent value="milestones" className="mt-6 space-y-6 focus-visible:outline-none">
               <MilestoneGamePath milestones={milestones} onToggle={toggleMilestone} />
 
-              {/* Matched Job Predictions — below quest map */}
-              <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 80, damping: 15 }}
-                className="rounded-3xl border-2 border-border bg-surface p-5 md:p-6 space-y-4 shadow-sm"
-              >
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-2">
-                    <Brain className="h-5 w-5 text-secondary" />
-                    <h3 className="font-display text-lg font-extrabold text-foreground">Matched Job Predictions</h3>
-                  </div>
-                  <Link to="/career-vision">
-                    <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                      <Button variant="outline" size="sm" className="text-xs font-black gap-1.5">
-                        Career Vision Simulator <ChevronRight className="h-3.5 w-3.5" />
-                      </Button>
-                    </motion.div>
-                  </Link>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Based on your logged workshop skills, volunteering, projects, and fair attendance, our predictor calculates your career inclinations.
-                </p>
-
-                <motion.div
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="visible"
-                  className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
-                >
-                  {predictedJobs.map((job) => (
-                    <motion.div
-                      key={job.name}
-                      variants={cardVariants}
-                      whileHover={{ y: -2 }}
-                      className="space-y-2 rounded-2xl border-2 border-border bg-background p-4"
-                    >
-                      <div className="flex justify-between items-start gap-2 text-xs font-extrabold">
-                        <span className="text-foreground leading-snug">{job.name}</span>
-                        <span className="shrink-0 text-secondary">{job.totalScore}%</span>
-                      </div>
-
-                      <div className="h-2 overflow-hidden rounded-full bg-muted">
-                        <motion.div
-                          className="h-full rounded-full bg-secondary"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${job.totalScore}%` }}
-                          transition={{ duration: 0.8, ease: "easeOut" }}
-                        />
-                      </div>
-
-                      <p className="text-[11px] text-muted-foreground leading-snug">{job.description}</p>
-
-                      <div className="flex items-center gap-1 text-[9px] font-black text-coral uppercase tracking-wider">
-                        <ShieldCheck className="h-3 w-3 shrink-0" /> {job.factor}
-                      </div>
-                    </motion.div>
-                  ))}
+                  <motion.ul layout className="space-y-2">
+                    {milestones
+                      .filter(m => m.phase === phase)
+                      .map((m) => (
+                        <motion.li
+                          layout
+                          key={m.id}
+                          whileHover={{ scale: 1.01, x: 2 }}
+                          className={cn(
+                            "flex items-start justify-between rounded-xl border-2 p-3.5 bg-background hover:border-foreground/20 transition-all",
+                            m.done ? "border-border/40 opacity-70" : "border-border shadow-sm",
+                          )}
+                        >
+                          <div className="flex items-start gap-3 flex-1 min-w-0">
+                            <div className="pt-0.5">
+                              <Checkbox
+                                checked={m.done}
+                                onCheckedChange={(v) => setMilestoneDone(m.id, v === true)}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setMilestoneDone(m.id, !m.done)}
+                              className="min-w-0 flex-1 text-left cursor-pointer"
+                            >
+                              <span className={cn("text-sm font-bold leading-snug block text-foreground", m.done && "text-muted-foreground line-through")}>
+                                {m.title}
+                              </span>
+                              <span className="text-xs text-muted-foreground block mt-0.5">{m.desc}</span>
+                            </button>
+                          </div>
+                          {m.aiSuggested && (
+                            <span className="shrink-0 ml-3 inline-flex items-center gap-1 rounded-full bg-coral/10 border border-coral/20 px-2 py-0.5 text-[9px] font-black text-coral uppercase">
+                              <Sparkles className="h-2.5 w-2.5" /> AI Custom
+                            </span>
+                          )}
+                        </motion.li>
+                      ))}
+                  </motion.ul>
                 </motion.div>
               </motion.section>
             </TabsContent>
@@ -304,24 +285,28 @@ const Roadmap = () => {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.95 }}
                           key={pt.id}
-                          onClick={() => togglePlannerTask(pt.id)}
                           whileHover={{ scale: 1.01, x: 2 }}
-                          whileTap={{ scale: 0.99 }}
                           className={cn(
-                            "flex items-center justify-between rounded-xl border-2 p-3.5 bg-background cursor-pointer hover:border-foreground/20 transition-all",
+                            "flex items-center justify-between rounded-xl border-2 p-3.5 bg-background hover:border-foreground/20 transition-all",
                             pt.done ? "border-border/40 opacity-70" : "border-border shadow-sm",
                           )}
                         >
-                          <div className="flex items-center gap-3">
-                            <div onClick={(e) => e.stopPropagation()}>
-                              <Checkbox
-                                checked={pt.done}
-                                onCheckedChange={(v) => togglePlannerTask(pt.id, v === true)}
-                              />
-                            </div>
-                            <span className={cn("text-sm font-bold text-foreground", pt.done && "text-muted-foreground line-through")}>
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <Checkbox
+                              checked={pt.done}
+                              onCheckedChange={(v) => setPlannerTaskDone(pt.id, v === true)}
+                              aria-label={`Mark "${pt.task}" as ${pt.done ? "incomplete" : "complete"}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setPlannerTaskDone(pt.id, !pt.done)}
+                              className={cn(
+                                "text-sm font-bold text-left text-foreground cursor-pointer",
+                                pt.done && "text-muted-foreground line-through",
+                              )}
+                            >
                               {pt.task}
-                            </span>
+                            </button>
                           </div>
                           <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
                             <Clock className="h-3 w-3" /> {pt.dueDate}

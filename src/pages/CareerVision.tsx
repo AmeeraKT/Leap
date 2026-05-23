@@ -10,6 +10,13 @@ import { useExperiences } from "@/lib/experiences-store";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { roadmapStore } from "@/lib/roadmap-store";
+import {
+  buildFallbackRoast,
+  parseRoastResponse,
+  RESUME_ROAST_SYSTEM_PROMPT,
+  type ResumeRoastAnalysis,
+} from "@/lib/resume-roast";
+import { ResumeRoastResults } from "@/components/ResumeRoastResults";
 
 interface JobPrediction {
   title: string;
@@ -57,8 +64,31 @@ const CareerVision = () => {
   // Resume Roaster State
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isRoasting, setIsRoasting] = useState(false);
-  const [roastResult, setRoastResult] = useState<string | null>(null);
+  const [roastAnalysis, setRoastAnalysis] = useState<ResumeRoastAnalysis | null>(null);
+  const [resumePreviewUrl, setResumePreviewUrl] = useState<string | null>(null);
+  const [resumeTextPreview, setResumeTextPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!resumeFile) {
+      setResumePreviewUrl(null);
+      setResumeTextPreview(null);
+      return;
+    }
+
+    const url = URL.createObjectURL(resumeFile);
+    setResumePreviewUrl(url);
+
+    const isTxt =
+      resumeFile.type === "text/plain" || resumeFile.name.toLowerCase().endsWith(".txt");
+    if (isTxt) {
+      resumeFile.text().then(setResumeTextPreview).catch(() => setResumeTextPreview(null));
+    } else {
+      setResumeTextPreview(null);
+    }
+
+    return () => URL.revokeObjectURL(url);
+  }, [resumeFile]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -305,14 +335,14 @@ const CareerVision = () => {
   const roastResume = async () => {
     if (!resumeFile) return;
     setIsRoasting(true);
-    setRoastResult(null);
+    setRoastAnalysis(null);
     const roasterKey = (import.meta.env.VITE_MISTRAL_AI_RESUME_ROASTER as string | undefined) || apiKey;
     try {
       let resumeContent = "";
-      if (resumeFile.type === "text/plain") {
-        resumeContent = await resumeFile.text();
+      if (resumeFile.type === "text/plain" || resumeFile.name.toLowerCase().endsWith(".txt")) {
+        resumeContent = resumeTextPreview ?? (await resumeFile.text());
       } else {
-        resumeContent = `[File: ${resumeFile.name} — binary PDF/DOCX. Roast based on typical weaknesses of a fresh graduate or student resume applying for tech roles.]`;
+        resumeContent = `[File: ${resumeFile.name} — binary PDF/DOCX. Infer likely skills and score criteria based on typical student/graduate tech resumes. Be specific in skill names.]`;
       }
       if (roasterKey) {
         const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
@@ -321,24 +351,26 @@ const CareerVision = () => {
           body: JSON.stringify({
             model: "open-mixtral-8x7b",
             messages: [
-              { role: "system", content: "You are the AI Resume Roaster — a brutally honest, hilariously savage career critic. Find every weakness, gap, buzzword, and embarrassing section in the resume and ROAST it mercilessly with wit and sarcasm. Be funny but genuinely constructive at the end. Format your response as 3-4 roast paragraphs, then a section titled '🔥 Redemption Arc (Fix These):' with 3 bullet-point tips." },
-              { role: "user", content: `Roast this resume:\n\n${resumeContent}` },
+              { role: "system", content: RESUME_ROAST_SYSTEM_PROMPT },
+              { role: "user", content: `Roast this resume and return the JSON analysis:\n\n${resumeContent}` },
             ],
           }),
         });
         if (!response.ok) {
           const errData = await response.json().catch(() => ({}));
-          throw new Error((errData as any)?.message || "Mistral API error");
+          throw new Error((errData as { message?: string })?.message || "Mistral API error");
         }
         const data = await response.json();
-        setRoastResult(data.choices[0].message.content);
+        const content = data.choices?.[0]?.message?.content as string;
+        setRoastAnalysis(parseRoastResponse(content));
       } else {
-        await new Promise(r => setTimeout(r, 2500));
-        setRoastResult(`🔥 **Roasting: ${resumeFile.name}** 🔥\n\nOh wow, where do I even begin? Your "Objective" statement reads like it was written in 2003 and left to marinate in mediocrity. "Seeking a challenging role to grow my skills" — congratulations, you've described every human on the planet.\n\nYour skills section lists Microsoft Word and Google Docs. Bold strategy listing software your grandmother has used since 1998. Recruiters are absolutely electrified by that level of innovation.\n\nThose 4-month internships look less like a career trajectory and more like someone who gets bored easily. The gaps between them are doing a lot of heavy lifting.\n\nNo LinkedIn, no GitHub, no portfolio? In 2025? We might as well have found this resume in a time capsule.\n\n🔥 Redemption Arc (Fix These):\n• Replace your Objective with a punchy 2-line Professional Summary tailored to the role.\n• Add quantified achievements — "Increased conversion by 23%" beats "Helped with marketing tasks".\n• Link your GitHub, portfolio, or LinkedIn — let the work do the talking.`);
+        await new Promise((r) => setTimeout(r, 2500));
+        setRoastAnalysis(buildFallbackRoast(resumeFile.name));
       }
       toast({ title: "Roast complete! 🔥", description: "Your resume has been thoroughly incinerated." });
-    } catch (err: any) {
-      toast({ variant: "destructive", title: "Roast Failed", description: err.message || "Could not contact Mistral API." });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Could not contact Mistral API.";
+      toast({ variant: "destructive", title: "Roast Failed", description: message });
     } finally {
       setIsRoasting(false);
     }
@@ -553,7 +585,7 @@ const CareerVision = () => {
                     <p className="text-sm font-bold text-foreground">{resumeFile.name}</p>
                     <p className="text-sm text-muted-foreground">{(resumeFile.size / 1024).toFixed(1)} KB · Ready to roast</p>
                   </div>
-                  <Button variant="outline" size="sm" className="text-sm font-bold" onClick={(e) => { e.stopPropagation(); setResumeFile(null); setRoastResult(null); }}>
+                  <Button variant="outline" size="sm" className="text-sm font-bold" onClick={(e) => { e.stopPropagation(); setResumeFile(null); setRoastAnalysis(null); }}>
                     Remove file
                   </Button>
                 </>
@@ -573,7 +605,7 @@ const CareerVision = () => {
                 className="hidden"
                 onChange={(e) => {
                   const f = e.target.files?.[0];
-                  if (f) { setResumeFile(f); setRoastResult(null); }
+                  if (f) { setResumeFile(f); setRoastAnalysis(null); }
                 }}
               />
             </div>
@@ -587,15 +619,26 @@ const CareerVision = () => {
               {isRoasting ? <><RefreshCw className="h-4 w-4 animate-spin" /> Incinerating your resume...</> : <><Flame className="h-4 w-4" /> Roast My Resume 🔥</>}
             </Button>
 
-            {/* Roast Output */}
-            {roastResult && (
-              <div className="rounded-2xl border-2 border-coral/30 bg-coral/5 p-5 space-y-3">
-                <div className="flex items-center gap-2 pb-2 border-b border-coral/20">
-                  <Flame className="h-5 w-5 text-coral" />
-                  <h3 className="font-display text-sm font-black text-coral uppercase tracking-wide">Roast Results</h3>
+            {resumeFile && resumePreviewUrl && !roastAnalysis && (
+              <div className="rounded-2xl border-2 border-border bg-background overflow-hidden">
+                <div className="px-4 py-3 border-b border-border bg-surface">
+                  <h3 className="font-display text-sm font-black text-foreground">Resume Preview</h3>
                 </div>
-                <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap font-medium">{roastResult}</div>
+                {(resumeFile.type === "application/pdf" || resumeFile.name.toLowerCase().endsWith(".pdf")) ? (
+                  <iframe title="Resume preview" src={resumePreviewUrl} className="h-[360px] w-full border-0" />
+                ) : resumeTextPreview ? (
+                  <pre className="h-[360px] overflow-auto p-4 text-xs font-mono whitespace-pre-wrap">{resumeTextPreview}</pre>
+                ) : null}
               </div>
+            )}
+
+            {roastAnalysis && resumeFile && (
+              <ResumeRoastResults
+                analysis={roastAnalysis}
+                resumeFile={resumeFile}
+                previewUrl={resumePreviewUrl}
+                textPreview={resumeTextPreview}
+              />
             )}
           </section>
         </TabsContent>

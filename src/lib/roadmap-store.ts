@@ -140,15 +140,27 @@ function setLocalPlanner(items: PlannerTask[]) {
   plannerListeners.forEach((l) => l());
 }
 
+function mergeDoneState<T extends { id: string; done: boolean }>(
+  previous: T[],
+  incoming: T[],
+): T[] {
+  const doneById = new Map(previous.map((item) => [item.id, item.done]));
+  return incoming.map((item) => ({
+    ...item,
+    done: doneById.has(item.id) ? doneById.get(item.id)! : item.done,
+  }));
+}
+
 async function syncMilestonesFromDb() {
   const { data, error } = await supabase
     .from("milestones")
     .select("*")
     .order("created_at", { ascending: true });
 
-  if (!error && data) {
-    milestoneCache = data.map(mapMilestoneFromDb);
-    milestoneListeners.forEach((l) => l());
+  if (!error && data && data.length > 0) {
+    const previous = getMilestones();
+    const incoming = data.map(mapMilestoneFromDb);
+    setLocalMilestones(mergeDoneState(previous, incoming));
   }
 }
 
@@ -158,9 +170,10 @@ async function syncPlannerFromDb() {
     .select("*")
     .order("created_at", { ascending: true });
 
-  if (!error && data) {
-    plannerCache = data.map(mapPlannerFromDb);
-    plannerListeners.forEach((l) => l());
+  if (!error && data && data.length > 0) {
+    const previous = getPlanner();
+    const incoming = data.map(mapPlannerFromDb);
+    setLocalPlanner(mergeDoneState(previous, incoming));
   }
 }
 
@@ -188,32 +201,23 @@ supabase.auth.getSession().then(({ data: { session } }) => {
 export const roadmapStore = {
   // Milestones Methods
   listMilestones: () => getMilestones(),
-  toggleMilestone: async (id: string, done?: boolean) => {
+  setMilestoneDone: async (id: string, done: boolean) => {
     const list = getMilestones();
     const item = list.find((m) => m.id === id);
-    if (!item) return;
+    if (!item || item.done === done) return;
 
-    const nextDone = done ?? !item.done;
-    if (nextDone === item.done) return;
-
-    const next = list.map((m) => (m.id === id ? { ...m, done: nextDone } : m));
+    const next = list.map((m) => (m.id === id ? { ...m, done } : m));
+    setLocalMilestones(next);
 
     if (currentUser) {
-      const { error } = await supabase
-        .from("milestones")
-        .update({ done: nextDone })
-        .eq("id", id);
-
-      if (!error) {
-        milestoneCache = next;
-        milestoneListeners.forEach((l) => l());
-        if (nextDone) progressionStore.grantChecklistItem(`milestone:${id}`, "Milestone complete");
-        return;
-      }
+      await supabase.from("milestones").update({ done }).eq("id", id);
     }
+  },
 
-    setLocalMilestones(next);
-    if (nextDone) progressionStore.grantChecklistItem(`milestone:${id}`, "Milestone complete");
+  toggleMilestone: async (id: string) => {
+    const item = getMilestones().find((m) => m.id === id);
+    if (!item) return;
+    await roadmapStore.setMilestoneDone(id, !item.done);
   },
 
   addMilestones: async (newMilestones: Milestone[]) => {
@@ -244,32 +248,23 @@ export const roadmapStore = {
 
   // Planner Tasks Methods
   listPlannerTasks: () => getPlanner(),
-  togglePlannerTask: async (id: string, done?: boolean) => {
+  setPlannerTaskDone: async (id: string, done: boolean) => {
     const list = getPlanner();
     const item = list.find((pt) => pt.id === id);
-    if (!item) return;
+    if (!item || item.done === done) return;
 
-    const nextDone = done ?? !item.done;
-    if (nextDone === item.done) return;
-
-    const next = list.map((pt) => (pt.id === id ? { ...pt, done: nextDone } : pt));
+    const next = list.map((pt) => (pt.id === id ? { ...pt, done } : pt));
+    setLocalPlanner(next);
 
     if (currentUser) {
-      const { error } = await supabase
-        .from("planner_tasks")
-        .update({ done: nextDone })
-        .eq("id", id);
-
-      if (!error) {
-        plannerCache = next;
-        plannerListeners.forEach((l) => l());
-        if (nextDone) progressionStore.grantChecklistItem(`planner:${id}`, "Task complete");
-        return;
-      }
+      await supabase.from("planner_tasks").update({ done }).eq("id", id);
     }
+  },
 
-    setLocalPlanner(next);
-    if (nextDone) progressionStore.grantChecklistItem(`planner:${id}`, "Task complete");
+  togglePlannerTask: async (id: string) => {
+    const item = getPlanner().find((pt) => pt.id === id);
+    if (!item) return;
+    await roadmapStore.setPlannerTaskDone(id, !item.done);
   },
 
   addPlannerTasks: async (newTasks: Omit<PlannerTask, "id" | "done">[]) => {
