@@ -382,7 +382,7 @@ const CareerVision = () => {
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Vision Builder</div>
-          <h1 className="mt-1 font-display text-3xl font-black md:text-4xl flex items-center gap-2">
+          <h1 className="mt-1 font-display text-3xl font-normal md:text-4xl flex items-center gap-2">
             Career Vision & Brand Coaching <Brain className="h-7 w-7 text-secondary" />
           </h1>
           <p className="text-sm text-muted-foreground">
@@ -393,7 +393,7 @@ const CareerVision = () => {
 
       {/* Subsection Tabs */}
       <Tabs defaultValue="predictor" className="w-full">
-        <TabsList className="flex w-full sm:w-fit justify-start gap-1 rounded-2xl border-2 border-border bg-surface p-1 flex-wrap font-display font-bold">
+        <TabsList className="flex w-full sm:w-fit justify-start gap-1 rounded-2xl border border-border bg-surface p-1 flex-wrap font-display font-bold">
           <TabsTrigger value="predictor" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
             <Sparkles className="h-4 w-4 mr-2 inline" /> AI Career Predictor
           </TabsTrigger>
@@ -407,11 +407,11 @@ const CareerVision = () => {
 
         {/* Tab 1: AI Career Predictor */}
         <TabsContent value="predictor" className="mt-6 focus-visible:outline-none">
-          <section className="rounded-3xl border-2 border-border bg-surface p-5 space-y-4 shadow-sm flex flex-col justify-between">
+          <section className="rounded-xl border border-border bg-surface p-5 space-y-4 shadow-sm flex flex-col justify-between">
             <div className="space-y-4">
               <div className="flex items-center gap-2 pb-2 border-b border-border">
                 <Sparkles className="h-5 w-5 text-coral animate-pulse" />
-                <h2 className="font-display text-lg font-black text-foreground">AI Career Predictor</h2>
+                <h2 className="font-display text-lg font-normal text-foreground">AI Career Predictor</h2>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Select which logged events or workshops to feed into the Mistral model to predict your top 5 inclined jobs.
@@ -444,7 +444,7 @@ const CareerVision = () => {
               </div>
               {/* Predictions Result */}
               {predictions === null ? (
-                <div className="rounded-2xl border-2 border-dashed border-border bg-background p-10 text-center space-y-2">
+                <div className="rounded-2xl border border-dashed border-border bg-background p-10 text-center space-y-2">
                   <Brain className="h-10 w-10 text-muted-foreground/40 mx-auto" />
                   <h3 className="text-sm font-bold text-muted-foreground uppercase">Prediction Ready</h3>
                   <p className="text-sm text-muted-foreground">Click Generate to scan your profile.</p>
@@ -455,7 +455,7 @@ const CareerVision = () => {
                   <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
                     {predictions.map((p, index) => (
                       <div key={p.title} className="p-3 rounded-2xl bg-background border border-border space-y-2">
-                        <div className="flex justify-between items-center text-sm font-black">
+                        <div className="flex justify-between items-center text-sm font-normal">
                           <span className="text-foreground">#{index + 1} {p.title}</span>
                           <span className="text-secondary">{p.score}% match</span>
                         </div>
@@ -475,7 +475,7 @@ const CareerVision = () => {
               )}
             </div>
             <div className="pt-4 border-t border-border">
-              <Button onClick={runPredictor} disabled={isPredicting || selectedEventIds.length === 0} variant="hero" className="w-full font-black py-5 gap-2">
+              <Button onClick={runPredictor} disabled={isPredicting || selectedEventIds.length === 0} variant="hero" className="w-full font-normal py-5 gap-2">
                 {isPredicting ? <><RefreshCw className="h-4 w-4 animate-spin" /> Analysing Skills...</> : <><Brain className="h-4 w-4" /> Run Mistral Career Predictor</>}
               </Button>
             </div>
@@ -484,13 +484,13 @@ const CareerVision = () => {
 
         {/* Tab 2: Jumpy Buddy Coach */}
         <TabsContent value="coach" className="mt-6 focus-visible:outline-none">
-          <section className="rounded-3xl border-2 border-border bg-surface p-5 shadow-sm flex flex-col justify-between min-h-[500px]">
+          <section className="rounded-xl border border-border bg-surface p-5 shadow-sm flex flex-col justify-between min-h-[500px]">
             <div className="flex items-center gap-3 pb-3 border-b border-border">
               <div className="p-2 bg-secondary/15 rounded-full border border-secondary/25">
                 <Jumpy size="xs" animate="float" />
               </div>
               <div>
-                <h2 className="font-display text-lg font-black text-foreground">Jumpy Buddy Coach</h2>
+                <h2 className="font-display text-lg font-normal text-foreground">Jumpy Buddy Coach</h2>
                 <p className="text-sm text-muted-foreground">Your career &amp; personal brand consultant buddy</p>
               </div>
             </div>
@@ -508,14 +508,14 @@ const CareerVision = () => {
                   {m.sender === "jumpy" && (
                     <div className="flex items-center gap-2 mb-1 border-b border-border/10 pb-1 shrink-0">
                       <Jumpy size="xs" animate="none" />
-                      <span className="font-display text-sm font-black">Jumpy</span>
+                      <span className="font-display text-sm font-normal">Jumpy</span>
                       <span className="text-sm text-muted-foreground font-normal ml-auto">{m.timestamp}</span>
                     </div>
                   )}
                   <span>{m.text}</span>
                   {m.isRoadmap && m.roadmapSteps && (
                     <div className="mt-3 p-3 rounded-xl bg-surface border border-border space-y-2">
-                      <p className="text-sm font-extrabold text-foreground">Suggested Roadmap Steps:</p>
+                      <p className="text-sm font-normal text-foreground">Suggested Roadmap Steps:</p>
                       <ul className="space-y-1 text-sm text-muted-foreground list-disc pl-4 font-semibold">
                         {m.roadmapSteps.map((step, sIdx) => <li key={sIdx}>{step}</li>)}
                       </ul>
@@ -550,7 +550,7 @@ const CareerVision = () => {
                 </button>
               </div>
               <form onSubmit={(e) => { e.preventDefault(); sendChatMessage(); }} className="flex gap-2">
-                <Input value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder="Ask Jumpy for career consulting & branding tips..." className="h-11 rounded-full border-2 text-sm" />
+                <Input value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder="Ask Jumpy for career consulting & branding tips..." className="h-11 rounded-full border text-sm" />
                 <Button type="submit" variant="hero" className="rounded-full h-11 w-11 shrink-0 p-0">
                   <Send className="h-4 w-4" />
                 </Button>
@@ -561,10 +561,10 @@ const CareerVision = () => {
 
         {/* Tab 3: AI Resume Roaster */}
         <TabsContent value="roaster" className="mt-6 focus-visible:outline-none">
-          <section className="rounded-3xl border-2 border-border bg-surface p-5 space-y-5 shadow-sm">
+          <section className="rounded-xl border border-border bg-surface p-5 space-y-5 shadow-sm">
             <div className="flex items-center gap-2 pb-2 border-b border-border">
               <Flame className="h-5 w-5 text-coral animate-pulse" />
-              <h2 className="font-display text-lg font-black text-foreground">AI Resume Roaster 🔥</h2>
+              <h2 className="font-display text-lg font-normal text-foreground">AI Resume Roaster 🔥</h2>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Upload your resume and let our brutally honest AI tear it apart — then tell you how to fix it. Supports PDF, DOCX, and TXT files.
@@ -574,7 +574,7 @@ const CareerVision = () => {
             <div
               onClick={() => fileInputRef.current?.click()}
               className={cn(
-                "flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed p-10 cursor-pointer transition-all",
+                "flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed p-10 cursor-pointer transition-all",
                 resumeFile ? "border-secondary bg-secondary/5" : "border-border bg-background hover:border-secondary/60 hover:bg-secondary/5"
               )}
             >
@@ -614,15 +614,15 @@ const CareerVision = () => {
               onClick={roastResume}
               disabled={!resumeFile || isRoasting}
               variant="hero"
-              className="w-full font-black py-5 gap-2"
+              className="w-full font-normal py-5 gap-2"
             >
               {isRoasting ? <><RefreshCw className="h-4 w-4 animate-spin" /> Incinerating your resume...</> : <><Flame className="h-4 w-4" /> Roast My Resume 🔥</>}
             </Button>
 
             {resumeFile && resumePreviewUrl && !roastAnalysis && (
-              <div className="rounded-2xl border-2 border-border bg-background overflow-hidden">
+              <div className="rounded-2xl border border-border bg-background overflow-hidden">
                 <div className="px-4 py-3 border-b border-border bg-surface">
-                  <h3 className="font-display text-sm font-black text-foreground">Resume Preview</h3>
+                  <h3 className="font-display text-sm font-normal text-foreground">Resume Preview</h3>
                 </div>
                 {(resumeFile.type === "application/pdf" || resumeFile.name.toLowerCase().endsWith(".pdf")) ? (
                   <iframe title="Resume preview" src={resumePreviewUrl} className="h-[360px] w-full border-0" />

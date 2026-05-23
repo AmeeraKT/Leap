@@ -43,9 +43,9 @@ export function ResumeRoastResults({
   return (
     <div className="space-y-5">
       <div className="grid gap-5 lg:grid-cols-2">
-        <div className="rounded-2xl border-2 border-border bg-background overflow-hidden flex flex-col min-h-[320px]">
+        <div className="rounded-2xl border border-border bg-background overflow-hidden flex flex-col min-h-[320px]">
           <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-border bg-surface">
-            <h3 className="font-display text-sm font-black text-foreground uppercase tracking-wide">
+            <h3 className="font-display text-sm font-normal text-foreground uppercase tracking-wide">
               Your Resume
             </h3>
             <span className="text-xs font-bold text-muted-foreground truncate max-w-[50%]">
@@ -79,12 +79,12 @@ export function ResumeRoastResults({
           </div>
         </div>
 
-        <div className="rounded-2xl border-2 border-coral/30 bg-coral/5 p-5 space-y-3 flex flex-col">
+        <div className="rounded-2xl border border-coral/30 bg-coral/5 p-5 space-y-3 flex flex-col">
           <div className="flex items-center justify-between gap-2 pb-2 border-b border-coral/20">
-            <h3 className="font-display text-sm font-black text-coral uppercase tracking-wide">
+            <h3 className="font-display text-sm font-normal text-coral uppercase tracking-wide">
               Roast Results
             </h3>
-            <span className="rounded-full bg-coral/15 border border-coral/25 px-2.5 py-0.5 text-xs font-black text-coral">
+            <span className="rounded-full bg-coral/15 border border-coral/25 px-2.5 py-0.5 text-xs font-normal text-coral">
               {analysis.overallScore}/100
             </span>
           </div>
@@ -95,9 +95,9 @@ export function ResumeRoastResults({
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <div className="rounded-2xl border-2 border-border bg-background p-4 space-y-3">
+        <div className="rounded-2xl border border-border bg-background p-4 space-y-3">
           <div>
-            <h3 className="font-display text-sm font-black text-foreground">Resume Criteria</h3>
+            <h3 className="font-display text-sm font-normal text-foreground">Resume Criteria</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               How your resume scores across key hiring dimensions
             </p>
@@ -125,7 +125,7 @@ export function ResumeRoastResults({
                 <span className="font-semibold text-foreground truncate pr-2">{c.name}</span>
                 <span
                   className={cn(
-                    "font-black shrink-0",
+                    "font-normal shrink-0",
                     c.score >= 70 ? "text-secondary" : c.score >= 50 ? "text-foreground" : "text-coral",
                   )}
                 >
@@ -136,9 +136,9 @@ export function ResumeRoastResults({
           </ul>
         </div>
 
-        <div className="rounded-2xl border-2 border-border bg-background p-4 space-y-3">
+        <div className="rounded-2xl border border-border bg-background p-4 space-y-3">
           <div>
-            <h3 className="font-display text-base font-black text-foreground">Skill Proficiency</h3>
+            <h3 className="font-display text-base font-normal text-foreground">Skill Proficiency</h3>
             <p className="text-sm text-muted-foreground mt-0.5">
               Inferred skill levels from your resume content
             </p>

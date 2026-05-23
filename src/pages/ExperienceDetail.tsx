@@ -43,7 +43,7 @@ const ExperienceDetail = () => {
       </Link>
 
       {/* Hero */}
-      <div className="overflow-hidden rounded-3xl border-2 border-border bg-surface">
+      <div className="overflow-hidden rounded-xl border border-border bg-surface">
         {exp.photoUrl && (
           <div className="aspect-[16/7] overflow-hidden bg-muted">
             <img src={exp.photoUrl} alt={exp.title} className="h-full w-full object-cover" />
@@ -53,7 +53,7 @@ const ExperienceDetail = () => {
           <span className="rounded-full bg-secondary/30 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-foreground">
             {exp.type}
           </span>
-          <h1 className="mt-3 font-display text-3xl font-black md:text-4xl">{exp.title}</h1>
+          <h1 className="mt-3 font-display text-3xl font-normal md:text-4xl">{exp.title}</h1>
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
             <span className="inline-flex items-center gap-1"><Calendar className="h-4 w-4" /> {exp.date}</span>
             {exp.location && <span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4" /> {exp.location}</span>}
@@ -63,8 +63,8 @@ const ExperienceDetail = () => {
       </div>
 
       {/* Action bar */}
-      <div className="my-6 flex flex-wrap gap-2 rounded-3xl border-2 border-border bg-surface p-3">
-        <span className="self-center pl-2 pr-1 font-display text-sm font-extrabold">✨ Create:</span>
+      <div className="my-6 flex flex-wrap gap-2 rounded-xl border border-border bg-surface p-3">
+        <span className="self-center pl-2 pr-1 font-display text-sm font-normal">✨ Create:</span>
         {ACTIONS.map((a) => {
           const Icon = a.icon;
           const posted = a.id !== "portfolio" && exp.posted[a.id as keyof typeof exp.posted];
@@ -73,7 +73,7 @@ const ExperienceDetail = () => {
               key={a.id}
               onClick={() => open(a.id)}
               className={cn(
-                "inline-flex items-center gap-2 rounded-full border-2 px-3.5 py-2 text-xs font-bold transition-all hover:-translate-y-0.5",
+                "inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-bold transition-all hover:-translate-y-0.5",
                 posted
                   ? "border-secondary/60 bg-secondary/15 text-foreground"
                   : "border-border bg-background text-foreground hover:border-foreground/40",
@@ -112,7 +112,7 @@ const ExperienceDetail = () => {
               <ul className="space-y-2">
                 {exp.peopleMet.map((p, i) => (
                   <li key={i} className="flex items-center gap-3 rounded-xl bg-background px-3 py-2">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary font-display text-sm font-black">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary font-display text-sm font-normal">
                       {p.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                     </div>
                     <div className="flex-1">
@@ -165,8 +165,8 @@ const ExperienceDetail = () => {
 };
 
 const Section = ({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) => (
-  <section className="rounded-3xl border-2 border-border bg-surface p-5">
-    <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-extrabold uppercase tracking-wider text-muted-foreground">
+  <section className="rounded-xl border border-border bg-surface p-5">
+    <h2 className="mb-3 flex items-center gap-2 font-display text-sm font-normal uppercase tracking-wider text-muted-foreground">
       <span>{icon}</span> {title}
     </h2>
     {children}
@@ -176,7 +176,7 @@ const Section = ({ icon, title, children }: { icon: React.ReactNode; title: stri
 const Stat = ({ label, value }: { label: string; value: number }) => (
   <div className="flex items-center justify-between">
     <dt className="text-muted-foreground">{label}</dt>
-    <dd className="font-display font-extrabold">{value}</dd>
+    <dd className="font-display font-normal">{value}</dd>
   </div>
 );
 

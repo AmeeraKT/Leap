@@ -5,25 +5,31 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-bold font-display ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.97]",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-body text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
-        hero: "bg-secondary text-foreground hover:bg-secondary/90 shadow-[0_4px_0_0_hsl(var(--primary))] hover:translate-y-0.5 hover:shadow-[0_2px_0_0_hsl(var(--primary))]",
-        coral: "bg-coral text-coral-foreground hover:bg-coral/90 shadow-sm",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border-2 border-border bg-surface hover:bg-muted text-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-muted text-foreground",
-        link: "text-primary underline-offset-4 hover:underline rounded-md",
+        default:
+          "rounded-pill bg-primary text-primary-foreground hover:bg-primary/90 shadow-none",
+        hero:
+          "rounded-pill bg-primary text-primary-foreground hover:bg-primary/90 shadow-none",
+        coral:
+          "rounded-lg border border-coral/40 bg-coral-soft/40 text-coral hover:bg-coral-soft/60 shadow-none",
+        destructive:
+          "rounded-pill bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "rounded-pill border border-primary/25 bg-transparent text-foreground hover:bg-muted shadow-none",
+        secondary:
+          "rounded-pill border border-border bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-none",
+        ghost: "rounded-md text-foreground hover:bg-muted shadow-none",
+        link: "rounded-xs text-brand-action underline-offset-4 hover:underline p-0 h-auto font-normal",
       },
       size: {
-        default: "h-11 px-5 py-2",
-        sm: "h-9 px-4 text-xs",
-        lg: "h-14 px-8 text-base",
-        xl: "h-16 px-10 text-lg",
-        icon: "h-10 w-10",
+        default: "h-11 px-6 py-2",
+        sm: "h-9 px-4 text-sm",
+        lg: "h-12 px-8 text-base",
+        xl: "h-14 px-10 text-base",
+        icon: "h-10 w-10 rounded-lg",
       },
     },
     defaultVariants: {

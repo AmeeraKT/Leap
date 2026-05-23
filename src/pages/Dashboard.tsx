@@ -232,7 +232,7 @@ const Dashboard = () => {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Student Hub</div>
-          <h1 className="mt-1 font-display text-3xl font-black md:text-4xl">
+          <h1 className="mt-1 font-display text-3xl font-normal md:text-4xl">
             Welcome back, {userName} 🐸
           </h1>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground font-bold">
@@ -261,11 +261,11 @@ const Dashboard = () => {
       </div>
 
       {/* Current Progress Section */}
-      <section className="rounded-3xl border-2 border-border bg-surface p-6 shadow-sm">
+      <section className="rounded-xl border border-border bg-surface p-6 shadow-sm">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-secondary animate-pulse" />
-            <h2 className="font-display text-xl font-extrabold text-foreground">Current Progress</h2>
+            <h2 className="font-display text-xl font-normal text-foreground">Current Progress</h2>
           </div>
           <span className="text-xs font-bold text-muted-foreground uppercase bg-background px-3 py-1.5 rounded-full border border-border">
             Stage {currentStep + 1} of 4
@@ -316,7 +316,7 @@ const Dashboard = () => {
                   stepMarkerRefs.current[i] = el;
                 }}
                 className={cn(
-                  "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 font-display text-sm font-black transition-all duration-300",
+                  "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border font-display text-sm font-normal transition-all duration-300",
                   i < currentStep && "border-secondary bg-secondary text-foreground scale-105",
                   i === currentStep && "border-coral bg-coral text-coral-foreground ring-4 ring-coral/20 scale-110",
                   i > currentStep && "border-border bg-surface text-muted-foreground group-hover:border-foreground/30",
@@ -325,7 +325,7 @@ const Dashboard = () => {
                 {i < currentStep ? <Check className="h-4 w-4" /> : i + 1}
               </div>
               <div className="flex flex-col md:items-center">
-                <div className={cn("text-sm font-extrabold transition-colors", i === currentStep ? "text-foreground" : "text-muted-foreground group-hover:text-foreground")}>
+                <div className={cn("text-sm font-normal transition-colors", i === currentStep ? "text-foreground" : "text-muted-foreground group-hover:text-foreground")}>
                   {s.label}
                 </div>
                 <div className="text-xs text-muted-foreground mt-0.5 max-w-[200px] leading-tight">
@@ -340,12 +340,12 @@ const Dashboard = () => {
       {/* Main Grid: Weekly Todo & Upcoming Events */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Weekly Todo List */}
-        <section className="rounded-3xl border-2 border-border bg-surface p-6 flex flex-col justify-between">
+        <section className="rounded-xl border border-border bg-surface p-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <ListTodo className="h-5 w-5 text-coral" />
-                <h2 className="font-display text-xl font-extrabold text-foreground">Weekly To-Do List</h2>
+                <h2 className="font-display text-xl font-normal text-foreground">Weekly To-Do List</h2>
               </div>
               <span className="text-xs font-bold text-muted-foreground">
                 {completedCount}/{todos.length} done
@@ -357,7 +357,7 @@ const Dashboard = () => {
             </p>
 
             {todos.length === 0 ? (
-              <div className="rounded-2xl border-2 border-dashed border-border bg-background p-8 text-center text-muted-foreground text-sm">
+              <div className="rounded-2xl border border-dashed border-border bg-background p-8 text-center text-muted-foreground text-sm">
                 No weekly tasks left. Add some in your Roadmap!
               </div>
             ) : (
@@ -370,7 +370,7 @@ const Dashboard = () => {
                     whileHover={{ scale: 1.01, x: 2 }}
                     whileTap={{ scale: 0.99 }}
                     className={cn(
-                      "flex items-start justify-between rounded-2xl border-2 p-3.5 bg-background hover:border-foreground/20 cursor-pointer transition-all",
+                      "flex items-start justify-between rounded-2xl border p-3.5 bg-background hover:border-foreground/20 cursor-pointer transition-all",
                       todo.done ? "border-border/40 opacity-70" : "border-border shadow-sm",
                     )}
                   >
@@ -386,12 +386,12 @@ const Dashboard = () => {
                           {todo.task}
                         </span>
                         <div className="flex flex-wrap gap-2 mt-2">
-                          <span className="rounded-full bg-surface border border-border px-2 py-0.5 text-[9px] font-extrabold text-muted-foreground uppercase">
+                          <span className="rounded-full bg-surface border border-border px-2 py-0.5 text-[9px] font-normal text-muted-foreground uppercase">
                             {todo.category}
                           </span>
                           <span
                             className={cn(
-                              "rounded-full px-2 py-0.5 text-[9px] font-extrabold uppercase",
+                              "rounded-full px-2 py-0.5 text-[9px] font-normal uppercase",
                               todo.priority === "High" && "bg-coral/10 text-coral",
                               todo.priority === "Medium" && "bg-secondary/20 text-foreground",
                               todo.priority === "Low" && "bg-muted text-muted-foreground",
@@ -413,21 +413,21 @@ const Dashboard = () => {
 
           <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
             <span className="text-xs text-muted-foreground font-semibold">Updated just now</span>
-            <Link to="/roadmap" className="text-sm font-extrabold text-primary hover:underline flex items-center gap-1">
+            <Link to="/roadmap" className="text-sm font-normal text-primary hover:underline flex items-center gap-1">
               Go to Planner <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
         </section>
 
         {/* Upcoming Events */}
-        <section className="rounded-3xl border-2 border-border bg-surface p-6 flex flex-col justify-between">
+        <section className="rounded-xl border border-border bg-surface p-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-secondary" />
-                <h2 className="font-display text-xl font-extrabold text-foreground">Upcoming Events</h2>
+                <h2 className="font-display text-xl font-normal text-foreground">Upcoming Events</h2>
               </div>
-              <Link to="/discover" className="text-xs font-extrabold text-primary hover:underline">
+              <Link to="/discover" className="text-xs font-normal text-primary hover:underline">
                 Find more opportunities
               </Link>
             </div>
@@ -447,15 +447,15 @@ const Dashboard = () => {
                   key={e.id}
                   variants={itemVariants}
                   whileHover={{ y: -2, scale: 1.01 }}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border-2 border-border bg-background p-4 shadow-sm"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-border bg-background p-4 shadow-sm"
                 >
                   <div className="space-y-1.5 flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-secondary/15 border border-secondary/20 px-2 py-0.5 text-[9px] font-extrabold text-foreground uppercase tracking-wide">
+                      <span className="rounded-full bg-secondary/15 border border-secondary/20 px-2 py-0.5 text-[9px] font-normal text-foreground uppercase tracking-wide">
                         {e.interest}
                       </span>
                     </div>
-                    <h3 className="font-display text-base font-extrabold leading-snug text-foreground">
+                    <h3 className="font-display text-base font-normal leading-snug text-foreground">
                       {e.title}
                     </h3>
                     <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground font-medium">
@@ -500,11 +500,11 @@ const Dashboard = () => {
 };
 
 const Card = ({ title, emoji, action, children }: { title: string; emoji: string; action?: React.ReactNode; children: React.ReactNode }) => (
-  <section className="rounded-3xl border-2 border-border bg-surface p-5">
+  <section className="rounded-xl border border-border bg-surface p-5">
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         <span className="text-xl">{emoji}</span>
-        <h2 className="font-display text-lg font-extrabold">{title}</h2>
+        <h2 className="font-display text-lg font-normal">{title}</h2>
       </div>
       {action}
     </div>

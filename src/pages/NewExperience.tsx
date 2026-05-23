@@ -65,10 +65,10 @@ const NewExperience = () => {
         <ArrowLeft className="h-4 w-4" /> Back to Journey Log
       </Link>
 
-      <h1 className="font-display text-3xl font-black md:text-4xl">Log a new experience</h1>
+      <h1 className="font-display text-3xl font-normal md:text-4xl">Log a new experience</h1>
       <p className="mb-6 text-sm text-muted-foreground">A few minutes now → a portfolio + LinkedIn post later.</p>
 
-      <form onSubmit={submit} className="space-y-5 rounded-3xl border-2 border-border bg-surface p-6">
+      <form onSubmit={submit} className="space-y-5 rounded-xl border border-border bg-surface p-6">
         <div>
           <Label htmlFor="title">Title *</Label>
           <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. UQ Innovation Summit 2026" />

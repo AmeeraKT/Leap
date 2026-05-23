@@ -94,7 +94,7 @@ export const ContentStudioModal = ({ experience, initialFormat = "linkedin", ope
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 font-display text-xl font-black">
+          <DialogTitle className="flex items-center gap-2 font-display text-xl font-normal">
             <Jumpy size="xs" animate="float" />
             Content Studio
           </DialogTitle>
@@ -110,7 +110,7 @@ export const ContentStudioModal = ({ experience, initialFormat = "linkedin", ope
                 key={f.id}
                 onClick={() => setFormat(f.id)}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-full border-2 px-3.5 py-1.5 text-xs font-bold transition-all",
+                  "inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-all",
                   active
                     ? "border-foreground bg-foreground text-background"
                     : "border-border bg-surface text-muted-foreground hover:border-foreground/40",
@@ -124,7 +124,7 @@ export const ContentStudioModal = ({ experience, initialFormat = "linkedin", ope
         </div>
 
         {/* Tone slider */}
-        <div className="rounded-2xl border-2 border-border bg-surface-soft p-4">
+        <div className="rounded-2xl border border-border bg-surface-soft p-4">
           <div className="mb-2 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-muted-foreground">
             <span>Professional</span>
             <span>Casual</span>
@@ -137,7 +137,7 @@ export const ContentStudioModal = ({ experience, initialFormat = "linkedin", ope
 
         {/* Output area */}
         {!text && !loading && (
-          <div className="rounded-2xl border-2 border-dashed border-border bg-background p-6 text-center">
+          <div className="rounded-2xl border border-dashed border-border bg-background p-6 text-center">
             <p className="text-sm text-muted-foreground">
               Click <strong>Generate</strong> and Jumpy will draft a {FORMATS.find((f) => f.id === format)?.label} post from this experience.
             </p>
@@ -145,7 +145,7 @@ export const ContentStudioModal = ({ experience, initialFormat = "linkedin", ope
         )}
 
         {loading && (
-          <div className="flex items-center justify-center rounded-2xl border-2 border-border bg-background p-10">
+          <div className="flex items-center justify-center rounded-2xl border border-border bg-background p-10">
             <Loader2 className="mr-2 h-5 w-5 animate-spin text-secondary" />
             <span className="text-sm font-semibold">Jumpy is writing...</span>
           </div>

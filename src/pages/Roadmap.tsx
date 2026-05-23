@@ -148,7 +148,7 @@ const Roadmap = () => {
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Roadmap Planner</div>
-          <h1 className="mt-1 font-display text-3xl font-black md:text-4xl">Guide Your Career Goals</h1>
+          <h1 className="mt-1 font-display text-3xl font-normal md:text-4xl">Guide Your Career Goals</h1>
           <p className="text-sm text-muted-foreground">
             A personalized roadmap built to scale with your activities. See how every action impacts job matches.
           </p>
@@ -168,7 +168,7 @@ const Roadmap = () => {
 
       <div className="space-y-6">
           <Tabs defaultValue="milestones" className="w-full">
-            <TabsList className="flex w-full justify-start gap-1 rounded-2xl border-2 border-border bg-surface p-1 flex-wrap font-display font-bold">
+            <TabsList className="flex w-full justify-start gap-1 rounded-2xl border border-border bg-surface p-1 flex-wrap font-display font-bold">
               <TabsTrigger value="milestones" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
                 Personalized Milestones
               </TabsTrigger>
@@ -198,11 +198,11 @@ const Roadmap = () => {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 100, damping: 15 }}
-                className="rounded-3xl border-2 border-border bg-surface p-5 space-y-4 shadow-sm"
+                className="rounded-xl border border-border bg-surface p-5 space-y-4 shadow-sm"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h3 className="font-display text-lg font-black text-foreground">Schedule Planner</h3>
+                    <h3 className="font-display text-lg font-normal text-foreground">Schedule Planner</h3>
                     <p className="text-xs text-muted-foreground">Break goals down into week, month, and year checklists.</p>
                   </div>
 
@@ -222,7 +222,7 @@ const Roadmap = () => {
                             transition={{ type: "spring", stiffness: 380, damping: 30 }}
                           />
                         )}
-                        <span className={cn("relative z-10", activePlannerTab === t ? "font-black" : "hover:text-foreground")}>
+                        <span className={cn("relative z-10", activePlannerTab === t ? "font-normal" : "hover:text-foreground")}>
                           {t}
                         </span>
                       </button>
@@ -253,7 +253,7 @@ const Roadmap = () => {
                           key={pt.id}
                           whileHover={{ scale: 1.01, x: 2 }}
                           className={cn(
-                            "flex items-center justify-between rounded-xl border-2 p-3.5 bg-background hover:border-foreground/20 transition-all",
+                            "flex items-center justify-between rounded-xl border p-3.5 bg-background hover:border-foreground/20 transition-all",
                             pt.done ? "border-border/40 opacity-70" : "border-border shadow-sm",
                           )}
                         >
@@ -380,12 +380,12 @@ const MetricCard = ({
   icon: React.ReactNode; title: string; value: string; progress: number;
   hint: string; cta?: string; ctaTo?: string; chart?: boolean;
 }) => (
-  <div className="rounded-3xl border-2 border-border bg-surface p-5">
+  <div className="rounded-xl border border-border bg-surface p-5">
     <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
       {icon} {title}
     </div>
     <div className="mt-2 flex items-baseline gap-2">
-      <span className="font-display text-3xl font-black">{value}</span>
+      <span className="font-display text-3xl font-normal">{value}</span>
     </div>
     {chart ? (
       <div className="mt-3 flex h-10 items-end gap-1">
@@ -428,9 +428,9 @@ const Module = ({
   const doneCount = resolved.filter((i) => i.checked).length;
 
   return (
-    <div className="rounded-3xl border-2 border-border bg-surface p-5">
+    <div className="rounded-xl border border-border bg-surface p-5">
       <div className="flex items-center justify-between">
-        <h3 className="font-display text-base font-extrabold">{title}</h3>
+        <h3 className="font-display text-base font-normal">{title}</h3>
         <span className="text-xs font-bold text-muted-foreground">
           {doneCount}/{items.length}
         </span>

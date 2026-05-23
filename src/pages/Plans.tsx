@@ -11,7 +11,7 @@ const Plans = () => {
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Plans</div>
-          <h1 className="mt-1 font-display text-3xl font-black md:text-4xl">Your top 3 pathways</h1>
+          <h1 className="mt-1 font-display text-3xl font-normal md:text-4xl">Your top 3 pathways</h1>
           <p className="text-sm text-muted-foreground">Drag to reorder. Pick a main plan, keep the rest as backups.</p>
         </div>
         <Button variant="outline" size="sm"><GitCompare className="h-4 w-4" /> Compare plans</Button>
@@ -38,8 +38,8 @@ const PlanCard = ({ pathway: p, variant, rank }: { pathway: Pathway; variant: "m
   return (
     <article
       className={cn(
-        "relative rounded-3xl border-2 bg-surface transition-transform hover:-translate-y-0.5",
-        isMain ? "border-secondary p-6 shadow-[0_4px_0_0_hsl(var(--primary))] md:p-8" : "border-border p-5",
+        "relative rounded-xl border bg-surface transition-transform hover:-translate-y-0.5",
+        isMain ? "border-secondary p-6  md:p-8" : "border-border p-5",
       )}
     >
       <button aria-label="Drag to reorder" className="absolute left-2 top-1/2 -translate-y-1/2 cursor-grab text-muted-foreground/60 hover:text-foreground">
@@ -52,7 +52,7 @@ const PlanCard = ({ pathway: p, variant, rank }: { pathway: Pathway; variant: "m
             <span className={cn("rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider", isMain ? "bg-coral text-coral-foreground" : "bg-secondary text-foreground")}>
               {isMain ? "★ Main plan" : `Backup #${rank - 1}`}
             </span>
-            <span className="rounded-full border-2 border-border bg-background px-2.5 py-1 text-[10px] font-bold uppercase text-muted-foreground">{p.type}</span>
+            <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-bold uppercase text-muted-foreground">{p.type}</span>
           </div>
 
           <div className="flex items-start gap-4">
@@ -60,7 +60,7 @@ const PlanCard = ({ pathway: p, variant, rank }: { pathway: Pathway; variant: "m
               {p.emoji}
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className={cn("font-display font-black leading-tight", isMain ? "text-2xl md:text-3xl" : "text-lg")}>{p.name}</h2>
+              <h2 className={cn("font-display font-normal leading-tight", isMain ? "text-2xl md:text-3xl" : "text-lg")}>{p.name}</h2>
               <div className="text-sm text-muted-foreground">{p.institution}</div>
             </div>
             <button aria-label="Favorite" className="text-muted-foreground hover:text-coral"><Heart className="h-5 w-5" /></button>
@@ -90,7 +90,7 @@ const PlanCard = ({ pathway: p, variant, rank }: { pathway: Pathway; variant: "m
             <div className="flex items-center justify-between rounded-xl bg-primary p-3 text-primary-foreground">
               <div>
                 <div className="text-[10px] font-bold uppercase opacity-70">Future-proof</div>
-                <div className="font-display text-2xl font-black">{p.futureProof}<span className="text-sm opacity-60">/100</span></div>
+                <div className="font-display text-2xl font-normal">{p.futureProof}<span className="text-sm opacity-60">/100</span></div>
               </div>
               <TrendingUp className="h-7 w-7 opacity-80" />
             </div>
