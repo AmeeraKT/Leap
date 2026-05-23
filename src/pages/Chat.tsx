@@ -38,14 +38,14 @@ const Chat = () => {
   return (
     <AnimatedPage className="flex h-screen flex-col bg-background overflow-hidden">
       {/* Header */}
-      <header className="flex items-center justify-between border-b-2 border-border bg-background px-4 py-3 z-10 shadow-sm">
+      <header className="flex items-center justify-between border-b border-border bg-background px-4 py-3 z-10 shadow-sm">
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
         <div className="flex items-center gap-2">
           <Jumpy size="xs" animate="float" />
           <div>
-            <div className="font-display text-base font-extrabold">Jumpy</div>
+            <div className="font-display text-base font-normal">Jumpy</div>
             <div className="text-[10px] font-bold uppercase text-secondary">● Online</div>
           </div>
         </div>
@@ -76,12 +76,12 @@ const Chat = () => {
                       </motion.div>
                     )}
                     {m.from === "user" && (
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary font-display text-sm font-black text-foreground">A</div>
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary font-display text-sm font-normal text-foreground">A</div>
                     )}
                     <motion.div
                       layout
                       className={cn(
-                        "max-w-[80%] rounded-2xl border-2 px-4 py-2.5 text-sm",
+                        "max-w-[80%] rounded-2xl border px-4 py-2.5 text-sm",
                         m.from === "jumpy" ? "border-border bg-surface text-foreground" : "border-primary bg-primary text-primary-foreground",
                       )}
                     >
@@ -111,7 +111,7 @@ const Chat = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => send(p)}
-                        className="rounded-full border-2 border-border bg-surface px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:border-secondary hover:text-foreground transition-all"
+                        className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:border-secondary hover:text-foreground transition-all"
                       >
                         {p}
                       </motion.button>
@@ -123,7 +123,7 @@ const Chat = () => {
           </div>
 
           {/* Input */}
-          <div className="border-t-2 border-border bg-background px-4 py-3 shadow-inner">
+          <div className="border-t border-border bg-background px-4 py-3 shadow-inner">
             <form
               onSubmit={(e) => { e.preventDefault(); send(input); }}
               className="mx-auto flex max-w-3xl gap-2"
@@ -132,7 +132,7 @@ const Chat = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask Jumpy anything…"
-                className="h-12 rounded-full border-2 px-5 transition-all focus-visible:ring-secondary"
+                className="h-12 rounded-full border px-5 transition-all focus-visible:ring-secondary"
               />
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button type="submit" variant="hero" size="lg" disabled={!input.trim()} className="rounded-full h-12 w-12 p-0 flex items-center justify-center">
@@ -152,7 +152,7 @@ const Chat = () => {
             >
               <SplitSquareHorizontal className="h-10 w-10 text-muted-foreground" />
             </motion.div>
-            <h3 className="mt-3 font-display text-lg font-extrabold">Split view</h3>
+            <h3 className="mt-3 font-display text-lg font-normal">Split view</h3>
             <p className="mt-1 max-w-xs text-sm text-muted-foreground">
               Pin a roadmap, plan, or document here while you chat with Jumpy. Coming soon.
             </p>

@@ -18,7 +18,7 @@ export const JumpyCelebration = ({ event, onClose }: Props) => {
           <Jumpy size="md" animate="hop" glow />
           <div>
             <div className="text-4xl">{event.emoji ?? "🐸"}</div>
-            <h2 className="mt-2 font-display text-2xl font-black">{event.title}</h2>
+            <h2 className="mt-2 font-display text-2xl font-normal">{event.title}</h2>
             <p className="mt-2 text-sm text-muted-foreground">{event.message}</p>
           </div>
           <Button variant="hero" className="rounded-full" onClick={onClose}>

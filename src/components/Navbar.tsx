@@ -65,7 +65,7 @@ export const Navbar = () => {
 
   const linkCls = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "relative px-1 py-2 text-sm font-bold transition-colors",
+      "relative px-1 py-2 text-sm font-medium transition-colors",
       isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
     );
 
@@ -76,11 +76,11 @@ export const Navbar = () => {
     : "A";
 
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-border bg-background/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/dashboard" className="flex items-center gap-2">
           <Jumpy size="xs" animate="none" />
-          <span className="font-display text-2xl font-extrabold text-foreground">Leap</span>
+          <span className="font-display text-xl font-normal tracking-tight text-foreground">Leap</span>
         </Link>
 
         <nav className="hidden items-center gap-7 md:flex">
@@ -104,21 +104,21 @@ export const Navbar = () => {
             <>
               <Link
                 to="/about-me"
-                className="flex items-center gap-2 rounded-full border-2 border-coral bg-coral px-3.5 py-1.5 shadow-[0_2px_0_0_hsl(var(--foreground)/0.12)] transition-transform hover:scale-[1.02]"
+                className="leap-chip-coral flex items-center gap-2 rounded-pill px-3.5 py-1.5 transition-opacity hover:opacity-90"
                 aria-label={`${xp.toLocaleString()} experience points, level ${level}`}
               >
-                <Sparkles className="h-4 w-4 shrink-0 text-coral-foreground" aria-hidden />
-                <span className="font-display text-xl font-black tabular-nums leading-none text-coral-foreground">
+                <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
+                <span className="font-display text-lg tabular-nums leading-none">
                   {xp.toLocaleString()}
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-coral-foreground/90">XP</span>
+                <span className="text-[10px] font-medium uppercase tracking-wider">XP</span>
               </Link>
-              <div className="hidden items-center gap-2 rounded-full border-2 border-secondary bg-secondary/20 px-3 py-1.5 lg:flex">
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Lvl</span>
-                <span className="font-display text-sm font-black text-foreground">{level}</span>
+              <div className="hidden items-center gap-2 rounded-pill border border-border bg-muted/50 px-3 py-1.5 lg:flex">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Lvl</span>
+                <span className="font-display text-sm font-medium text-foreground">{level}</span>
               </div>
               <Link to="/about-me" title="Profile Details">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary font-display text-sm font-black text-foreground hover:opacity-85 transition-opacity">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted font-display text-sm font-medium text-foreground hover:bg-muted/80 transition-colors">
                   {userInitial}
                 </div>
               </Link>
@@ -144,13 +144,13 @@ export const Navbar = () => {
         <div className="flex items-center gap-2 md:hidden">
           <Link
             to="/about-me"
-            className="flex items-center gap-1.5 rounded-full border-2 border-coral bg-coral px-2.5 py-1 shadow-[0_2px_0_0_hsl(var(--foreground)/0.12)]"
+            className="leap-chip-coral flex items-center gap-1.5 rounded-pill px-2.5 py-1"
             aria-label={`${xp.toLocaleString()} experience points`}
           >
-            <span className="font-display text-base font-black tabular-nums leading-none text-coral-foreground">
+            <span className="font-display text-base tabular-nums leading-none">
               {xp.toLocaleString()}
             </span>
-            <span className="text-[9px] font-bold uppercase text-coral-foreground/90">XP</span>
+            <span className="text-[9px] font-medium uppercase">XP</span>
           </Link>
           <ThemeToggle />
           <Sheet open={open} onOpenChange={setOpen}>
@@ -164,14 +164,14 @@ export const Navbar = () => {
                 <Link
                   to="/about-me"
                   onClick={() => setOpen(false)}
-                  className="mx-4 mb-4 flex items-center justify-center gap-2 rounded-2xl border-2 border-coral bg-coral px-4 py-3"
+                  className="leap-chip-coral mx-4 mb-4 flex items-center justify-center gap-2 rounded-lg px-4 py-3"
                 >
-                  <Sparkles className="h-5 w-5 text-coral-foreground" aria-hidden />
-                  <span className="font-display text-2xl font-black tabular-nums text-coral-foreground">
+                  <Sparkles className="h-5 w-5" aria-hidden />
+                  <span className="font-display text-2xl tabular-nums">
                     {xp.toLocaleString()}
                   </span>
-                  <span className="text-xs font-bold uppercase tracking-wider text-coral-foreground/90">XP</span>
-                  <span className="text-xs font-bold text-coral-foreground/80">· Lvl {level}</span>
+                  <span className="text-xs font-medium uppercase tracking-wider">XP</span>
+                  <span className="text-xs font-medium opacity-80">· Lvl {level}</span>
                 </Link>
                 <div className="mb-4 flex items-center justify-between px-4">
                   <span className="text-sm font-bold text-muted-foreground">Theme</span>
@@ -198,7 +198,7 @@ export const Navbar = () => {
                 {user ? (
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary font-display text-base font-black text-foreground">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary font-display text-base font-normal text-foreground">
                         {userInitial}
                       </div>
                       <div className="flex-1 min-w-0">

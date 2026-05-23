@@ -14,12 +14,12 @@ export const StreakPanel = () => {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-3xl border-2 border-coral/50 bg-coral/10 p-4">
+      <div className="rounded-xl border border-coral/50 bg-coral/10 p-4">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-coral">
           <Flame className="h-4 w-4" /> Daily streak
         </div>
         <div className="mt-2 flex items-baseline gap-2">
-          <span className="font-display text-4xl font-black text-foreground">{state.streakDays}</span>
+          <span className="font-display text-4xl font-normal text-foreground">{state.streakDays}</span>
           <span className="text-sm font-bold text-muted-foreground">days in a row</span>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
@@ -38,11 +38,11 @@ export const StreakPanel = () => {
         )}
       </div>
 
-      <div className="rounded-3xl border-2 border-border bg-surface p-4">
+      <div className="rounded-xl border border-border bg-surface p-4">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
           <Target className="h-3 w-3" /> Weekly goal
         </div>
-        <div className="mt-2 font-display text-2xl font-black">
+        <div className="mt-2 font-display text-2xl font-normal">
           {weeklyLogs} / {WEEKLY_GOAL}
         </div>
         <div className="text-xs text-muted-foreground">experiences logged this week</div>

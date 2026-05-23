@@ -26,7 +26,7 @@ const features = [
   {
     icon: Route,
     title: "Quest roadmap",
-    body: "Follow a cartoon career map with milestones, planner checklists, brand coaching, and job predictions.",
+    body: "Follow a six-stage career map with milestones, planner checklists, brand coaching, and job predictions.",
     to: "/roadmap",
   },
   {
@@ -96,7 +96,7 @@ const Home = () => {
       <header className="container flex items-center justify-between py-6">
         <div className="flex items-center gap-2">
           <Jumpy size="xs" animate="none" />
-          <span className="font-display text-2xl font-extrabold text-foreground">Leap</span>
+          <span className="font-display text-2xl font-normal text-foreground">Leap</span>
         </div>
         <nav className="hidden items-center gap-8 md:flex">
           <a href="#features" className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
@@ -127,27 +127,21 @@ const Home = () => {
           initial="hidden"
           animate="visible"
         >
-          <motion.div
-            variants={itemVariants}
-            className="inline-flex items-center gap-2 rounded-full border-2 border-border bg-surface px-4 py-1.5"
-          >
-            <span className="h-2 w-2 rounded-full bg-secondary animate-pulse" />
-            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              Career quest · XP · AI coach
-            </span>
+          <motion.div variants={itemVariants} className="leap-mono-label inline-flex items-center gap-2">
+            Career planning · XP · AI coach
           </motion.div>
 
           <motion.h1
             variants={itemVariants}
-            className="font-display text-5xl font-black leading-[1.05] text-foreground md:text-7xl"
+            className="font-display text-5xl font-normal leading-[1.02] text-foreground md:text-6xl lg:text-7xl"
           >
-            Build your career like a{" "}
-            <span className="text-coral">game</span>
+            Plan your career with{" "}
+            <span className="text-coral">clarity</span>
           </motion.h1>
 
-          <motion.p variants={itemVariants} className="max-w-lg text-lg text-muted-foreground">
-            Leap helps students log real experiences, follow a visual quest roadmap, earn XP, discover
-            events, and get AI job matches — with Jumpy the frog cheering you on every hop.
+          <motion.p variants={itemVariants} className="max-w-lg text-lg text-muted-foreground leading-relaxed">
+            Leap helps students log real experiences, follow a structured roadmap, earn XP, discover
+            events, and get AI job matches — with Jumpy guiding each step.
           </motion.p>
 
           <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-3">
@@ -176,22 +170,22 @@ const Home = () => {
 
           <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-6 pt-2">
             <div>
-              <div className="font-display text-2xl font-extrabold">4</div>
+              <div className="font-display text-2xl font-normal">4</div>
               <div className="text-xs text-muted-foreground">Core tools</div>
             </div>
             <div className="h-8 w-px bg-border" />
             <div>
-              <div className="font-display text-2xl font-extrabold flex items-center gap-1">
+              <div className="font-display text-2xl font-normal flex items-center gap-1">
                 <Trophy className="h-5 w-5 text-coral" /> XP
               </div>
               <div className="text-xs text-muted-foreground">Levels & badges</div>
             </div>
             <div className="h-8 w-px bg-border" />
             <div>
-              <div className="font-display text-2xl font-extrabold flex items-center gap-1">
+              <div className="font-display text-2xl font-normal flex items-center gap-1">
                 <Map className="h-5 w-5 text-secondary" /> Quest
               </div>
-              <div className="text-xs text-muted-foreground">Cartoon roadmap</div>
+              <div className="text-xs text-muted-foreground">Six-stage roadmap</div>
             </div>
           </motion.div>
         </motion.div>
@@ -210,11 +204,11 @@ const Home = () => {
       </section>
 
       {/* Features */}
-      <section id="features" className="bg-primary py-20 text-primary-foreground">
+      <section id="features" className="leap-band-deep py-20">
         <div className="container">
           <div className="mx-auto mb-12 max-w-2xl text-center">
-            <h2 className="font-display text-4xl font-black md:text-5xl">Everything in your Leap hub</h2>
-            <p className="mt-3 text-primary-foreground/70">
+            <h2 className="font-display text-4xl font-normal text-white md:text-5xl">Everything in your Leap hub</h2>
+            <p className="mt-3 text-white/75">
               Four tools that take you from “what’s next?” to job-ready — tap a card to explore.
             </p>
           </div>
@@ -231,12 +225,12 @@ const Home = () => {
                   variants={itemVariants}
                   whileHover={{ y: -6, scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="h-full rounded-2xl bg-surface p-6 text-foreground shadow-sm hover:shadow-md transition-shadow duration-200"
+                  className="leap-card h-full rounded-lg bg-card p-6 text-foreground transition-colors hover:bg-muted/30"
                 >
                   <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-foreground">
                     <f.icon className="h-5 w-5" />
                   </div>
-                  <h3 className="mb-2 font-display text-lg font-extrabold">{f.title}</h3>
+                  <h3 className="mb-2 font-display text-lg font-normal">{f.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{f.body}</p>
                   <span className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-coral">
                     Explore <ArrowRight className="h-3 w-3" />
@@ -251,7 +245,7 @@ const Home = () => {
       {/* How it works */}
       <section id="how" className="container py-20">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <h2 className="font-display text-4xl font-black md:text-5xl">How Leap works</h2>
+          <h2 className="font-display text-4xl font-normal md:text-5xl">How Leap works</h2>
           <p className="mt-3 text-muted-foreground">Four hops from sign-up to career momentum.</p>
         </div>
         <motion.div
@@ -266,10 +260,10 @@ const Home = () => {
               key={s.step}
               variants={itemVariants}
               whileHover={{ y: -4 }}
-              className="rounded-2xl border-2 border-border bg-surface p-6 shadow-sm"
+              className="leap-panel rounded-lg p-6"
             >
-              <div className="font-display text-5xl font-black text-secondary">{s.step}</div>
-              <h3 className="mt-4 font-display text-xl font-extrabold">{s.title}</h3>
+              <div className="font-display text-5xl font-normal text-secondary">{s.step}</div>
+              <h3 className="mt-4 font-display text-xl font-normal">{s.title}</h3>
               <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.body}</p>
             </motion.div>
           ))}
@@ -283,12 +277,12 @@ const Home = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ type: "spring", stiffness: 80, damping: 15 }}
-          className="relative overflow-hidden rounded-3xl bg-secondary p-10 md:p-16 shadow-lg"
+          className="leap-band-navy relative overflow-hidden rounded-xl p-10 md:p-16"
         >
           <div className="grid items-center gap-8 md:grid-cols-[1fr_auto]">
             <div>
-              <h2 className="font-display text-3xl font-black text-foreground md:text-5xl">Ready to make the leap?</h2>
-              <p className="mt-3 max-w-xl text-foreground/80">
+              <h2 className="font-display text-3xl font-normal text-white md:text-5xl">Ready to make the leap?</h2>
+              <p className="mt-3 max-w-xl text-white/80">
                 Jump into the demo as Alex Chen, explore the quest map, log a win, and watch your XP climb on
                 the dashboard.
               </p>
@@ -321,11 +315,11 @@ const Home = () => {
         </motion.div>
       </section>
 
-      <footer className="container border-t-2 border-border py-8 text-sm text-muted-foreground">
+      <footer className="container border-t border-border py-8 text-sm text-muted-foreground">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Jumpy size="xs" animate="none" />
-            <span className="font-display font-extrabold text-foreground">Leap</span>
+            <span className="font-display font-normal text-foreground">Leap</span>
           </div>
           <div>© {new Date().getFullYear()} Leap. Built with 🐸 for students building their brand.</div>
         </div>

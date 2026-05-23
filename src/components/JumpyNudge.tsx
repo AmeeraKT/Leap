@@ -10,7 +10,7 @@ interface Props {
 
 export const JumpyNudge = ({ message, ctaLabel, to }: Props) => {
   return (
-    <div className="flex items-center gap-4 rounded-3xl border-2 border-coral/40 bg-coral/10 p-4">
+    <div className="flex items-center gap-4 rounded-xl border border-coral/40 bg-coral/10 p-4">
       <Jumpy size="xs" animate="float" />
       <div className="flex-1">
         <p className="text-sm font-semibold text-foreground">{message}</p>

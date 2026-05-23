@@ -19,7 +19,7 @@ export const ExperienceCard = ({ experience }: { experience: Experience }) => {
   return (
     <Link
       to={`/journey/${e.id}`}
-      className="group block overflow-hidden rounded-3xl border-2 border-border bg-surface transition-all hover:-translate-y-1 hover:border-secondary hover:shadow-[0_8px_0_0_hsl(var(--border))]"
+      className="group block overflow-hidden rounded-xl border border-border bg-surface transition-all hover:-translate-y-1 hover:border-secondary hover:"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {e.photoUrl ? (
@@ -48,7 +48,7 @@ export const ExperienceCard = ({ experience }: { experience: Experience }) => {
       </div>
 
       <div className="space-y-2 p-4">
-        <h3 className="line-clamp-2 font-display text-base font-extrabold leading-tight">{e.title}</h3>
+        <h3 className="line-clamp-2 font-display text-base font-normal leading-tight">{e.title}</h3>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <Calendar className="h-3 w-3" /> {e.date}

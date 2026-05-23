@@ -118,14 +118,14 @@ const JourneyLog = () => {
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Journey Log</div>
-          <h1 className="mt-1 font-display text-3xl font-black md:text-4xl">Document Wins & Build Your Brand</h1>
+          <h1 className="mt-1 font-display text-3xl font-normal md:text-4xl">Document Wins & Build Your Brand</h1>
           <p className="text-sm text-muted-foreground">
             Track your milestones, build a clean portfolio website, and draft social posts instantly.
           </p>
         </div>
         <Link to="/journey/new" className="self-start">
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="hero" className="rounded-full px-5 py-6 font-display text-sm font-extrabold gap-2">
+            <Button variant="hero" className="rounded-full px-5 py-6 font-display text-sm font-normal gap-2">
               <Plus className="h-4 w-4" /> Log experience
             </Button>
           </motion.div>
@@ -133,7 +133,7 @@ const JourneyLog = () => {
       </div>
 
       <Tabs defaultValue="wins" className="w-full">
-        <TabsList className="flex w-full sm:w-fit justify-start gap-1 rounded-2xl border-2 border-border bg-surface p-1">
+        <TabsList className="flex w-full sm:w-fit justify-start gap-1 rounded-2xl border border-border bg-surface p-1">
           <TabsTrigger value="wins" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
             My Wins
           </TabsTrigger>
@@ -173,7 +173,7 @@ const JourneyLog = () => {
                     whileTap={{ scale: 0.97 }}
                     onClick={() => setFilter(f.value)}
                     className={cn(
-                      "rounded-full border-2 px-4 py-1.5 text-xs font-bold transition-all",
+                      "rounded-full border px-4 py-1.5 text-xs font-bold transition-all",
                       filter === f.value
                         ? "border-foreground bg-foreground text-background"
                         : "border-border bg-surface text-muted-foreground hover:border-foreground/40",
@@ -188,7 +188,7 @@ const JourneyLog = () => {
                 <motion.div 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="rounded-3xl border-2 border-dashed border-border bg-surface p-12 text-center"
+                  className="rounded-xl border border-dashed border-border bg-surface p-12 text-center"
                 >
                   <div className="text-4xl">📝</div>
                   <p className="mt-3 font-display text-lg font-bold">Nothing logged here yet</p>
@@ -215,20 +215,20 @@ const JourneyLog = () => {
               <motion.button 
                 whileHover={{ y: -2, scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="group flex w-full items-center gap-3 rounded-3xl border-2 border-border bg-surface p-4 text-left transition-all hover:border-coral"
+                className="group flex w-full items-center gap-3 rounded-xl border border-border bg-surface p-4 text-left transition-all hover:border-coral"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-coral text-coral-foreground">
                   <Mic className="h-5 w-5" />
                 </div>
                 <div>
-                  <div className="font-display text-sm font-extrabold">Quick voice log</div>
+                  <div className="font-display text-sm font-normal">Quick voice log</div>
                   <div className="text-xs text-muted-foreground">Tap to record (coming soon)</div>
                 </div>
               </motion.button>
 
               <StreakPanel />
               {unsharedCount > 0 && (
-                <p className="rounded-2xl border-2 border-border bg-surface px-3 py-2 text-xs text-muted-foreground">
+                <p className="rounded-2xl border border-border bg-surface px-3 py-2 text-xs text-muted-foreground">
                   <span className="font-bold text-coral">{unsharedCount} unshared</span> · turn them into content
                 </p>
               )}
@@ -240,10 +240,10 @@ const JourneyLog = () => {
         <TabsContent value="portfolio" className="mt-6 focus-visible:outline-none">
           <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
             {/* Customizer Sidebar */}
-            <aside className="space-y-6 rounded-3xl border-2 border-border bg-surface p-5 h-fit">
+            <aside className="space-y-6 rounded-xl border border-border bg-surface p-5 h-fit">
               <div className="flex items-center gap-2">
                 <Layout className="h-5 w-5 text-secondary" />
-                <h3 className="font-display text-lg font-extrabold">Portfolio Settings</h3>
+                <h3 className="font-display text-lg font-normal">Portfolio Settings</h3>
               </div>
 
               {/* Theme selector */}
@@ -257,7 +257,7 @@ const JourneyLog = () => {
                       whileTap={{ scale: 0.97 }}
                       onClick={() => setPortfolioTheme(theme)}
                       className={cn(
-                        "rounded-xl p-2 text-xs font-bold border-2 transition-all capitalize",
+                        "rounded-xl p-2 text-xs font-bold border transition-all capitalize",
                         theme === "neon" && (portfolioTheme === "neon" ? "border-secondary bg-secondary/15" : "border-border bg-background"),
                         theme === "dark" && (portfolioTheme === "dark" ? "border-foreground bg-muted" : "border-border bg-background"),
                         theme === "emerald" && (portfolioTheme === "emerald" ? "border-coral bg-coral/15" : "border-border bg-background"),
@@ -276,7 +276,7 @@ const JourneyLog = () => {
                   value={portfolioBio}
                   onChange={(e) => setPortfolioBio(e.target.value)}
                   placeholder="Tell your story..."
-                  className="rounded-xl border-2 min-h-[100px] text-xs focus-visible:ring-secondary"
+                  className="rounded-xl border min-h-[100px] text-xs focus-visible:ring-secondary"
                 />
               </div>
 
@@ -300,7 +300,7 @@ const JourneyLog = () => {
                         href="https://leap.me/explorer-dev"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs font-extrabold text-primary hover:underline block truncate"
+                        className="text-xs font-normal text-primary hover:underline block truncate"
                       >
                         leap.me/explorer-dev
                       </a>
@@ -322,7 +322,7 @@ const JourneyLog = () => {
               <motion.div
                 layout
                 className={cn(
-                  "rounded-3xl border-4 border-black/40 overflow-hidden shadow-2xl transition-all duration-300 min-h-[480px] p-6 sm:p-8 bg-background relative",
+                  "rounded-xl border-4 border-black/40 overflow-hidden shadow-2xl transition-all duration-300 min-h-[480px] p-6 sm:p-8 bg-background relative",
                   portfolioTheme === "neon" && "bg-slate-950 text-white border-slate-800 shadow-secondary/15",
                   portfolioTheme === "dark" && "bg-neutral-900 text-white border-neutral-800",
                   portfolioTheme === "emerald" && "bg-emerald-950 text-emerald-50 border-emerald-900",
@@ -340,10 +340,10 @@ const JourneyLog = () => {
                 <div className="pt-8 space-y-8">
                   {/* Hero */}
                   <div className="space-y-3 text-center sm:text-left">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-primary/25 border border-primary/40 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider">
+                    <div className="inline-flex items-center gap-2 rounded-full bg-primary/25 border border-primary/40 px-3 py-1 text-[11px] font-normal uppercase tracking-wider">
                       🎓 Student Portfolio
                     </div>
-                    <h2 className="font-display text-3xl font-black tracking-tight leading-none mt-2">
+                    <h2 className="font-display text-3xl font-normal tracking-tight leading-none mt-2">
                       Explorer Dev
                     </h2>
                     <p className="text-sm opacity-80 max-w-xl leading-relaxed">
@@ -353,7 +353,7 @@ const JourneyLog = () => {
 
                   {/* Logged wins */}
                   <div className="space-y-4">
-                    <h3 className="font-display text-lg font-extrabold border-b border-white/10 pb-2">
+                    <h3 className="font-display text-lg font-normal border-b border-white/10 pb-2">
                       Project Garden & Event Journal
                     </h3>
 
@@ -365,12 +365,12 @@ const JourneyLog = () => {
                           className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2 hover:bg-white/10 transition-colors"
                         >
                           <div className="flex justify-between items-start">
-                            <span className="text-[9px] font-black uppercase tracking-wider opacity-60">
+                            <span className="text-[9px] font-normal uppercase tracking-wider opacity-60">
                               {exp.type}
                             </span>
                             <span className="text-[9px] font-medium opacity-65">{exp.date}</span>
                           </div>
-                          <h4 className="font-display font-extrabold text-sm leading-tight">{exp.title}</h4>
+                          <h4 className="font-display font-normal text-sm leading-tight">{exp.title}</h4>
                           <p className="text-xs opacity-75 line-clamp-2 leading-relaxed">
                             {exp.reflection}
                           </p>
@@ -398,10 +398,10 @@ const JourneyLog = () => {
         <TabsContent value="studio" className="mt-6 focus-visible:outline-none">
           <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
             {/* Control rail */}
-            <div className="space-y-4 rounded-3xl border-2 border-border bg-surface p-5 h-fit">
+            <div className="space-y-4 rounded-xl border border-border bg-surface p-5 h-fit">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-coral animate-pulse" />
-                <h3 className="font-display text-base font-extrabold">Generate Posts</h3>
+                <h3 className="font-display text-base font-normal">Generate Posts</h3>
               </div>
               <p className="text-xs text-muted-foreground">
                 Select one of your logged experiences to draft targeted, professional social media posts.
@@ -414,7 +414,7 @@ const JourneyLog = () => {
                     setStudioExpId(e.target.value);
                     setDrafts(null);
                   }}
-                  className="w-full rounded-xl border-2 border-border bg-background px-3 py-2.5 text-xs font-bold focus-visible:outline-none focus-visible:border-secondary"
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-bold focus-visible:outline-none focus-visible:border-secondary"
                 >
                   {experiences.map((exp) => (
                     <option key={exp.id} value={exp.id}>
@@ -429,7 +429,7 @@ const JourneyLog = () => {
                   onClick={generateSocialPosts}
                   disabled={isGenerating || !studioExpId}
                   variant="hero"
-                  className="w-full font-black py-5"
+                  className="w-full font-normal py-5"
                 >
                   {isGenerating ? "Writing Drafts..." : "Generate AI Drafts"}
                 </Button>
@@ -445,10 +445,10 @@ const JourneyLog = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     key="empty"
-                    className="rounded-3xl border-2 border-dashed border-border bg-surface p-16 text-center space-y-4"
+                    className="rounded-xl border border-dashed border-border bg-surface p-16 text-center space-y-4"
                   >
                     <div className="text-5xl">✍️</div>
-                    <h3 className="font-display text-xl font-extrabold">Ready to share your achievements?</h3>
+                    <h3 className="font-display text-xl font-normal">Ready to share your achievements?</h3>
                     <p className="text-sm text-muted-foreground max-w-md mx-auto">
                       Select a logged win on the left and click "Generate AI Drafts". Jumpy will write platform-optimized copy based on your reflection and takeaways.
                     </p>
@@ -462,9 +462,9 @@ const JourneyLog = () => {
                     className="grid gap-6"
                   >
                     {/* LinkedIn */}
-                    <div className="rounded-3xl border-2 border-border bg-surface p-5 space-y-3 relative">
+                    <div className="rounded-xl border border-border bg-surface p-5 space-y-3 relative">
                       <div className="flex items-center justify-between border-b border-border pb-3">
-                        <span className="text-xs font-extrabold text-muted-foreground uppercase flex items-center gap-1">
+                        <span className="text-xs font-normal text-muted-foreground uppercase flex items-center gap-1">
                           <Send className="h-4 w-4" /> LinkedIn Post
                         </span>
                         <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
@@ -486,9 +486,9 @@ const JourneyLog = () => {
                     </div>
 
                     {/* Twitter / X */}
-                    <div className="rounded-3xl border-2 border-border bg-surface p-5 space-y-3 relative">
+                    <div className="rounded-xl border border-border bg-surface p-5 space-y-3 relative">
                       <div className="flex items-center justify-between border-b border-border pb-3">
-                        <span className="text-xs font-extrabold text-muted-foreground uppercase flex items-center gap-1">
+                        <span className="text-xs font-normal text-muted-foreground uppercase flex items-center gap-1">
                           <Send className="h-4 w-4" /> Twitter/X Tweet
                         </span>
                         <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
@@ -510,9 +510,9 @@ const JourneyLog = () => {
                     </div>
 
                     {/* Blog outline */}
-                    <div className="rounded-3xl border-2 border-border bg-surface p-5 space-y-3 relative">
+                    <div className="rounded-xl border border-border bg-surface p-5 space-y-3 relative">
                       <div className="flex items-center justify-between border-b border-border pb-3">
-                        <span className="text-xs font-extrabold text-muted-foreground uppercase flex items-center gap-1">
+                        <span className="text-xs font-normal text-muted-foreground uppercase flex items-center gap-1">
                           <FileText className="h-4 w-4" /> Blog/Medium Outline
                         </span>
                         <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>

@@ -270,7 +270,7 @@ const Discover = () => {
       {/* Header */}
       <div>
         <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Discover Hub</div>
-        <h1 className="mt-1 font-display text-3xl font-black md:text-4xl">Find Opportunities</h1>
+        <h1 className="mt-1 font-display text-3xl font-normal md:text-4xl">Find Opportunities</h1>
         <p className="text-sm text-muted-foreground">
           Join student-led communities, find active cohort group chats, and attend skills-based events.
         </p>
@@ -284,7 +284,7 @@ const Discover = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search communities, chat groups, skills (e.g. Mistral, Figma)..."
-            className="h-12 rounded-full border-2 pl-11 pr-4 text-sm focus-visible:ring-secondary"
+            className="h-12 rounded-full border pl-11 pr-4 text-sm focus-visible:ring-secondary"
           />
         </div>
         <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
@@ -296,7 +296,7 @@ const Discover = () => {
               whileTap={{ scale: 0.97 }}
               onClick={() => setActiveInterestFilter(cat)}
               className={cn(
-                "rounded-full px-4 py-1.5 text-xs font-extrabold whitespace-nowrap transition-all border-2",
+                "rounded-full px-4 py-1.5 text-xs font-normal whitespace-nowrap transition-all border",
                 activeInterestFilter === cat
                   ? "border-foreground bg-foreground text-background"
                   : "border-border bg-surface text-muted-foreground hover:border-foreground/30",
@@ -309,7 +309,7 @@ const Discover = () => {
       </div>
 
       <Tabs defaultValue="communities" className="w-full">
-        <TabsList className="flex w-full sm:w-fit justify-start gap-1 rounded-2xl border-2 border-border bg-surface p-1">
+        <TabsList className="flex w-full sm:w-fit justify-start gap-1 rounded-2xl border border-border bg-surface p-1">
           <TabsTrigger value="communities" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
             <Users className="h-4 w-4 mr-2 inline" /> Communities
           </TabsTrigger>
@@ -327,10 +327,10 @@ const Discover = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="rounded-3xl border-2 border-dashed border-border bg-surface p-12 text-center"
+              className="rounded-xl border border-dashed border-border bg-surface p-12 text-center"
             >
               <div className="text-4xl">🐸</div>
-              <h3 className="mt-3 font-display text-xl font-extrabold">No communities found</h3>
+              <h3 className="mt-3 font-display text-xl font-normal">No communities found</h3>
               <p className="mt-1 text-sm text-muted-foreground">Try clearing your filters or changing search keywords.</p>
             </motion.div>
           ) : (
@@ -345,7 +345,7 @@ const Discover = () => {
                   key={c.id}
                   variants={itemVariants}
                   whileHover={{ y: -2 }}
-                  className="rounded-3xl border-2 border-border bg-surface p-6 shadow-sm flex flex-col justify-between"
+                  className="rounded-xl border border-border bg-surface p-6 shadow-sm flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <motion.div
@@ -355,12 +355,12 @@ const Discover = () => {
                       className="flex items-center justify-between gap-2"
                     >
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-secondary/15 border border-secondary/20 px-3 py-1 text-[10px] font-extrabold text-foreground uppercase tracking-wide">
+                        <span className="rounded-full bg-secondary/15 border border-secondary/20 px-3 py-1 text-[10px] font-normal text-foreground uppercase tracking-wide">
                           {c.type}
                         </span>
                         <span
                           className={cn(
-                            "rounded-full border px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide inline-flex items-center gap-1",
+                            "rounded-full border px-3 py-1 text-[10px] font-normal uppercase tracking-wide inline-flex items-center gap-1",
                             ROADMAP_LEVEL_TAGS[c.roadmapLevel].badgeClass,
                           )}
                           title={`Best matched to your ${ROADMAP_LEVEL_TAGS[c.roadmapLevel].label} roadmap phase`}
@@ -374,7 +374,7 @@ const Discover = () => {
                       </span>
                     </motion.div>
                     <div>
-                      <h3 className="font-display text-xl font-extrabold text-foreground">{c.name}</h3>
+                      <h3 className="font-display text-xl font-normal text-foreground">{c.name}</h3>
                       <span className="text-xs font-bold text-muted-foreground uppercase">{c.category}</span>
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed">{c.desc}</p>
@@ -413,10 +413,10 @@ const Discover = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="rounded-3xl border-2 border-dashed border-border bg-surface p-12 text-center"
+              className="rounded-xl border border-dashed border-border bg-surface p-12 text-center"
             >
               <div className="text-4xl">💬</div>
-              <h3 className="mt-3 font-display text-xl font-extrabold">No active group chats</h3>
+              <h3 className="mt-3 font-display text-xl font-normal">No active group chats</h3>
               <p className="mt-1 text-sm text-muted-foreground">Adjust your filters to see active chats.</p>
             </motion.div>
           ) : (
@@ -431,11 +431,11 @@ const Discover = () => {
                   key={chat.id}
                   variants={itemVariants}
                   whileHover={{ y: -2 }}
-                  className="rounded-3xl border-2 border-border bg-surface p-6 shadow-sm flex flex-col justify-between"
+                  className="rounded-xl border border-border bg-surface p-6 shadow-sm flex flex-col justify-between"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-[10px] font-extrabold text-foreground uppercase tracking-wide">
+                      <span className="rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-[10px] font-normal text-foreground uppercase tracking-wide">
                         {chat.platform}
                       </span>
                       <span className="text-xs font-bold text-coral flex items-center gap-1.5">
@@ -447,7 +447,7 @@ const Discover = () => {
                       </span>
                     </div>
                     <div>
-                      <h3 className="font-display text-xl font-black text-foreground">{chat.name}</h3>
+                      <h3 className="font-display text-xl font-normal text-foreground">{chat.name}</h3>
                       <span className="text-xs font-bold text-muted-foreground uppercase">{chat.category}</span>
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed">{chat.description}</p>
@@ -486,10 +486,10 @@ const Discover = () => {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="rounded-3xl border-2 border-dashed border-border bg-surface p-12 text-center"
+              className="rounded-xl border border-dashed border-border bg-surface p-12 text-center"
             >
               <div className="text-4xl">📅</div>
-              <h3 className="mt-3 font-display text-xl font-extrabold">No interest-based events</h3>
+              <h3 className="mt-3 font-display text-xl font-normal">No interest-based events</h3>
               <p className="mt-1 text-sm text-muted-foreground">Adjust your search or look at other categories.</p>
             </motion.div>
           ) : (
@@ -504,20 +504,20 @@ const Discover = () => {
                   key={e.id}
                   variants={itemVariants}
                   whileHover={{ y: -2 }}
-                  className="rounded-3xl border-2 border-border bg-surface p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
+                  className="rounded-xl border border-border bg-surface p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6"
                 >
                   <div className="space-y-3 flex-1 min-w-0">
                     <div className="flex flex-wrap gap-2">
-                      <span className="rounded-full bg-secondary/15 border border-secondary/20 px-2.5 py-0.5 text-[9px] font-extrabold text-foreground uppercase tracking-wide">
+                      <span className="rounded-full bg-secondary/15 border border-secondary/20 px-2.5 py-0.5 text-[9px] font-normal text-foreground uppercase tracking-wide">
                         {e.interest}
                       </span>
-                      <span className="rounded-full bg-coral/10 border border-coral/25 px-2.5 py-0.5 text-[9px] font-extrabold text-coral uppercase tracking-wide">
+                      <span className="rounded-full bg-coral/10 border border-coral/25 px-2.5 py-0.5 text-[9px] font-normal text-coral uppercase tracking-wide">
                         {e.type}
                       </span>
                     </div>
 
                     <div>
-                      <h3 className="font-display text-2xl font-extrabold text-foreground leading-tight">{e.title}</h3>
+                      <h3 className="font-display text-2xl font-normal text-foreground leading-tight">{e.title}</h3>
                       <p className="text-sm font-semibold text-muted-foreground mt-0.5">{e.speaker}</p>
                     </div>
 
@@ -526,7 +526,7 @@ const Discover = () => {
                       {e.skills.map((skill) => (
                         <span
                           key={skill}
-                          className="rounded-full bg-background border border-border px-2 py-0.5 text-[10px] font-extrabold text-muted-foreground"
+                          className="rounded-full bg-background border border-border px-2 py-0.5 text-[10px] font-normal text-muted-foreground"
                         >
                           +{skill}
                         </span>

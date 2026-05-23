@@ -88,14 +88,14 @@ const AboutMe = () => {
   return (
     <div className="container py-8 md:py-10">
       {/* Header */}
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-3xl border-2 border-border bg-surface p-6">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-surface p-6">
         <div className="flex items-center gap-5">
           <div className="rounded-full bg-secondary/30 p-2">
             <Jumpy size="sm" animate="float" />
           </div>
           <div>
             <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">About me</div>
-            <h1 className="font-display text-3xl font-black">{displayName}</h1>
+            <h1 className="font-display text-3xl font-normal">{displayName}</h1>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span className="rounded-full bg-coral/15 px-2.5 py-0.5 font-bold text-coral">Lvl {level}</span>
               <span>•</span>
@@ -122,9 +122,9 @@ const AboutMe = () => {
         </div>
       </div>
 
-      <section className="mb-8 rounded-3xl border-2 border-border bg-surface p-6">
+      <section className="mb-8 rounded-xl border border-border bg-surface p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-xl font-extrabold">Achievements</h2>
+          <h2 className="font-display text-xl font-normal">Achievements</h2>
           <span className="text-xs font-bold text-muted-foreground">
             {achievementsUnlocked.length} / 8 unlocked
           </span>
@@ -135,13 +135,13 @@ const AboutMe = () => {
       {/* Sections */}
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {sections.map((s) => (
-          <section key={s.key} className="rounded-3xl border-2 border-border bg-surface p-5">
+          <section key={s.key} className="rounded-xl border border-border bg-surface p-5">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-secondary text-foreground">
                   <s.icon className="h-4 w-4" />
                 </div>
-                <h2 className="font-display text-lg font-extrabold">{s.title}</h2>
+                <h2 className="font-display text-lg font-normal">{s.title}</h2>
               </div>
               <Button variant="ghost" size="sm" className="h-8 px-2"><Pencil className="h-3.5 w-3.5" /></Button>
             </div>

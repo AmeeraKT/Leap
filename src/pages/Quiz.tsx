@@ -177,7 +177,7 @@ const Quiz = () => {
   return (
     <AnimatedPage className="min-h-screen bg-background">
       {/* Top bar */}
-      <header className="sticky top-0 z-10 border-b-2 border-border bg-background/90 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur">
         <div className="container flex items-center justify-between py-4">
           <button
             onClick={() => navigate("/")}
@@ -188,7 +188,7 @@ const Quiz = () => {
           </button>
           <div className="flex items-center gap-2">
             <Jumpy size="xs" animate="float" />
-            <span className="font-display text-lg font-black">
+            <span className="font-display text-lg font-normal">
               {mode === "signUp" ? "Leap Sign-up" : "Leap Sign-in"}
             </span>
           </div>
@@ -206,7 +206,7 @@ const Quiz = () => {
 
       <main className="container max-w-2xl py-10 pb-32">
         <div className="mb-8 text-center">
-          <h1 className="font-display text-4xl font-black md:text-5xl leading-tight">
+          <h1 className="font-display text-4xl font-normal md:text-5xl leading-tight">
             {mode === "signUp" ? (
               <>
                 Start your journey with <span className="text-coral">Leap</span>
@@ -229,7 +229,7 @@ const Quiz = () => {
             type="button"
             variant="outline"
             size="lg"
-            className="w-full h-12 rounded-xl border-2 font-display font-bold"
+            className="w-full h-12 rounded-xl border font-display font-bold"
             onClick={signInAsDemo}
             disabled={loading}
           >
@@ -247,7 +247,7 @@ const Quiz = () => {
 
         {/* Toggle sign in / sign up */}
         <div className="mb-6 flex justify-center">
-          <div className="inline-flex rounded-2xl border-2 border-border bg-surface p-1">
+          <div className="inline-flex rounded-2xl border border-border bg-surface p-1">
             <button
               onClick={() => setMode("signUp")}
               className={`rounded-xl px-4 py-2 font-display text-sm font-bold transition-all ${
@@ -279,9 +279,9 @@ const Quiz = () => {
               {/* Card 1: Account Details */}
               <motion.div
                 variants={cardVariants}
-                className="rounded-3xl border-2 border-border bg-surface p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+                className="rounded-xl border border-border bg-surface p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
               >
-                <h2 className="mb-4 font-display text-2xl font-extrabold text-foreground flex items-center gap-2">
+                <h2 className="mb-4 font-display text-2xl font-normal text-foreground flex items-center gap-2">
                   <User className="h-5 w-5 text-secondary" />
                   1. Account Details
                 </h2>
@@ -361,9 +361,9 @@ const Quiz = () => {
               {/* Card 2: Background & Ambitions */}
               <motion.div
                 variants={cardVariants}
-                className="rounded-3xl border-2 border-border bg-surface p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+                className="rounded-xl border border-border bg-surface p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
               >
-                <h2 className="mb-4 font-display text-2xl font-extrabold text-foreground flex items-center gap-2">
+                <h2 className="mb-4 font-display text-2xl font-normal text-foreground flex items-center gap-2">
                   🎓 2. Background & Ambitions
                 </h2>
                 <div className="space-y-4">
@@ -376,7 +376,7 @@ const Quiz = () => {
                       <SelectTrigger className="h-12 rounded-xl bg-background border-input hover:border-secondary/60 transition-colors focus:ring-secondary">
                       <SelectValue placeholder="Select highest education..." />
                       </SelectTrigger>
-                      <SelectContent className="bg-surface border-2 border-border rounded-xl">
+                      <SelectContent className="bg-surface border border-border rounded-xl">
                         <SelectItem value="hs">High School</SelectItem>
                         <SelectItem value="diploma">Diploma / TAFE</SelectItem>
                         <SelectItem value="bachelor">Bachelor's Degree</SelectItem>
@@ -403,9 +403,9 @@ const Quiz = () => {
               {/* Card 3: Personal Interests */}
               <motion.div
                 variants={cardVariants}
-                className="rounded-3xl border-2 border-border bg-surface p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+                className="rounded-xl border border-border bg-surface p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
               >
-                <h2 className="mb-4 font-display text-2xl font-extrabold text-foreground flex items-center gap-2">
+                <h2 className="mb-4 font-display text-2xl font-normal text-foreground flex items-center gap-2">
                   🎨 3. Select Your Interests
                 </h2>
                 <p className="text-sm text-muted-foreground mb-3 leading-snug">
@@ -428,7 +428,7 @@ const Quiz = () => {
                         <ChevronDown className="h-4 w-4 opacity-50 text-foreground shrink-0" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-[340px] max-h-[300px] overflow-y-auto bg-surface border-2 border-border rounded-xl p-1 z-30 shadow-md">
+                    <DropdownMenuContent className="w-[340px] max-h-[300px] overflow-y-auto bg-surface border border-border rounded-xl p-1 z-30 shadow-md">
                       {interestOptions.map((opt) => (
                         <DropdownMenuCheckboxItem
                           key={opt}
@@ -453,9 +453,9 @@ const Quiz = () => {
             /* Sign In mode simple cards */
             <motion.div
               variants={cardVariants}
-              className="rounded-3xl border-2 border-border bg-surface p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+              className="rounded-xl border border-border bg-surface p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
             >
-              <h2 className="mb-4 font-display text-2xl font-extrabold text-foreground flex items-center gap-2">
+              <h2 className="mb-4 font-display text-2xl font-normal text-foreground flex items-center gap-2">
                 <Lock className="h-5 w-5 text-secondary" />
                 Sign in to your account
               </h2>
@@ -500,7 +500,7 @@ const Quiz = () => {
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 80, damping: 15 }}
-        className="fixed bottom-0 left-0 right-0 border-t-2 border-border bg-surface/95 backdrop-blur z-20 shadow-lg"
+        className="fixed bottom-0 left-0 right-0 border-t border-border bg-surface/95 backdrop-blur z-20 shadow-lg"
       >
         <div className="container flex max-w-2xl items-center justify-between py-4">
           <Button variant="ghost" onClick={() => navigate("/")} disabled={loading}>

@@ -29,7 +29,7 @@ const Results = () => {
       <header className="container flex items-center justify-between py-6">
         <button onClick={() => navigate("/")} className="flex items-center gap-2">
           <Jumpy size="xs" animate="none" />
-          <span className="font-display text-xl font-extrabold">Leap</span>
+          <span className="font-display text-xl font-normal">Leap</span>
         </button>
         <div className="flex items-center gap-2">
           <ThemeToggle />
@@ -54,7 +54,7 @@ const Results = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.5 }}
-            className="mt-4 font-display text-4xl font-black md:text-6xl"
+            className="mt-4 font-display text-4xl font-normal md:text-6xl"
           >
             Here's where you want to be,{" "}
             <span className="text-primary">{firstName}</span>…
@@ -100,11 +100,11 @@ const Results = () => {
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, type: "spring", stiffness: 80, damping: 15 }}
-        className="fixed bottom-0 left-0 right-0 border-t-2 border-border bg-surface/95 backdrop-blur z-20 shadow-lg"
+        className="fixed bottom-0 left-0 right-0 border-t border-border bg-surface/95 backdrop-blur z-20 shadow-lg"
       >
         <div className="container flex max-w-5xl items-center justify-between py-4">
           <div className="text-sm">
-            <div className="font-display font-extrabold">Ready to commit?</div>
+            <div className="font-display font-normal">Ready to commit?</div>
             <div className="text-xs text-muted-foreground">Start building your step-by-step roadmap now.</div>
           </div>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -142,7 +142,7 @@ const TransformCard = ({
     transition={{ type: "spring", stiffness: 70, damping: 15, delay }}
     whileHover={{ y: -5, scale: 1.02 }}
     className={cn(
-      "relative overflow-hidden rounded-3xl border-2 p-8 text-center transition-shadow duration-300 shadow-sm hover:shadow-md",
+      "relative overflow-hidden rounded-xl border p-8 text-center transition-shadow duration-300 shadow-sm hover:shadow-md",
       tone === "dream" ? "border-secondary bg-secondary/15" : "border-border bg-surface",
     )}
   >
@@ -153,7 +153,7 @@ const TransformCard = ({
     <div className="mt-4 flex justify-center">
       <Jumpy size="md" animate={tone === "dream" ? "hop" : "float"} glow={tone === "dream"} />
     </div>
-    <div className="mt-4 font-display text-2xl font-black">{title}</div>
+    <div className="mt-4 font-display text-2xl font-normal">{title}</div>
     <div className="text-sm text-muted-foreground">{subtitle}</div>
     {tone === "dream" && (
       <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-coral/15 px-3 py-1 text-xs font-bold text-coral">

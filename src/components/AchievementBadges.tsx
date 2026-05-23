@@ -20,7 +20,7 @@ export const AchievementBadges = ({ compact }: Props) => {
           <div
             key={a.id}
             className={cn(
-              "rounded-2xl border-2 p-3 transition-colors",
+              "rounded-2xl border p-3 transition-colors",
               unlocked
                 ? "border-secondary bg-secondary/15"
                 : "border-border bg-background opacity-80",
@@ -28,7 +28,7 @@ export const AchievementBadges = ({ compact }: Props) => {
             title={a.description}
           >
             <div className="text-2xl">{unlocked ? a.emoji : "🔒"}</div>
-            <div className="mt-1 font-display text-xs font-extrabold leading-tight">{a.title}</div>
+            <div className="mt-1 font-display text-xs font-normal leading-tight">{a.title}</div>
             {!compact && (
               <div className="mt-0.5 text-[10px] text-muted-foreground">{unlocked ? a.description : detail}</div>
             )}
