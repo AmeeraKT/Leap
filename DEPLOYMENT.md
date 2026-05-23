@@ -29,6 +29,10 @@ Repository: [rudra-code-creator/leap-UQIES-hackathon](https://github.com/rudra-c
 
 After this, every push to `master` deploys to production; other branches get preview URLs.
 
+## If GitHub deploys fail with `ERESOLVE` on `npm install`
+
+`master` must include **both** `.npmrc` (`legacy-peer-deps=true`) and an updated `package-lock.json` with `@vitejs/plugin-react-swc@^4.3.1` (Vite 8 peer). Without those files, Vercel’s `npm ci` step fails before the build runs. CLI uploads worked earlier because they included local fixes not yet on `master`.
+
 ## CLI (optional)
 
 ```bash

@@ -7,7 +7,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { MilestoneGamePath } from "@/components/MilestoneGamePath";
+import { MilestoneGamePath, getActiveRoadmapPhaseIndex } from "@/components/MilestoneGamePath";
+import { Jumpy } from "@/components/Jumpy";
+import { ROADMAP_PHASE_ORDER, phaseShortLabel } from "@/lib/roadmap-alumni";
 import { RoadmapAlumniSection } from "@/components/RoadmapAlumniSection";
 import { JumpyNudge } from "@/components/JumpyNudge";
 import { useExperiences } from "@/lib/experiences-store";
@@ -142,41 +144,60 @@ const Roadmap = () => {
 
   const firstUnshared = experiences.find((e) => !Object.values(e.posted).some(Boolean));
 
+  const activeStageIndex = useMemo(() => getActiveRoadmapPhaseIndex(milestones), [milestones]);
+  const activeStageLabel =
+    activeStageIndex >= 0 && activeStageIndex < ROADMAP_PHASE_ORDER.length
+      ? phaseShortLabel(ROADMAP_PHASE_ORDER[activeStageIndex])
+      : null;
+  const allStagesComplete = milestones.length > 0 && milestones.every((m) => m.done);
+
   return (
-    <AnimatedPage className="container py-8 md:py-10 space-y-6 overflow-x-hidden">
+    <AnimatedPage className="container space-y-8 overflow-x-hidden py-8 md:py-10">
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Roadmap Planner</div>
-          <h1 className="mt-1 font-display text-3xl font-normal md:text-4xl">Guide Your Career Goals</h1>
-          <p className="text-sm text-muted-foreground">
-            A personalized roadmap built to scale with your activities. See how every action impacts job matches.
-          </p>
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-soft-stone/80 via-background to-pale-blue/50 p-6 md:p-8 dark:from-[hsl(240_9%_10%)] dark:via-card dark:to-brand-navy/30 dark:border-border/80">
+        <div className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-coral/10 blur-3xl dark:bg-coral/15" aria-hidden />
+        <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex gap-4 md:gap-6">
+            <Jumpy size="md" animate="float" glow className="hidden shrink-0 sm:block" />
+            <div>
+              <p className="leap-mono-label">Roadmap planner</p>
+              <h1 className="mt-2 font-display text-3xl font-normal tracking-tight md:text-4xl">
+                Guide your career goals
+              </h1>
+              <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
+                {allStagesComplete
+                  ? "You cleared every milestone — Jumpy is proud. Keep logging wins in Journey Log."
+                  : activeStageLabel
+                    ? `Jumpy is waiting for you in ${activeStageLabel}. Complete milestones to hop to the next stage.`
+                    : "A personalized roadmap that grows with your experiences and skills."}
+              </p>
+            </div>
+          </div>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="shrink-0">
+            <Button
+              onClick={regenerateAIPlan}
+              disabled={isRegenerating}
+              variant="hero"
+              className="gap-2 px-6 py-5"
+            >
+              <RefreshCw className={cn("h-4 w-4", isRegenerating && "animate-spin")} />
+              {isRegenerating ? "Regenerating…" : "Regenerate AI plan"}
+            </Button>
+          </motion.div>
         </div>
-        <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-          <Button
-            onClick={regenerateAIPlan}
-            disabled={isRegenerating}
-            variant="hero"
-            className="self-start gap-2 font-bold py-5 px-5"
-          >
-            <RefreshCw className={cn("h-4 w-4", isRegenerating && "animate-spin")} />
-            {isRegenerating ? "Regenerating..." : "Regenerate AI Plan"}
-          </Button>
-        </motion.div>
       </div>
 
       <div className="space-y-6">
           <Tabs defaultValue="milestones" className="w-full">
-            <TabsList className="flex w-full justify-start gap-1 rounded-2xl border border-border bg-surface p-1 flex-wrap font-display font-bold">
-              <TabsTrigger value="milestones" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
+            <TabsList className="leap-tabs-list flex w-full flex-wrap justify-start font-display">
+              <TabsTrigger value="milestones" className="leap-tab-trigger rounded-lg px-4 py-2 font-display data-[state=active]:shadow-none">
                 Personalized Milestones
               </TabsTrigger>
-              <TabsTrigger value="planner" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
+              <TabsTrigger value="planner" className="leap-tab-trigger rounded-lg px-4 py-2 font-display data-[state=active]:shadow-none">
                 Time Planner
               </TabsTrigger>
-              <TabsTrigger value="brand" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
-                Personal Brand Coaching ⭐
+              <TabsTrigger value="brand" className="leap-tab-trigger rounded-lg px-4 py-2 font-display data-[state=active]:shadow-none">
+                Personal Brand Coaching
               </TabsTrigger>
             </TabsList>
 
@@ -198,7 +219,7 @@ const Roadmap = () => {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 100, damping: 15 }}
-                className="rounded-xl border border-border bg-surface p-5 space-y-4 shadow-sm"
+                className="leap-card-elevated space-y-4 rounded-xl p-5"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
@@ -254,7 +275,7 @@ const Roadmap = () => {
                           whileHover={{ scale: 1.01, x: 2 }}
                           className={cn(
                             "flex items-center justify-between rounded-xl border p-3.5 bg-background hover:border-foreground/20 transition-all",
-                            pt.done ? "border-border/40 opacity-70" : "border-border shadow-sm",
+                            pt.done ? "border-border/40 opacity-70" : "border-border dark:hover:border-border/80",
                           )}
                         >
                           <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -380,8 +401,8 @@ const MetricCard = ({
   icon: React.ReactNode; title: string; value: string; progress: number;
   hint: string; cta?: string; ctaTo?: string; chart?: boolean;
 }) => (
-  <div className="rounded-xl border border-border bg-surface p-5">
-    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+  <div className="leap-card-elevated rounded-xl p-5">
+    <div className="leap-mono-label flex items-center gap-2">
       {icon} {title}
     </div>
     <div className="mt-2 flex items-baseline gap-2">
@@ -428,7 +449,7 @@ const Module = ({
   const doneCount = resolved.filter((i) => i.checked).length;
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-5">
+    <div className="leap-card-elevated rounded-xl p-5">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-base font-normal">{title}</h3>
         <span className="text-xs font-bold text-muted-foreground">
