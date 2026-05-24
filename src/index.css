@@ -55,6 +55,14 @@
     --brand-muted: 240 5% 60%;
     --brand-hairline: 240 6% 86%;
 
+    --roadmap-tint-1: 108 76% 95%;
+    --roadmap-tint-2: 40 14% 92%;
+    --roadmap-tint-3: 228 100% 97%;
+    --roadmap-tint-4: 108 50% 94%;
+    --roadmap-tint-5: 40 14% 94%;
+    --roadmap-tint-6: 172 40% 93%;
+    --roadmap-glow: 11 100% 67%;
+
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 13%;
     --sidebar-primary: 240 9% 10%;
@@ -98,6 +106,22 @@
     --sidebar-accent-foreground: 0 0% 96%;
     --sidebar-border: 240 6% 22%;
     --sidebar-ring: 228 76% 60%;
+
+    --brand-deep: 172 42% 22%;
+    --brand-navy: 211 48% 18%;
+    --brand-stone: 240 9% 14%;
+    --brand-pale-green: 172 32% 14%;
+    --brand-pale-blue: 228 32% 14%;
+    --brand-hairline: 240 6% 24%;
+    --brand-action: 217 79% 62%;
+
+    --roadmap-tint-1: 172 32% 14%;
+    --roadmap-tint-2: 240 9% 13%;
+    --roadmap-tint-3: 228 32% 14%;
+    --roadmap-tint-4: 172 28% 12%;
+    --roadmap-tint-5: 40 8% 13%;
+    --roadmap-tint-6: 211 40% 16%;
+    --roadmap-glow: 11 100% 67%;
   }
 }
 
@@ -150,6 +174,27 @@
     @apply rounded-[22px] border border-border bg-card text-card-foreground;
   }
 
+  .leap-card-elevated {
+    @apply leap-card shadow-none;
+    @apply dark:border-border/80 dark:bg-gradient-to-b dark:from-card dark:to-[hsl(240_9%_7%)];
+    @apply dark:shadow-[0_1px_0_0_hsl(var(--border)_/_0.6)_inset,0_24px_48px_-24px_hsl(0_0%_0%_/_0.55)];
+  }
+
+  .roadmap-journey-shell {
+    @apply relative overflow-hidden;
+  }
+
+  .roadmap-journey-shell::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-coral/40 to-transparent;
+  }
+
+  .dark .roadmap-journey-shell::after {
+    content: "";
+    @apply pointer-events-none absolute -right-24 -top-24 h-48 w-48 rounded-full opacity-30;
+    background: radial-gradient(circle, hsl(var(--roadmap-glow) / 0.12) 0%, transparent 70%);
+  }
+
   .leap-panel {
     @apply rounded-lg border border-border bg-surface;
   }
@@ -182,11 +227,13 @@
 
   .leap-tabs-list {
     @apply inline-flex flex-wrap gap-1 rounded-lg border border-border bg-muted/50 p-1;
+    @apply dark:border-border/80 dark:bg-muted/30;
   }
 
   .leap-tab-trigger {
     @apply rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors;
     @apply data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-none;
+    @apply dark:data-[state=active]:border dark:data-[state=active]:border-border/80 dark:data-[state=active]:bg-card;
   }
 }
 
@@ -231,6 +278,49 @@
 
   .bg-pale-blue {
     background-color: hsl(var(--brand-pale-blue));
+  }
+
+  .bg-roadmap-tint-1 {
+    background-color: hsl(var(--roadmap-tint-1));
+  }
+
+  .bg-roadmap-tint-2 {
+    background-color: hsl(var(--roadmap-tint-2));
+  }
+
+  .bg-roadmap-tint-3 {
+    background-color: hsl(var(--roadmap-tint-3));
+  }
+
+  .bg-roadmap-tint-4 {
+    background-color: hsl(var(--roadmap-tint-4));
+  }
+
+  .bg-roadmap-tint-5 {
+    background-color: hsl(var(--roadmap-tint-5));
+  }
+
+  .bg-roadmap-tint-6 {
+    background-color: hsl(var(--roadmap-tint-6));
+  }
+
+  .roadmap-path-line {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--border)) 0%,
+      hsl(var(--coral) / 0.45) 50%,
+      hsl(var(--border)) 100%
+    );
+  }
+
+  .dark .roadmap-path-line {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--border)) 0%,
+      hsl(var(--coral) / 0.35) 45%,
+      hsl(var(--brand-deep) / 0.5) 75%,
+      hsl(var(--border)) 100%
+    );
   }
 
   .bg-brand-deep {
