@@ -18,6 +18,7 @@ import JourneyLog from "./pages/JourneyLog.tsx";
 import ExperienceDetail from "./pages/ExperienceDetail.tsx";
 import NewExperience from "./pages/NewExperience.tsx";
 import CareerVision from "./pages/CareerVision.tsx";
+import Waitlist from "./pages/Waitlist.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/results" element={<Results />} />
           <Route path="/chat" element={<Chat />} />

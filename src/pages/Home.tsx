@@ -46,23 +46,23 @@ const features = [
 const howItWorks = [
   {
     step: "01",
-    title: "Start in seconds",
-    body: "Create an account or use the one-click demo — no setup friction.",
+    title: "Explore",
+    body: "Discover yourself and potential career paths. Jumpy AI personalizes suggestions of events and opportunities that fit you best.",
   },
   {
     step: "02",
-    title: "Match your path",
-    body: "Complete the quiz, review your top pathways, and open your student dashboard.",
+    title: "Engage",
+    body: "Turn your career development into action. Curated events, like-minded communities and personal brand coaching sessions helps make you stand out in the crowd.",
   },
   {
     step: "03",
-    title: "Log & discover",
-    body: "Record experiences in Journey Log, RSVP to events, and join communities in Discover.",
+    title: "Capture",
+    body: "Turn your everyday experiences into career-ready evidence. Log events and their details so you can never forget them in interviews.",
   },
   {
     step: "04",
-    title: "Level up & launch",
-    body: "Clear quest milestones for XP, follow your roadmap, and use Career Vision to target roles.",
+    title: "Showcase",
+    body: "Turn your growth into opportunities. LEAP transforms experience logs into portfolio format or social media content so employers can see your growth..",
   },
 ];
 
@@ -127,10 +127,6 @@ const Home = () => {
           initial="hidden"
           animate="visible"
         >
-          <motion.div variants={itemVariants} className="leap-mono-label inline-flex items-center gap-2">
-            Career planning · XP · AI coach
-          </motion.div>
-
           <motion.h1
             variants={itemVariants}
             className="font-display text-5xl font-normal leading-[1.02] text-foreground md:text-6xl lg:text-7xl"
@@ -144,28 +140,34 @@ const Home = () => {
             events, and get AI job matches — with Jumpy guiding each step.
           </motion.p>
 
-          <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-3">
-            <Link to="/quiz">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button variant="hero" size="xl">
-                  Get started
+          <motion.div variants={itemVariants} className="flex w-fit max-w-full flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <Link to="/quiz">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button variant="hero" size="xl">
+                    Get started
+                    <ArrowRight />
+                  </Button>
+                </motion.div>
+              </Link>
+              <Link to="/quiz">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button variant="outline" size="lg" className="font-bold">
+                    <Sparkles className="h-4 w-4 text-secondary" />
+                    Try demo account
+                  </Button>
+                </motion.div>
+              </Link>
+            </div>
+
+            <Link to="/waitlist" className="block w-full">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full">
+                <Button variant="coral" size="lg" className="w-full font-bold">
+                  Join waitlist
                   <ArrowRight />
                 </Button>
               </motion.div>
             </Link>
-            <Link to="/quiz">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button variant="outline" size="lg" className="font-bold">
-                  <Sparkles className="h-4 w-4 text-secondary" />
-                  Try demo account
-                </Button>
-              </motion.div>
-            </Link>
-          </motion.div>
-
-          <motion.div variants={itemVariants} className="flex items-center gap-2 text-sm text-muted-foreground">
-            <ShieldCheck className="h-4 w-4 text-secondary shrink-0" />
-            One-click demo · Earn XP from checklist tasks · Works offline in demo mode
           </motion.div>
 
           <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-6 pt-2">
@@ -207,9 +209,9 @@ const Home = () => {
       <section id="features" className="leap-band-deep py-20">
         <div className="container">
           <div className="mx-auto mb-12 max-w-2xl text-center">
-            <h2 className="font-display text-4xl font-normal text-white md:text-5xl">Everything in your Leap hub</h2>
+            <h2 className="font-display text-4xl font-normal text-white md:text-5xl">Recipe to your Success</h2>
             <p className="mt-3 text-white/75">
-              Four tools that take you from “what’s next?” to job-ready — tap a card to explore.
+              Four tools that take you from “what’s next?” to job-ready.
             </p>
           </div>
           <motion.div
