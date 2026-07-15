@@ -1,1 +1,4 @@
-project_id = "ljhkmdiialfvoilszmzn"
+project_id = "fgirlottswrlnpbdaxrr"
+
+[functions.submit-waitlist]
+verify_jwt = false

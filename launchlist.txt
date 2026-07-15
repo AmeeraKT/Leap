@@ -1,0 +1,24 @@
+Rm5DQo
+
+
+https://getlaunchlist.com/s/Rm5DQo
+
+
+https://getlaunchlist.com/js/widget.js
+
+
+<!-- 1. Add this to your <head> -->
+<script src="https://getlaunchlist.com/js/widget.js" defer></script>
+
+<!-- 2. Drop this where the form should appear -->
+<div class="launchlist-widget" data-key-id="Rm5DQo"></div>
+
+
+
+
+REACT 
+<!-- 1. Add this to your <head> -->
+<script src="https://getlaunchlist.com/js/widget.js" defer></script>
+
+<!-- 2. Drop this where the form should appear -->
+<div class="launchlist-widget" data-key-id="Rm5DQo"></div>
