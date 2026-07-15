@@ -122,7 +122,7 @@ const Home = () => {
       {/* Hero */}
       <section className="container grid items-center gap-10 py-12 md:grid-cols-2 md:py-20">
         <motion.div
-          className="space-y-6"
+          className="inline-flex max-w-full flex-col gap-6"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -131,16 +131,16 @@ const Home = () => {
             variants={itemVariants}
             className="font-display text-5xl font-normal leading-[1.02] text-foreground md:text-6xl lg:text-7xl"
           >
-            Plan your career with{" "}
-            <span className="text-coral">clarity</span>
+            <span className="block w-max max-w-full">Up your employability</span>
+            <span className="block">
+              with <span className="text-coral">clarity</span>
+            </span>
           </motion.h1>
 
           <motion.p variants={itemVariants} className="max-w-lg text-lg text-muted-foreground leading-relaxed">
-            Leap helps students log real experiences, follow a structured roadmap, earn XP, discover
-            events, and get AI job matches — with Jumpy guiding each step.
-          </motion.p>
+            Leap helps students get hired with structured career roadmap, tools to log experiences and personal brand coaching. With Jumpy the frog guide!          </motion.p>
 
-          <motion.div variants={itemVariants} className="flex w-fit max-w-full flex-col gap-3">
+            <motion.div variants={itemVariants} className="flex w-full flex-col gap-3">
             <div className="flex flex-wrap items-center gap-3">
               <Link to="/quiz">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -150,9 +150,9 @@ const Home = () => {
                   </Button>
                 </motion.div>
               </Link>
-              <Link to="/quiz">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button variant="outline" size="lg" className="font-bold">
+              <Link to="/quiz" className="min-w-0 flex-1">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full">
+                  <Button variant="outline" size="lg" className="w-full font-bold">
                     <Sparkles className="h-4 w-4 text-secondary" />
                     Try demo account
                   </Button>
@@ -170,19 +170,22 @@ const Home = () => {
             </Link>
           </motion.div>
 
-          <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-6 pt-2">
+          <motion.div
+            variants={itemVariants}
+            className="flex w-full items-start justify-between gap-3 pt-2"
+          >
             <div>
               <div className="font-display text-2xl font-normal">4</div>
               <div className="text-xs text-muted-foreground">Core tools</div>
             </div>
-            <div className="h-8 w-px bg-border" />
+            <div className="h-8 w-px shrink-0 bg-border" />
             <div>
-              <div className="font-display text-2xl font-normal flex items-center gap-1">
+            <div className="font-display flex items-center gap-1 text-2xl font-normal">
                 <Trophy className="h-5 w-5 text-coral" /> XP
               </div>
               <div className="text-xs text-muted-foreground">Levels & badges</div>
             </div>
-            <div className="h-8 w-px bg-border" />
+            <div className="h-8 w-px shrink-0 bg-border" />
             <div>
               <div className="font-display text-2xl font-normal flex items-center gap-1">
                 <Map className="h-5 w-5 text-secondary" /> Quest
@@ -279,7 +282,7 @@ const Home = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ type: "spring", stiffness: 80, damping: 15 }}
-          className="leap-band-navy relative overflow-hidden rounded-xl p-10 md:p-16"
+          className="leap-band-deep relative overflow-hidden rounded-xl p-10 md:p-16"
         >
           <div className="grid items-center gap-8 md:grid-cols-[1fr_auto]">
             <div>
