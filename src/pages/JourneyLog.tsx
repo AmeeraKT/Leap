@@ -150,13 +150,35 @@ const JourneyLog = () => {
             Track your milestones, build a clean portfolio website, and draft social posts instantly.
           </p>
         </div>
-        <Link to="/journey/new" className="self-start">
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="hero" className="rounded-full px-5 py-6 font-display text-sm font-normal gap-2">
-              <Plus className="h-4 w-4" /> Log experience
-            </Button>
-          </motion.div>
-        </Link>
+        <div className="flex w-full max-w-sm items-center gap-2 self-start rounded-full bg-black p-1.5 pl-4 text-white md:w-auto md:min-w-[17.5rem] dark:bg-white dark:text-black">
+          <p className="min-w-0 flex-1 font-display text-sm font-normal">
+            Log new experience
+          </p>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <motion.button
+              type="button"
+              whileHover={{ y: -2, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() =>
+                toast({
+                  title: "Voice log coming soon",
+                  description: "Tap again later to record a quick win.",
+                })
+              }
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-md ring-1 ring-white/30 transition-colors hover:opacity-90 dark:bg-black dark:text-white dark:ring-black/20"
+              aria-label="Voice log"
+            >
+              <Mic className="h-5 w-5" />
+            </motion.button>
+            <Link
+              to="/journey/new"
+              aria-label="Add new experience"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-coral text-coral-foreground shadow-md ring-2 ring-white/40 transition-opacity hover:opacity-90 dark:ring-black/15"
+            >
+              <Plus className="h-5 w-5" strokeWidth={2.5} />
+            </Link>
+          </div>
+        </div>
       </div>
 
       <Tabs defaultValue="wins" className="w-full">
@@ -300,36 +322,6 @@ const JourneyLog = () => {
 
             {/* Right rail */}
             <aside className="hidden space-y-4 lg:block">
-              <div className="flex items-center gap-2 rounded-full border border-border bg-background p-2 pl-4">
-                <p className="min-w-0 flex-1 font-display text-sm font-normal text-foreground">
-                  Log new experience
-                </p>
-                <div className="flex shrink-0 items-center gap-1.5">
-                  <motion.button
-                    type="button"
-                    whileHover={{ y: -2, scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() =>
-                      toast({
-                        title: "Voice log coming soon",
-                        description: "Tap again later to record a quick win.",
-                      })
-                    }
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-muted/50"
-                    aria-label="Voice log"
-                  >
-                    <Mic className="h-5 w-5" />
-                  </motion.button>
-                  <Link
-                    to="/journey/new"
-                    aria-label="Add new experience"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-coral text-coral-foreground transition-opacity hover:opacity-90"
-                  >
-                    <Plus className="h-5 w-5" />
-                  </Link>
-                </div>
-              </div>
-
               <StreakPanel />
             </aside>
           </div>
