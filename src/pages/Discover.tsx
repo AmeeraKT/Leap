@@ -269,7 +269,6 @@ const Discover = () => {
     <AnimatedPage className="container py-8 md:py-10 space-y-6 overflow-x-hidden">
       {/* Header */}
       <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Discover Hub</div>
         <h1 className="mt-1 font-display text-3xl font-normal md:text-4xl">Find Opportunities</h1>
         <p className="text-sm text-muted-foreground">
           Join student-led communities, find active cohort group chats, and attend skills-based events.

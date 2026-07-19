@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Menu, LogOut, Sparkles } from "lucide-react";
-import { Jumpy } from "@/components/Jumpy";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -22,7 +21,6 @@ export const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [profileName, setProfileName] = useState("");
-  const location = useLocation();
   const navigate = useNavigate();
   const { level, xp } = useProgression();
 
@@ -79,8 +77,7 @@ export const Navbar = () => {
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/dashboard" className="flex items-center gap-2">
-          <Jumpy size="xs" animate="none" />
-          <span className="font-display text-xl font-normal tracking-tight text-foreground">Leap</span>
+          <span className="font-display text-xl font-normal tracking-tight text-foreground">LEAP</span>
         </Link>
 
         <nav className="hidden items-center gap-7 md:flex">

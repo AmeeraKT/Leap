@@ -1,10 +1,6 @@
 import {
   ArrowRight,
-  Sparkles,
   Target,
-  Map,
-  ShieldCheck,
-  Trophy,
   BookOpen,
   Brain,
   Route,
@@ -15,30 +11,34 @@ import { Jumpy } from "@/components/Jumpy";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion } from "framer-motion";
 import { AnimatedPage } from "@/components/AnimatedPage";
+import jumpyThink from "@/assets/jumpy-think.png";
+import jumpyTalk from "@/assets/jumpy-talk.png";
+import jumpyBlink from "@/assets/jumpy-blink.png";
+import jumpyHappy from "@/assets/jumpy-happy.png";
 
 const features = [
   {
     icon: Target,
     title: "Quiz & pathway plans",
-    body: "Sign up or try the demo, get your top 3 pathway matches, and compare plans that fit your goals.",
+    body: "Take a quick quiz, get your top 3 career matches, and compare plans built around your goals.",
     to: "/quiz",
   },
   {
     icon: Route,
     title: "Quest roadmap",
-    body: "Follow a six-stage career map with milestones, planner checklists, brand coaching, and job predictions.",
+    body: "A six-stage career map with milestones, checklists, coaching and job predictions.",
     to: "/roadmap",
   },
   {
     icon: BookOpen,
     title: "Journey log",
-    body: "Log workshops and projects, draft social posts, track streaks, and earn XP as you build your brand.",
+    body: "Log your wins, draft social posts, keep your streak, and earn XP as your brand grows.",
     to: "/journey",
   },
   {
     icon: Brain,
     title: "Career Vision",
-    body: "AI job matches from your experience, resume feedback, and a coach chat with Jumpy when you need help.",
+    body: "AI job matches, resume feedback, and Jumpy on call when you're stuck.",
     to: "/career-vision",
   },
 ];
@@ -46,23 +46,35 @@ const features = [
 const howItWorks = [
   {
     step: "01",
-    title: "Explore",
-    body: "Discover yourself and potential career paths. Jumpy AI personalizes suggestions of events and opportunities that fit you best.",
+    title: "EXPLORE",
+    body: "Not sure what career fits? Jumpy matches you with events, communities and paths that actually suit you.",
+    image: jumpyThink,
+    imageAlt: "Jumpy thinking about career paths",
+    imageLeft: false,
   },
   {
     step: "02",
-    title: "Engage",
-    body: "Turn your career development into action. Curated events, like-minded communities and personal brand coaching sessions helps make you stand out in the crowd.",
+    title: "ENGAGE",
+    body: "Show up and stand out. Join events, meet like-minded students, and get brand coaching that gets you noticed.",
+    image: jumpyTalk,
+    imageAlt: "Jumpy talking and engaging",
+    imageLeft: true,
   },
   {
     step: "03",
-    title: "Capture",
-    body: "Turn your everyday experiences into career-ready evidence. Log events and their details so you can never forget them in interviews.",
+    title: "CAPTURE",
+    body: "Never blank in an interview again. Log every event, project and connection as career-ready proof.",
+    image: jumpyBlink,
+    imageAlt: "Jumpy capturing a moment",
+    imageLeft: false,
   },
   {
     step: "04",
-    title: "Showcase",
-    body: "Turn your growth into opportunities. LEAP transforms experience logs into portfolio format or social media content so employers can see your growth..",
+    title: "SHOWCASE",
+    body: "Turn your logs into LinkedIn posts and a portfolio that employers actually see.",
+    image: jumpyHappy,
+    imageAlt: "Jumpy showcasing wins",
+    imageLeft: true,
   },
 ];
 
@@ -88,6 +100,29 @@ const itemVariants = {
     },
   },
 };
+
+const revealEase = [0.16, 1, 0.3, 1] as const;
+
+const revealViewport = { once: true, margin: "-120px" as const };
+
+const textReveal = {
+  initial: { opacity: 0, y: 60 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: revealViewport,
+  transition: { duration: 0.9, ease: revealEase },
+};
+
+const imageReveal = {
+  initial: { opacity: 0, y: 60 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: revealViewport,
+  transition: { duration: 0.9, ease: revealEase, delay: 0.15 },
+};
+
+const featureBands = [
+  [features[0], features[1]],
+  [features[2], features[3]],
+] as const;
 
 const Home = () => {
   return (
@@ -185,71 +220,116 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="leap-band-deep py-20">
-        <div className="container">
-          <div className="mx-auto mb-12 max-w-2xl text-center">
-            <h2 className="font-display text-4xl font-normal text-white md:text-5xl">Recipe to your Success</h2>
-          </div>
+      {/* How LEAP works */}
+      <section id="how" className="overflow-x-hidden">
+        <div className="container py-16 md:py-24">
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            className="grid gap-5 md:grid-cols-2 lg:grid-cols-4"
+            {...textReveal}
+            className="mx-auto mb-8 max-w-2xl text-center md:mb-16"
           >
-            {features.map((f) => (
-              <Link key={f.title} to={f.to}>
-                <motion.div
-                  variants={itemVariants}
-                  whileHover={{ y: -6, scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="leap-card h-full rounded-lg bg-card p-6 text-foreground transition-colors hover:bg-muted/30"
-                >
-                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-foreground">
-                    <f.icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="mb-2 font-display text-lg font-normal">{f.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{f.body}</p>
-                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-coral">
-                  </span>
-                </motion.div>
-              </Link>
-            ))}
+            <h2 className="font-display text-4xl font-normal md:text-5xl">How LEAP works</h2>
+            <p className="mt-3 text-muted-foreground">Four hops from sign-up to career momentum.</p>
           </motion.div>
         </div>
+
+        {howItWorks.map((phase) => (
+          <div key={phase.step} className="container py-16 md:py-24 lg:py-32">
+            <div className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
+              <motion.div
+                {...textReveal}
+                className={
+                  phase.imageLeft
+                    ? "order-2 space-y-4 md:order-2"
+                    : "order-2 space-y-4 md:order-1"
+                }
+              >
+                <p className="text-sm font-semibold tracking-widest text-muted-foreground">
+                  {phase.step}
+                </p>
+                <h3 className="font-display text-4xl font-normal uppercase leading-[1.05] text-foreground md:text-5xl lg:text-6xl">
+                  {phase.title}
+                </h3>
+                <p className="max-w-md text-lg leading-relaxed text-muted-foreground">
+                  {phase.body}
+                </p>
+              </motion.div>
+
+              <motion.div
+                {...imageReveal}
+                className={
+                  phase.imageLeft
+                    ? "order-1 relative flex items-center justify-center md:order-1"
+                    : "order-1 relative flex items-center justify-center md:order-2"
+                }
+              >
+                <div className="absolute inset-0 -z-10 m-auto h-56 w-56 rounded-full bg-secondary/30 blur-3xl md:h-80 md:w-80" />
+                <img
+                  src={phase.image}
+                  alt={phase.imageAlt}
+                  className="relative h-44 w-44 object-contain select-none md:h-64 md:w-64 lg:h-72 lg:w-72"
+                  draggable={false}
+                />
+              </motion.div>
+            </div>
+          </div>
+        ))}
       </section>
 
-      {/* How it works */}
-      <section id="how" className="container py-20">
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <h2 className="font-display text-4xl font-normal md:text-5xl">How Leap works</h2>
-          <p className="mt-3 text-muted-foreground">Four hops from sign-up to career momentum.</p>
+      {/* Features */}
+      <section id="features" className="leap-band-deep overflow-x-hidden">
+        <div className="container py-16 md:py-24">
+          <motion.div {...textReveal} className="mx-auto mb-12 max-w-2xl text-center md:mb-20">
+            <h2 className="font-display text-4xl font-normal text-white md:text-5xl">
+              Recipe to your success
+            </h2>
+          </motion.div>
+
+          <div className="space-y-16 md:space-y-24">
+            {featureBands.map((band, bandIndex) => (
+              <div
+                key={bandIndex}
+                className="grid gap-12 md:grid-cols-2 md:gap-20"
+              >
+                {band.map((f, featureIndex) => (
+                  <motion.div
+                    key={f.title}
+                    initial={{ opacity: 0, y: 60 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={revealViewport}
+                    transition={{
+                      duration: 0.9,
+                      ease: revealEase,
+                      delay: featureIndex * 0.12,
+                    }}
+                  >
+                    <Link
+                      to={f.to}
+                      className="group block space-y-4 text-white transition-opacity hover:opacity-90"
+                    >
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 text-white">
+                        <f.icon className="h-5 w-5" />
+                      </div>
+                      <h3 className="font-display text-3xl font-normal md:text-4xl">
+                        {f.title}
+                      </h3>
+                      <p className="max-w-md text-base leading-relaxed text-white/75 md:text-lg">
+                        {f.body}
+                      </p>
+                      <span className="inline-flex items-center gap-1 text-sm font-semibold text-white/90 transition-transform group-hover:translate-x-1">
+                        Open
+                        <ArrowRight className="h-4 w-4" />
+                      </span>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          {howItWorks.map((s) => (
-            <motion.div
-              key={s.step}
-              variants={itemVariants}
-              whileHover={{ y: -4 }}
-              className="leap-panel rounded-lg p-6"
-            >
-              <div className="font-display text-5xl font-normal text-secondary">{s.step}</div>
-              <h3 className="mt-4 font-display text-xl font-normal">{s.title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{s.body}</p>
-            </motion.div>
-          ))}
-        </motion.div>
       </section>
 
       {/* CTA */}
-      <section id="about" className="container pb-20">
+      <section id="about" className="container pb-20 pt-20">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}

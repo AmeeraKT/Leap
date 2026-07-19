@@ -10,7 +10,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { MilestoneGamePath, getActiveRoadmapPhaseIndex } from "@/components/MilestoneGamePath";
 import { Jumpy } from "@/components/Jumpy";
 import { ROADMAP_PHASE_ORDER, phaseShortLabel } from "@/lib/roadmap-alumni";
-import { RoadmapAlumniSection } from "@/components/RoadmapAlumniSection";
 import { JumpyNudge } from "@/components/JumpyNudge";
 import { useExperiences } from "@/lib/experiences-store";
 import { useToast } from "@/hooks/use-toast";
@@ -160,7 +159,6 @@ const Roadmap = () => {
           <div className="flex gap-4 md:gap-6">
             <Jumpy size="md" animate="float" glow className="hidden shrink-0 sm:block" />
             <div>
-              <p className="leap-mono-label">Roadmap planner</p>
               <h1 className="mt-2 font-display text-3xl font-normal tracking-tight md:text-4xl">
                 Guide your career goals
               </h1>
@@ -168,7 +166,7 @@ const Roadmap = () => {
                 {allStagesComplete
                   ? "You cleared every milestone — Jumpy is proud. Keep logging wins in Journey Log."
                   : activeStageLabel
-                    ? `Jumpy is waiting for you in ${activeStageLabel}. Complete milestones to hop to the next stage.`
+                    ? `You're in the ${activeStageLabel} level! Complete milestones to hop to the next level.`
                     : "A personalized roadmap that grows with your experiences and skills."}
               </p>
             </div>
@@ -210,7 +208,6 @@ const Roadmap = () => {
                   if (current) setMilestoneDone(id, done ?? !current.done);
                 }}
               />
-              <RoadmapAlumniSection />
             </TabsContent>
 
             {/* Time Planner Content */}

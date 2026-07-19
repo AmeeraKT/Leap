@@ -117,7 +117,6 @@ const JourneyLog = () => {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Journey Log</div>
           <h1 className="mt-1 font-display text-3xl font-normal md:text-4xl">Document Wins & Build Your Brand</h1>
           <p className="text-sm text-muted-foreground">
             Track your milestones, build a clean portfolio website, and draft social posts instantly.

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { AnimatedPage } from "@/components/AnimatedPage";
 import { Brain, Sparkles, Send, RefreshCw, Key, Plus, Upload, FileText, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,10 +34,42 @@ interface Message {
   roadmapSteps?: string[];
 }
 
+const CAREER_VISION_TABS = ["predictor", "coach", "roaster"] as const;
+type CareerVisionTab = (typeof CAREER_VISION_TABS)[number];
+
+function tabFromSearch(value: string | null): CareerVisionTab {
+  if (value && (CAREER_VISION_TABS as readonly string[]).includes(value)) {
+    return value as CareerVisionTab;
+  }
+  return "predictor";
+}
+
 const CareerVision = () => {
   const experiences = useExperiences();
   const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<CareerVisionTab>(() =>
+    tabFromSearch(searchParams.get("tab")),
+  );
+
+  useEffect(() => {
+    setActiveTab(tabFromSearch(searchParams.get("tab")));
+  }, [searchParams]);
+
+  const onTabChange = (value: string) => {
+    const next = tabFromSearch(value);
+    setActiveTab(next);
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev);
+        if (next === "predictor") params.delete("tab");
+        else params.set("tab", next);
+        return params;
+      },
+      { replace: true },
+    );
+  };
 
   // Mistral API State
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("mistral_api_key") || "");
@@ -381,7 +414,6 @@ const CareerVision = () => {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Vision Builder</div>
           <h1 className="mt-1 font-display text-3xl font-normal md:text-4xl flex items-center gap-2">
             Career Vision & Brand Coaching <Brain className="h-7 w-7 text-secondary" />
           </h1>
@@ -392,16 +424,16 @@ const CareerVision = () => {
       </div>
 
       {/* Subsection Tabs */}
-      <Tabs defaultValue="predictor" className="w-full">
+      <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
         <TabsList className="flex w-full sm:w-fit justify-start gap-1 rounded-2xl border border-border bg-surface p-1 flex-wrap font-display font-bold">
           <TabsTrigger value="predictor" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
             <Sparkles className="h-4 w-4 mr-2 inline" /> AI Career Predictor
           </TabsTrigger>
           <TabsTrigger value="coach" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
-            🐸 Jumpy Buddy Coach
+            Jumpy Buddy Chat
           </TabsTrigger>
           <TabsTrigger value="roaster" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
-            <Flame className="h-4 w-4 mr-2 inline" /> AI Resume Roaster 🔥
+            <Flame className="h-4 w-4 mr-2 inline" /> AI Resume Roaster
           </TabsTrigger>
         </TabsList>
 
@@ -485,15 +517,6 @@ const CareerVision = () => {
         {/* Tab 2: Jumpy Buddy Coach */}
         <TabsContent value="coach" className="mt-6 focus-visible:outline-none">
           <section className="rounded-xl border border-border bg-surface p-5 shadow-sm flex flex-col justify-between min-h-[500px]">
-            <div className="flex items-center gap-3 pb-3 border-b border-border">
-              <div className="p-2 bg-secondary/15 rounded-full border border-secondary/25">
-                <Jumpy size="xs" animate="float" />
-              </div>
-              <div>
-                <h2 className="font-display text-lg font-normal text-foreground">Jumpy Buddy Coach</h2>
-                <p className="text-sm text-muted-foreground">Your career &amp; personal brand consultant buddy</p>
-              </div>
-            </div>
             <div className="flex-1 overflow-y-auto space-y-4 my-4 pr-2 max-h-[400px] min-h-[200px]">
               {messages.map((m, idx) => (
                 <div
@@ -564,7 +587,7 @@ const CareerVision = () => {
           <section className="rounded-xl border border-border bg-surface p-5 space-y-5 shadow-sm">
             <div className="flex items-center gap-2 pb-2 border-b border-border">
               <Flame className="h-5 w-5 text-coral animate-pulse" />
-              <h2 className="font-display text-lg font-normal text-foreground">AI Resume Roaster 🔥</h2>
+              <h2 className="font-display text-lg font-normal text-foreground">AI Resume Roaster</h2>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Upload your resume and let our brutally honest AI tear it apart — then tell you how to fix it. Supports PDF, DOCX, and TXT files.
@@ -616,7 +639,7 @@ const CareerVision = () => {
               variant="hero"
               className="w-full font-normal py-5 gap-2"
             >
-              {isRoasting ? <><RefreshCw className="h-4 w-4 animate-spin" /> Incinerating your resume...</> : <><Flame className="h-4 w-4" /> Roast My Resume 🔥</>}
+              {isRoasting ? <><RefreshCw className="h-4 w-4 animate-spin" /> Incinerating your resume...</> : <><Flame className="h-4 w-4" /> Roast My Resume</>}
             </Button>
 
             {resumeFile && resumePreviewUrl && !roastAnalysis && (
