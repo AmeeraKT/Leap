@@ -96,7 +96,7 @@ const Home = () => {
       <header className="container flex items-center justify-between py-6">
         <div className="flex items-center gap-2">
           <Jumpy size="xs" animate="none" />
-          <span className="font-display text-2xl font-normal text-foreground">Leap</span>
+          <span className="font-display text-2xl font-normal text-foreground">LEAP</span>
         </div>
         <nav className="hidden items-center gap-8 md:flex">
           <a href="#features" className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
@@ -122,7 +122,7 @@ const Home = () => {
       {/* Hero */}
       <section className="container grid items-center gap-10 py-12 md:grid-cols-2 md:py-20">
         <motion.div
-          className="inline-flex max-w-full flex-col gap-6"
+          className="flex w-full max-w-lg flex-col gap-6"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -131,29 +131,31 @@ const Home = () => {
             variants={itemVariants}
             className="font-display text-5xl font-normal leading-[1.02] text-foreground md:text-6xl lg:text-7xl"
           >
-            <span className="block w-max max-w-full">Up your employability</span>
+            <span className="block">LEVEL UP your employability,</span>
             <span className="block">
-              with <span className="text-coral">clarity</span>
+              the <span className="text-coral">FUN way!</span>
             </span>
           </motion.h1>
 
-          <motion.p variants={itemVariants} className="max-w-lg text-lg text-muted-foreground leading-relaxed">
-            Leap helps students get hired with structured career roadmap, tools to log experiences and personal brand coaching. With Jumpy the frog guide!          </motion.p>
+          <motion.p variants={itemVariants} className="text-lg leading-relaxed text-muted-foreground">
+            Stop applying blindly. Start standing out.
+            Discover your career path, build your brand, and grow with a student community where noone gatekeeps.
+            
+            With Jumpy your career sidekick!
+          </motion.p>
 
-            <motion.div variants={itemVariants} className="flex w-full flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <Link to="/quiz">
+          <motion.div variants={itemVariants} className="flex w-full flex-col gap-3">
+            <div className="flex w-full items-stretch gap-3">
+              <Link to="/quiz" className="shrink-0">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button variant="hero" size="xl">
                     Get started
-                    <ArrowRight />
                   </Button>
                 </motion.div>
               </Link>
               <Link to="/quiz" className="min-w-0 flex-1">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-full">
-                  <Button variant="outline" size="lg" className="w-full font-bold">
-                    <Sparkles className="h-4 w-4 text-secondary" />
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="h-full w-full">
+                  <Button variant="outline" size="lg" className="h-full w-full font-bold">
                     Try demo account
                   </Button>
                 </motion.div>
@@ -164,34 +166,9 @@ const Home = () => {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full">
                 <Button variant="coral" size="lg" className="w-full font-bold">
                   Join waitlist
-                  <ArrowRight />
                 </Button>
               </motion.div>
             </Link>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            className="flex w-full items-start justify-between gap-3 pt-2"
-          >
-            <div>
-              <div className="font-display text-2xl font-normal">4</div>
-              <div className="text-xs text-muted-foreground">Core tools</div>
-            </div>
-            <div className="h-8 w-px shrink-0 bg-border" />
-            <div>
-            <div className="font-display flex items-center gap-1 text-2xl font-normal">
-                <Trophy className="h-5 w-5 text-coral" /> XP
-              </div>
-              <div className="text-xs text-muted-foreground">Levels & badges</div>
-            </div>
-            <div className="h-8 w-px shrink-0 bg-border" />
-            <div>
-              <div className="font-display text-2xl font-normal flex items-center gap-1">
-                <Map className="h-5 w-5 text-secondary" /> Quest
-              </div>
-              <div className="text-xs text-muted-foreground">Six-stage roadmap</div>
-            </div>
           </motion.div>
         </motion.div>
 
@@ -213,9 +190,6 @@ const Home = () => {
         <div className="container">
           <div className="mx-auto mb-12 max-w-2xl text-center">
             <h2 className="font-display text-4xl font-normal text-white md:text-5xl">Recipe to your Success</h2>
-            <p className="mt-3 text-white/75">
-              Four tools that take you from “what’s next?” to job-ready.
-            </p>
           </div>
           <motion.div
             variants={containerVariants}
@@ -238,7 +212,6 @@ const Home = () => {
                   <h3 className="mb-2 font-display text-lg font-normal">{f.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{f.body}</p>
                   <span className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-coral">
-                    Explore <ArrowRight className="h-3 w-3" />
                   </span>
                 </motion.div>
               </Link>
@@ -295,7 +268,6 @@ const Home = () => {
                 <Link to="/quiz">
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button variant="default" size="xl">
-                      <Sparkles className="h-4 w-4" />
                       Try demo account
                     </Button>
                   </motion.div>
@@ -326,7 +298,7 @@ const Home = () => {
             <Jumpy size="xs" animate="none" />
             <span className="font-display font-normal text-foreground">Leap</span>
           </div>
-          <div>© {new Date().getFullYear()} Leap. Built with 🐸 for students building their brand.</div>
+          <div>© {new Date().getFullYear()} LEAP. Built for students who want to standout.</div>
         </div>
       </footer>
     </AnimatedPage>
