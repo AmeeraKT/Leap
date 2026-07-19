@@ -7,17 +7,19 @@ export interface Achievement {
   title: string;
   description: string;
   emoji: string;
+  /** Reward shown on the badge; granted once on unlock */
+  points: number;
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
-  { id: "first_hop", title: "First Hop", description: "Complete the Leap sign-up quiz", emoji: "🐸" },
-  { id: "documentarian", title: "Documentarian", description: "Log 5+ journey experiences", emoji: "📝" },
-  { id: "amplifier", title: "Amplifier", description: "Share one win on 2+ platforms", emoji: "📣" },
-  { id: "consistency_frog", title: "Consistency Frog", description: "Post content 2+ times", emoji: "🔄" },
-  { id: "networker", title: "Networker", description: "Log an experience with 3+ contacts", emoji: "🤝" },
-  { id: "task_master", title: "Task Master", description: "Complete 10 roadmap or checklist tasks", emoji: "✅" },
-  { id: "streak_starter", title: "Streak Starter", description: "Reach a 3-day activity streak", emoji: "🔥" },
-  { id: "brand_builder", title: "Brand Builder", description: "Complete 3 personal brand milestones", emoji: "⭐" },
+  { id: "first_hop", title: "First Hop", description: "Complete the Leap sign-up quiz", emoji: "🐸", points: 50 },
+  { id: "documentarian", title: "Documentarian", description: "Log 5+ journey experiences", emoji: "📝", points: 100 },
+  { id: "amplifier", title: "Amplifier", description: "Share one win on 2+ platforms", emoji: "📣", points: 75 },
+  { id: "consistency_frog", title: "Consistency Frog", description: "Post content 2+ times", emoji: "🔄", points: 80 },
+  { id: "networker", title: "Networker", description: "Log an experience with 3+ contacts", emoji: "🤝", points: 85 },
+  { id: "task_master", title: "Task Master", description: "Complete 10 roadmap or checklist tasks", emoji: "✅", points: 120 },
+  { id: "streak_starter", title: "Streak Starter", description: "Reach a 3-day activity streak", emoji: "🔥", points: 60 },
+  { id: "brand_builder", title: "Brand Builder", description: "Complete 3 personal brand milestones", emoji: "⭐", points: 100 },
 ];
 
 export function getAchievement(id: string): Achievement | undefined {
@@ -89,6 +91,7 @@ export function evaluateAchievements(
         title: achievement.title,
         emoji: achievement.emoji,
         silent: options?.silent,
+        points: achievement.points,
       });
       unlocked.push(achievement.id);
     }

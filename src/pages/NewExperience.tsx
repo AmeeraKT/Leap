@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { experiencesStore, type Experience } from "@/lib/experiences-store";
 import { toast } from "sonner";
 
@@ -31,14 +37,40 @@ const NewExperience = () => {
   const [date, setDate] = useState("");
   const [location, setLocation] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
-  const [reflection, setReflection] = useState("");
+  const [description, setDescription] = useState("");
   const [takeaways, setTakeaways] = useState("");
   const [skills, setSkills] = useState("");
+  const [quickFilling, setQuickFilling] = useState(false);
+
+  const runQuickFill = async () => {
+    const seed = description.trim() || title.trim();
+    if (!seed) {
+      toast.error("Add a short description (or title) first so AI has something to expand");
+      return;
+    }
+    setQuickFilling(true);
+    await new Promise((r) => setTimeout(r, 700));
+    const filled = [
+      seed,
+      "",
+      "I showed up, contributed, and left with clearer next steps for my career.",
+      "Key moments: connecting with others, trying something new, and noting what I want to practice next.",
+    ].join("\n");
+    setDescription(filled);
+    if (!skills.trim()) {
+      setSkills("Communication, Collaboration, Problem Solving");
+    }
+    if (!takeaways.trim()) {
+      setTakeaways("Showed up and stayed curious\nMet people worth following up with\nClearer sense of what to try next");
+    }
+    setQuickFilling(false);
+    toast.success("Quick fill ready — edit anything that feels off");
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !reflection.trim()) {
-      toast.error("Title and reflection are required");
+    if (!title.trim() || !description.trim()) {
+      toast.error("Title and description are required");
       return;
     }
     const exp: Experience = {
@@ -48,7 +80,7 @@ const NewExperience = () => {
       date: date.trim() || new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
       location: location.trim() || undefined,
       photoUrl: photoUrl.trim() || undefined,
-      reflection: reflection.trim(),
+      reflection: description.trim(),
       takeaways: takeaways.split("\n").map((t) => t.trim()).filter(Boolean),
       skills: skills.split(",").map((t) => t.trim()).filter(Boolean),
       peopleMet: [],
@@ -102,8 +134,36 @@ const NewExperience = () => {
         </div>
 
         <div>
-          <Label htmlFor="reflection">Reflection *</Label>
-          <Textarea id="reflection" value={reflection} onChange={(e) => setReflection(e.target.value)} rows={4} placeholder="What happened? How did it feel? What did you actually learn?" />
+          <div className="mb-1.5 flex items-center justify-between gap-2">
+            <Label htmlFor="description">Description *</Label>
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7 gap-1.5 rounded-full px-2.5 text-xs font-bold"
+                    onClick={runQuickFill}
+                    disabled={quickFilling}
+                  >
+                    <Sparkles className="h-3 w-3 text-coral" />
+                    {quickFilling ? "Filling…" : "Quick fill"}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-[220px] text-xs">
+                  AI will fill the details based on your input fast
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <Textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            placeholder="What happened? How did it feel? What did you actually learn?"
+          />
         </div>
 
         <div>
@@ -118,9 +178,7 @@ const NewExperience = () => {
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="ghost" onClick={() => navigate("/journey")}>Cancel</Button>
-          <Button type="submit" className="rounded-full bg-foreground text-background hover:bg-foreground/90">
-            Save experience
-          </Button>
+          <Button type="submit" variant="hero">Save experience</Button>
         </div>
       </form>
     </div>

@@ -22,11 +22,6 @@ import {
   cubicBezier,
 } from "framer-motion";
 import { AnimatedPage } from "@/components/AnimatedPage";
-import exploreGif from "@/assets/GIFS/EXPLORE.gif";
-import engageGif from "@/assets/GIFS/ENGAGE.gif";
-import captureGif from "@/assets/GIFS/CAPTURE.gif";
-import showcaseGif from "@/assets/GIFS/SHOWCASE.gif";
-import rewardGif from "@/assets/GIFS/REWARD.gif";
 import jumpyThink from "@/assets/jumpy-think.png";
 import jumpyTalk from "@/assets/jumpy-talk.png";
 import jumpyHappy from "@/assets/jumpy-happy.png";
@@ -34,6 +29,12 @@ import jumpyHop from "@/assets/jumpy-hop.png";
 import { toast } from "sonner";
 import { enterDemoAccount } from "@/lib/demo-account";
 import { cn } from "@/lib/utils";
+
+const exploreGif = "/assets/GIFS/EXPLORE.gif";
+const engageGif = "/assets/GIFS/ENGAGE.gif";
+const captureGif = "/assets/GIFS/CAPTURE.gif";
+const showcaseGif = "/assets/GIFS/SHOWCASE.gif";
+const rewardGif = "/assets/GIFS/REWARD.gif";
 
 const MEDIA_FRAME =
   "relative w-full overflow-hidden rounded-2xl border-[4px] border-coral bg-card";
@@ -111,6 +112,8 @@ function FeatureMediaFrame({ src, alt }: { src: string; alt: string }) {
         src={src}
         alt={alt}
         className="aspect-[16/11] w-full object-cover object-top md:aspect-[16/10] lg:min-h-[28rem]"
+        loading="lazy"
+        decoding="async"
         draggable={false}
       />
     </div>

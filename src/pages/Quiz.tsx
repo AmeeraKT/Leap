@@ -1,18 +1,39 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { ArrowLeft, ArrowRight, Mail, Lock, User, MapPin, ChevronDown, Loader2, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ChevronsUpDown,
+  GripVertical,
+} from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
+import { AnimatedPage } from "@/components/AnimatedPage";
+import { Jumpy } from "@/components/Jumpy";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Jumpy } from "@/components/Jumpy";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { supabase } from "@/integrations/supabase/client";
-import { defaultQuiz, type QuizState } from "@/lib/quiz-types";
-import { progressionStore } from "@/lib/progression-store";
-import { DEMO_QUIZ } from "@/lib/demo-account";
-import { toast } from "sonner";
-import { motion } from "framer-motion";
-import { AnimatedPage } from "@/components/AnimatedPage";
+import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectContent,
@@ -22,513 +43,525 @@ import {
 } from "@/components/ui/select";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
   DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { progressionStore } from "@/lib/progression-store";
+import {
+  CITY_SIZE_OPTIONS,
+  COMMUTE_OPTIONS,
+  DESIRED_FIELD_OPTIONS,
+  EDUCATION_LEVELS,
+  EMPLOYMENT_STATUSES,
+  EXPERIENCE_OPTIONS,
+  FLEXIBILITY_OPTIONS,
+  INDUSTRY_OPTIONS,
+  INTEREST_OPTIONS,
+  PERSONALITY_PAIRS,
+  QUIZ_SECTIONS,
+  SALARY_OPTIONS,
+  SKILL_OPTIONS,
+  SOCIAL_ENV_OPTIONS,
+  STUDYING_OPTIONS,
+  TIMELINE_OPTIONS,
+  WORK_LIFE_OPTIONS,
+  YEAR_LEVELS,
+  defaultQuiz,
+  type QuizState,
+} from "@/lib/quiz-types";
+import { cn } from "@/lib/utils";
 
-const interestOptions = [
-  "Tech",
-  "Art & Design",
-  "Business",
-  "Healthcare",
-  "Engineering",
-  "Science",
-  "Education",
-  "Trades",
-  "Hospitality",
-  "Sports",
-  "Sustainability",
-];
+const TOTAL = QUIZ_SECTIONS.length;
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
+const stepMotion = {
+  initial: { opacity: 0, y: 18 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
+  exit: { opacity: 0, y: -12, transition: { duration: 0.25 } },
 };
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 90,
-      damping: 14,
-    },
-  },
-};
+function PillSelect({
+  options,
+  value,
+  onChange,
+}: {
+  options: readonly string[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((opt) => {
+        const active = value === opt;
+        return (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => onChange(opt)}
+            className={cn(
+              "rounded-full border px-4 py-2 text-left text-sm font-semibold transition-all",
+              active
+                ? "border-foreground bg-foreground text-background"
+                : "border-border bg-card text-muted-foreground hover:border-foreground/40 hover:text-foreground",
+            )}
+          >
+            {opt}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
-const Quiz = () => {
-  const navigate = useNavigate();
-  const [mode, setMode] = useState<"signUp" | "signIn">("signUp");
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<QuizState>(defaultQuiz);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const update = <K extends keyof QuizState>(k: K, v: QuizState[K]) =>
-    setData((d) => ({ ...d, [k]: v }));
-
-  const signInAsDemo = async () => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInAsDemo();
-      if (error) {
-        toast.error(error.message);
-        return;
-      }
-      sessionStorage.setItem("leap-quiz", JSON.stringify(DEMO_QUIZ));
-      progressionStore.grantQuizComplete();
-      toast.success("Welcome, Alex! You're using the demo account. 🐸");
-      navigate("/dashboard");
-    } catch {
-      toast.error("Could not start the demo. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const validateAndSubmit = async () => {
-    if (!email.trim() || !email.includes("@")) {
-      toast.error("Please enter a valid email address.");
-      return;
-    }
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters.");
-      return;
-    }
-
-    if (mode === "signUp") {
-      if (!data.name.trim()) {
-        toast.error("Please enter your full name.");
-        return;
-      }
-      if (!data.currentEducation) {
-        toast.error("Please select your current education level.");
-        return;
-      }
-      if (!data.desiredField.trim()) {
-        toast.error("Please enter your dream field or role.");
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              name: data.name.trim(),
-              age: parseInt(data.age) || 22,
-              location: data.location.trim(),
-              current_education: data.currentEducation,
-              desired_field: data.desiredField.trim(),
-              interests: data.interests,
-            },
-          },
-        });
-
-        if (error) {
-          toast.error(error.message);
-          return;
-        }
-
-        // Save user configuration to session storage for temporary results matching compatibility
-        sessionStorage.setItem("leap-quiz", JSON.stringify(data));
-        progressionStore.grantQuizComplete();
-        toast.success("Account created successfully! Finding your matches... 🐸");
-        navigate("/results");
-      } catch (err) {
-        toast.error("Something went wrong. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      // Sign In
-      setLoading(true);
-      try {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          toast.error(error.message);
-          return;
-        }
-
-        toast.success("Welcome back! 🐸");
-        navigate("/dashboard");
-      } catch (err) {
-        toast.error("Authentication failed. Please check details.");
-      } finally {
-        setLoading(false);
-      }
-    }
+function MultiSelectDropdown({
+  label,
+  options,
+  values,
+  onChange,
+  placeholder = "Select all that apply",
+}: {
+  label: string;
+  options: readonly string[];
+  values: string[];
+  onChange: (next: string[]) => void;
+  placeholder?: string;
+}) {
+  const toggle = (opt: string) => {
+    onChange(values.includes(opt) ? values.filter((v) => v !== opt) : [...values, opt]);
   };
 
   return (
-    <AnimatedPage className="min-h-screen bg-background">
-      {/* Top bar */}
-      <header className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur">
-        <div className="container flex items-center justify-between py-4">
-          <button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-sm font-bold text-foreground hover:text-primary transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </button>
-          <div className="flex items-center gap-2">
-            <Jumpy size="xs" animate="float" />
-            <span className="font-display text-lg font-normal">
-              {mode === "signUp" ? "Leap Sign-up" : "Leap Sign-in"}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <button
-              onClick={() => navigate("/")}
-              className="text-sm font-bold text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="container max-w-2xl py-10 pb-32">
-        <div className="mb-8 text-center">
-          <h1 className="font-display text-4xl font-normal md:text-5xl leading-tight">
-            {mode === "signUp" ? (
-              <>
-                Start your journey with <span className="text-coral">Leap</span>
-              </>
-            ) : (
-              <>
-                Welcome back to <span className="text-coral">Leap</span>
-              </>
-            )}
-          </h1>
-          <p className="mt-2 text-lg text-muted-foreground">
-            {mode === "signUp"
-              ? "Create your account and build your personalized roadmap in seconds."
-              : "Log in to your account and track your brand milestones."}
-          </p>
-        </div>
-
-        <div className="mb-6">
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <Button
             type="button"
             variant="outline"
-            size="lg"
-            className="w-full h-12 rounded-xl border font-display font-bold"
-            onClick={signInAsDemo}
-            disabled={loading}
+            className="h-auto min-h-11 w-full justify-between rounded-xl px-3 py-2 font-normal"
           >
-            {loading ? (
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            ) : (
-              <Sparkles className="mr-2 h-5 w-5 text-secondary" />
-            )}
-            Continue with demo account
+            <span className={cn("truncate text-left text-sm", values.length === 0 && "text-muted-foreground")}>
+              {values.length === 0 ? placeholder : values.join(", ")}
+            </span>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
-          <p className="mt-2 text-center text-xs text-muted-foreground">
-            Instantly sign in as Alex Chen — no form needed
-          </p>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="max-h-72 w-[var(--radix-dropdown-menu-trigger-width)] overflow-y-auto" align="start">
+          <DropdownMenuLabel className="text-xs text-muted-foreground">Select all that apply</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {options.map((opt) => (
+            <DropdownMenuCheckboxItem
+              key={opt}
+              checked={values.includes(opt)}
+              onCheckedChange={() => toggle(opt)}
+              onSelect={(e) => e.preventDefault()}
+            >
+              {opt}
+            </DropdownMenuCheckboxItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {values.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          {values.map((v) => (
+            <span
+              key={v}
+              className="inline-flex items-center gap-1 rounded-full bg-coral/10 px-2.5 py-0.5 text-xs font-semibold text-coral"
+            >
+              <Check className="h-3 w-3" />
+              {v}
+            </span>
+          ))}
         </div>
+      )}
+    </div>
+  );
+}
 
-        {/* Toggle sign in / sign up */}
-        <div className="mb-6 flex justify-center">
-          <div className="inline-flex rounded-2xl border border-border bg-surface p-1">
-            <button
-              onClick={() => setMode("signUp")}
-              className={`rounded-xl px-4 py-2 font-display text-sm font-bold transition-all ${
-                mode === "signUp" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Sign Up
-            </button>
-            <button
-              onClick={() => setMode("signIn")}
-              className={`rounded-xl px-4 py-2 font-display text-sm font-bold transition-all ${
-                mode === "signIn" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Sign In
-            </button>
+function SortablePriorityItem({ id, label, index }: { id: string; label: string; index: number }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-3 touch-manipulation",
+        isDragging && "z-10 border-coral shadow-md",
+      )}
+    >
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary font-display text-xs tabular-nums text-foreground">
+        {index + 1}
+      </span>
+      <span className="min-w-0 flex-1 text-sm font-semibold text-foreground">{label}</span>
+      <button
+        type="button"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground"
+        aria-label={`Drag to reorder ${label}`}
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+    </li>
+  );
+}
+
+const Quiz = () => {
+  const navigate = useNavigate();
+  const [step, setStep] = useState(0);
+  const [quizState, setQuizState] = useState<QuizState>(defaultQuiz);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const update = <K extends keyof QuizState>(key: K, value: QuizState[K]) => {
+    setQuizState((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const progress = ((step + 1) / TOTAL) * 100;
+  const section = QUIZ_SECTIONS[step];
+
+  const canNext = useMemo(() => {
+    switch (step) {
+      case 0:
+        return quizState.studyingAreas.length > 0;
+      case 1:
+        return Boolean(quizState.currentEducation && quizState.yearLevel);
+      case 2:
+        return Boolean(quizState.employmentStatus && quizState.industry && quizState.experience);
+      case 3:
+        return Boolean(
+          quizState.desiredField &&
+            quizState.salaryExpectation &&
+            quizState.timeline &&
+            quizState.flexibility,
+        );
+      case 4:
+        return true;
+      case 5:
+        return Boolean(
+          quizState.citySize &&
+            quizState.socialEnv &&
+            quizState.commute &&
+            quizState.workLifeBalance,
+        );
+      default:
+        return true;
+    }
+  }, [step, quizState]);
+
+  const finish = () => {
+    sessionStorage.setItem("leap-quiz", JSON.stringify(quizState));
+    progressionStore.grantQuizComplete();
+    toast.success("Quiz complete — finding your matches 🐸");
+    navigate("/results");
+  };
+
+  const onNext = () => {
+    if (!canNext) {
+      toast.error("Pick an option to continue");
+      return;
+    }
+    if (step >= TOTAL - 1) finish();
+    else setStep((s) => s + 1);
+  };
+
+  const onBack = () => {
+    if (step === 0) navigate("/");
+    else setStep((s) => s - 1);
+  };
+
+  const onPriorityDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = quizState.priorities.indexOf(String(active.id));
+    const newIndex = quizState.priorities.indexOf(String(over.id));
+    if (oldIndex < 0 || newIndex < 0) return;
+    update("priorities", arrayMove(quizState.priorities, oldIndex, newIndex));
+  };
+
+  return (
+    <AnimatedPage className="min-h-screen bg-background pb-28">
+      <header className="container flex items-center justify-between py-5">
+        <Link to="/" className="flex items-center gap-2">
+          <Jumpy size="xs" animate="none" />
+          <span className="font-display text-xl font-normal text-foreground">LEAP</span>
+        </Link>
+        <ThemeToggle />
+      </header>
+
+      <div className="container max-w-2xl">
+        <div className="mb-6 space-y-2">
+          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <span>
+              Section {step + 1} of {TOTAL}
+            </span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          <div className="h-2.5 overflow-hidden rounded-full bg-secondary">
+            <motion.div
+              className="h-full rounded-full bg-coral"
+              animate={{ width: `${progress}%` }}
+              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+            />
           </div>
         </div>
 
-        {/* Form Layout */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="space-y-8"
-        >
-          {mode === "signUp" ? (
-            <>
-              {/* Card 1: Account Details */}
-              <motion.div
-                variants={cardVariants}
-                className="rounded-xl border border-border bg-surface p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
-              >
-                <h2 className="mb-4 font-display text-2xl font-normal text-foreground flex items-center gap-2">
-                  <User className="h-5 w-5 text-secondary" />
-                  1. Account Details
-                </h2>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="name" className="font-bold text-sm">Full Name</Label>
-                    <div className="relative mt-1.5">
-                      <Input
-                        id="name"
-                        value={data.name}
-                        onChange={(e) => update("name", e.target.value)}
-                        placeholder="Alex Chen"
-                        className="h-12 pl-10 rounded-xl transition-all focus-visible:ring-secondary"
-                      />
-                      <User className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground" />
-                    </div>
-                  </div>
+        <AnimatePresence mode="wait">
+          <motion.div key={section.id} {...stepMotion} className="space-y-6">
+            <div>
+              <h1 className="font-display text-3xl font-normal text-foreground md:text-4xl">
+                {section.title}
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground md:text-base">{section.subtext}</p>
+            </div>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <Label htmlFor="age" className="font-bold text-sm">Age</Label>
-                      <Input
-                        id="age"
-                        value={data.age}
-                        onChange={(e) => update("age", e.target.value)}
-                        placeholder="22"
-                        className="mt-1.5 h-12 rounded-xl transition-all focus-visible:ring-secondary"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="loc" className="font-bold text-sm">Where are you based?</Label>
-                      <div className="relative mt-1.5">
-                        <Input
-                          id="loc"
-                          value={data.location}
-                          onChange={(e) => update("location", e.target.value)}
-                          placeholder="Sydney, Australia"
-                          className="h-12 pl-10 rounded-xl transition-all focus-visible:ring-secondary"
-                        />
-                        <MapPin className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground" />
-                      </div>
-                    </div>
-                  </div>
+            <div className="leap-panel space-y-6 rounded-2xl border border-border bg-card p-5 md:p-6">
+              {step === 0 && (
+                <>
+                  <MultiSelectDropdown
+                    label="What are you studying (or drawn to)?"
+                    options={STUDYING_OPTIONS}
+                    values={quizState.studyingAreas}
+                    onChange={(v) => update("studyingAreas", v)}
+                  />
+                  <MultiSelectDropdown
+                    label="Interests outside study (optional)"
+                    options={INTEREST_OPTIONS}
+                    values={quizState.interests}
+                    onChange={(v) => update("interests", v)}
+                    placeholder="Optional — helps us recommend events"
+                  />
+                </>
+              )}
 
-                  <div>
-                    <Label htmlFor="email" className="font-bold text-sm">Email Address</Label>
-                    <div className="relative mt-1.5">
-                      <Input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="alex.chen@example.com"
-                        className="h-12 pl-10 rounded-xl transition-all focus-visible:ring-secondary"
-                      />
-                      <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground" />
-                    </div>
+              {step === 1 && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Current education level</Label>
+                    <PillSelect
+                      options={EDUCATION_LEVELS}
+                      value={quizState.currentEducation}
+                      onChange={(v) => update("currentEducation", v)}
+                    />
                   </div>
-
-                  <div>
-                    <Label htmlFor="password" className="font-bold text-sm">Create Password</Label>
-                    <div className="relative mt-1.5">
-                      <Input
-                        id="password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Min. 6 characters"
-                        className="h-12 pl-10 rounded-xl transition-all focus-visible:ring-secondary"
-                      />
-                      <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground" />
-                    </div>
+                  <div className="space-y-2">
+                    <Label>What year are you in?</Label>
+                    <PillSelect
+                      options={YEAR_LEVELS}
+                      value={quizState.yearLevel}
+                      onChange={(v) => update("yearLevel", v)}
+                    />
                   </div>
-                </div>
-              </motion.div>
+                  <div className="space-y-2">
+                    <Label htmlFor="field">Field of study</Label>
+                    <Input
+                      id="field"
+                      value={quizState.currentField}
+                      onChange={(e) => update("currentField", e.target.value)}
+                      placeholder="e.g. Computer Science, Nursing, Commerce…"
+                      className="rounded-xl"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Or leave blank and we&apos;ll use what you selected earlier.
+                    </p>
+                  </div>
+                </>
+              )}
 
-              {/* Card 2: Background & Ambitions */}
-              <motion.div
-                variants={cardVariants}
-                className="rounded-xl border border-border bg-surface p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
-              >
-                <h2 className="mb-4 font-display text-2xl font-normal text-foreground flex items-center gap-2">
-                  🎓 2. Background & Ambitions
-                </h2>
-                <div className="space-y-4">
-                  <div>
-                    <Label className="mb-1.5 block font-bold text-sm">Highest Education Achieved</Label>
+              {step === 2 && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Current employment status</Label>
+                    <PillSelect
+                      options={EMPLOYMENT_STATUSES}
+                      value={quizState.employmentStatus}
+                      onChange={(v) => update("employmentStatus", v)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Current or most recent industry</Label>
                     <Select
-                      value={data.currentEducation}
-                      onValueChange={(v) => update("currentEducation", v)}
+                      value={quizState.industry || undefined}
+                      onValueChange={(v) => update("industry", v)}
                     >
-                      <SelectTrigger className="h-12 rounded-xl bg-background border-input hover:border-secondary/60 transition-colors focus:ring-secondary">
-                      <SelectValue placeholder="Select highest education..." />
+                      <SelectTrigger className="rounded-xl">
+                        <SelectValue placeholder="Select an industry" />
                       </SelectTrigger>
-                      <SelectContent className="bg-surface border border-border rounded-xl">
-                        <SelectItem value="hs">High School</SelectItem>
-                        <SelectItem value="diploma">Diploma / TAFE</SelectItem>
-                        <SelectItem value="bachelor">Bachelor's Degree</SelectItem>
-                        <SelectItem value="masters">Master's Degree</SelectItem>
-                        <SelectItem value="phd">PhD / Doctorate</SelectItem>
-                        <SelectItem value="none">None</SelectItem>
+                      <SelectContent>
+                        {INDUSTRY_OPTIONS.map((o) => (
+                          <SelectItem key={o} value={o}>
+                            {o}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
-
-                  <div>
-                    <Label htmlFor="df" className="font-bold text-sm">Dream Role or Field</Label>
-                    <Input
-                      id="df"
-                      value={data.desiredField}
-                      onChange={(e) => update("desiredField", e.target.value)}
-                      placeholder="e.g. UX Designer, Software Engineer, Founder..."
-                      className="mt-1.5 h-12 rounded-xl transition-all focus-visible:ring-secondary"
+                  <div className="space-y-2">
+                    <Label>Years of work experience</Label>
+                    <PillSelect
+                      options={EXPERIENCE_OPTIONS}
+                      value={quizState.experience}
+                      onChange={(v) => update("experience", v)}
                     />
                   </div>
-                </div>
-              </motion.div>
-
-              {/* Card 3: Personal Interests */}
-              <motion.div
-                variants={cardVariants}
-                className="rounded-xl border border-border bg-surface p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
-              >
-                <h2 className="mb-4 font-display text-2xl font-normal text-foreground flex items-center gap-2">
-                  🎨 3. Select Your Interests
-                </h2>
-                <p className="text-sm text-muted-foreground mb-3 leading-snug">
-                  Select your fields of interest to help Jumpy personalize matches.
-                </p>
-
-                <div className="space-y-2">
-                  <Label className="font-bold text-sm">Interests</Label>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full h-12 justify-between rounded-xl px-4 font-normal text-muted-foreground bg-background hover:bg-background border-input hover:border-secondary/60 transition-colors"
-                      >
-                        <span className="text-foreground truncate max-w-[90%] font-semibold">
-                          {data.interests.length > 0
-                            ? data.interests.join(", ")
-                            : "Select your interests..."}
-                        </span>
-                        <ChevronDown className="h-4 w-4 opacity-50 text-foreground shrink-0" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-[340px] max-h-[300px] overflow-y-auto bg-surface border border-border rounded-xl p-1 z-30 shadow-md">
-                      {interestOptions.map((opt) => (
-                        <DropdownMenuCheckboxItem
-                          key={opt}
-                          checked={data.interests.includes(opt)}
-                          onCheckedChange={(checked) => {
-                            const next = checked
-                              ? [...data.interests, opt]
-                              : data.interests.filter((x) => x !== opt);
-                            update("interests", next);
-                          }}
-                          className="rounded-lg py-2 font-semibold hover:bg-secondary/15 cursor-pointer text-foreground"
-                        >
-                          {opt}
-                        </DropdownMenuCheckboxItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </motion.div>
-            </>
-          ) : (
-            /* Sign In mode simple cards */
-            <motion.div
-              variants={cardVariants}
-              className="rounded-xl border border-border bg-surface p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
-            >
-              <h2 className="mb-4 font-display text-2xl font-normal text-foreground flex items-center gap-2">
-                <Lock className="h-5 w-5 text-secondary" />
-                Sign in to your account
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="email" className="font-bold text-sm">Email Address</Label>
-                  <div className="relative mt-1.5">
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="alex.chen@example.com"
-                      className="h-12 pl-10 rounded-xl transition-all focus-visible:ring-secondary"
-                    />
-                    <Mail className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground" />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="password" className="font-bold text-sm">Password</Label>
-                  <div className="relative mt-1.5">
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="h-12 pl-10 rounded-xl transition-all focus-visible:ring-secondary"
-                    />
-                    <Lock className="absolute left-3.5 top-3.5 h-5 w-5 text-muted-foreground" />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </motion.div>
-      </main>
-
-      {/* Sticky footer */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 80, damping: 15 }}
-        className="fixed bottom-0 left-0 right-0 border-t border-border bg-surface/95 backdrop-blur z-20 shadow-lg"
-      >
-        <div className="container flex max-w-2xl items-center justify-between py-4">
-          <Button variant="ghost" onClick={() => navigate("/")} disabled={loading}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Cancel
-          </Button>
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-            <Button variant="hero" size="xl" onClick={validateAndSubmit} disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Loading...
-                </>
-              ) : mode === "signUp" ? (
-                <>
-                  Create Account & Match Me
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </>
-              ) : (
-                <>
-                  Sign In
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <MultiSelectDropdown
+                    label="Top skills"
+                    options={SKILL_OPTIONS}
+                    values={quizState.skills}
+                    onChange={(v) => update("skills", v)}
+                  />
                 </>
               )}
-            </Button>
+
+              {step === 3 && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Desired career field</Label>
+                    <Select
+                      value={quizState.desiredField || undefined}
+                      onValueChange={(v) => update("desiredField", v)}
+                    >
+                      <SelectTrigger className="rounded-xl">
+                        <SelectValue placeholder="Pick your top match" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DESIRED_FIELD_OPTIONS.map((o) => (
+                          <SelectItem key={o} value={o}>
+                            {o}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Salary expectations (first 5 years)</Label>
+                    <PillSelect
+                      options={SALARY_OPTIONS}
+                      value={quizState.salaryExpectation}
+                      onChange={(v) => update("salaryExpectation", v)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>When do you want to start your career?</Label>
+                    <PillSelect
+                      options={TIMELINE_OPTIONS}
+                      value={quizState.timeline}
+                      onChange={(v) => update("timeline", v)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Work flexibility preference</Label>
+                    <PillSelect
+                      options={FLEXIBILITY_OPTIONS}
+                      value={quizState.flexibility}
+                      onChange={(v) => update("flexibility", v)}
+                    />
+                  </div>
+                </>
+              )}
+
+              {step === 4 && (
+                <div className="space-y-7">
+                  {PERSONALITY_PAIRS.map(([left, right], i) => (
+                    <div key={left} className="space-y-3">
+                      <div className="flex justify-between gap-3 text-xs font-semibold text-muted-foreground">
+                        <span className="max-w-[45%] text-left">{left}</span>
+                        <span className="max-w-[45%] text-right">{right}</span>
+                      </div>
+                      <Slider
+                        value={[quizState.personality[i]]}
+                        min={0}
+                        max={100}
+                        step={1}
+                        onValueChange={([v]) => {
+                          const next = [...quizState.personality];
+                          next[i] = v;
+                          update("personality", next);
+                        }}
+                        className="[&_[role=slider]]:border-coral [&_.bg-primary]:bg-coral"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {step === 5 && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Where are you based / want to be?</Label>
+                    <PillSelect
+                      options={CITY_SIZE_OPTIONS}
+                      value={quizState.citySize}
+                      onChange={(v) => update("citySize", v)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Campus / social environment</Label>
+                    <PillSelect
+                      options={SOCIAL_ENV_OPTIONS}
+                      value={quizState.socialEnv}
+                      onChange={(v) => update("socialEnv", v)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Commute tolerance</Label>
+                    <PillSelect
+                      options={COMMUTE_OPTIONS}
+                      value={quizState.commute}
+                      onChange={(v) => update("commute", v)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Work–life balance priority</Label>
+                    <PillSelect
+                      options={WORK_LIFE_OPTIONS}
+                      value={quizState.workLifeBalance}
+                      onChange={(v) => update("workLifeBalance", v)}
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <Label>Rank your overall priorities</Label>
+                    <p className="text-xs text-muted-foreground">Drag to rank what matters most to you.</p>
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onPriorityDragEnd}>
+                      <SortableContext items={quizState.priorities} strategy={verticalListSortingStrategy}>
+                        <ul className="space-y-2">
+                          {quizState.priorities.map((p, i) => (
+                            <SortablePriorityItem key={p} id={p} label={p} index={i} />
+                          ))}
+                        </ul>
+                      </SortableContext>
+                    </DndContext>
+                  </div>
+                </>
+              )}
+            </div>
           </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-border bg-background/95 backdrop-blur">
+        <div className="container flex max-w-2xl items-center justify-between gap-3 py-4">
+          <Button type="button" variant="ghost" onClick={onBack} className="gap-1.5">
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <Button type="button" variant="hero" onClick={onNext} className="gap-1.5" disabled={!canNext}>
+            {step >= TOTAL - 1 ? "See my matches" : "Next"}
+            <ArrowRight className="h-4 w-4" />
+          </Button>
         </div>
-      </motion.div>
+      </div>
     </AnimatedPage>
   );
 };

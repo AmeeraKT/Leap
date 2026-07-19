@@ -4,7 +4,7 @@ import { mockChecklist, mockRoadmap } from "@/lib/mock-data";
 
 export const XP_RULES = {
   quizComplete: 100,
-  roadmapTask: 25,
+  roadmapTask: 15,
   journeyLog: 50,
   contentPosted: 30,
   contentGenerated: 20,
@@ -208,6 +208,7 @@ export interface GrantXpOptions {
   label?: string;
   showToast?: boolean;
   countAsWeeklyLog?: boolean;
+  unit?: "XP" | "pts";
 }
 
 function grantXp(amount: number, options: GrantXpOptions = {}): boolean {
@@ -231,7 +232,8 @@ function grantXp(amount: number, options: GrantXpOptions = {}): boolean {
   const newLevel = levelFromXp(state.xp);
 
   if (showToast) {
-    const msg = label ? `+${amount} XP — ${label}` : `+${amount} XP`;
+    const unit = options.unit ?? "XP";
+    const msg = label ? `+${amount} ${unit} — ${label}` : `+${amount} ${unit}`;
     toast.success(msg);
   }
 
@@ -279,7 +281,7 @@ export const progressionStore = {
       label: "Draft created",
     }),
   grantChecklistItem: (grantKey: string, label = "Task complete") =>
-    grantXp(XP_RULES.roadmapTask, { grantKey, label }),
+    grantXp(XP_RULES.roadmapTask, { grantKey, label, unit: "pts" }),
   toggleRoadmapTask: (taskId: string, done?: boolean, fallbackDone = false) => {
     const state = getState();
     const wasDone = state.roadmapTaskState[taskId] ?? fallbackDone;
@@ -291,6 +293,7 @@ export const progressionStore = {
       grantXp(isBrand ? XP_RULES.brandModuleItem : XP_RULES.roadmapTask, {
         grantKey: isBrand ? taskId.replace("brand-", "brand:") : `task:${taskId}`,
         label: isBrand ? "Brand milestone" : "Task complete",
+        unit: "pts",
       });
     }
   },
@@ -310,7 +313,7 @@ export const progressionStore = {
   },
   unlockAchievement: (
     id: string,
-    meta?: { title: string; emoji: string; silent?: boolean },
+    meta?: { title: string; emoji: string; silent?: boolean; points?: number },
   ) => {
     const state = getState();
     if (state.achievementsUnlocked.includes(id)) return;
@@ -318,12 +321,22 @@ export const progressionStore = {
       ...state,
       achievementsUnlocked: [...state.achievementsUnlocked, id],
     });
+    if (meta?.points && meta.points > 0) {
+      grantXp(meta.points, {
+        grantKey: `achievement:${id}`,
+        label: meta.title ?? "Achievement",
+        unit: "pts",
+        showToast: !meta.silent,
+      });
+    }
     if (!meta?.silent) {
       enqueueCelebration({
         id: `ach-${id}-${Date.now()}`,
         kind: "achievement",
         title: meta?.title ?? "Achievement unlocked",
-        message: "New badge added to your profile.",
+        message: meta?.points
+          ? `+${meta.points} pts · New badge added to your profile.`
+          : "New badge added to your profile.",
         emoji: meta?.emoji ?? "🏆",
       });
     }

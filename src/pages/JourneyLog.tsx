@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Mic, Sparkles, Send, Copy, Laptop, Layout, FileText, Globe } from "lucide-react";
-import { useExperiences, type Experience } from "@/lib/experiences-store";
+import { Plus, Mic, Sparkles, Send, Copy, Laptop, Layout, FileText, Globe, Pencil, Trash2, X } from "lucide-react";
+import { useExperiences, experiencesStore, type Experience } from "@/lib/experiences-store";
 import { ExperienceCard } from "@/components/ExperienceCard";
 import { JumpyNudge } from "@/components/JumpyNudge";
 import { StreakPanel } from "@/components/StreakPanel";
@@ -50,6 +50,8 @@ const JourneyLog = () => {
   const experiences = useExperiences();
   const { toast } = useToast();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["value"]>("All");
+  const [editMode, setEditMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   
   // Content Studio State
   const [studioExpId, setStudioExpId] = useState<string>(experiences[0]?.id || "");
@@ -112,12 +114,37 @@ const JourneyLog = () => {
     });
   };
 
+  const exitEditMode = () => {
+    setEditMode(false);
+    setSelectedIds([]);
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
+
+  const selectAllFiltered = () => {
+    setSelectedIds(filtered.map((e) => e.id));
+  };
+
+  const deleteSelected = async () => {
+    if (selectedIds.length === 0) return;
+    const count = selectedIds.length;
+    await experiencesStore.removeMany(selectedIds);
+    toast({
+      title: count === 1 ? "Experience deleted" : `${count} experiences deleted`,
+      description: "Removed from your journey log.",
+    });
+    exitEditMode();
+  };
+
   return (
     <AnimatedPage className="container py-8 md:py-10 space-y-6 overflow-x-hidden">
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Journey Log</div>
           <h1 className="mt-1 font-display text-3xl font-normal md:text-4xl">Document Wins & Build Your Brand</h1>
           <p className="text-sm text-muted-foreground">
             Track your milestones, build a clean portfolio website, and draft social posts instantly.
@@ -155,6 +182,7 @@ const JourneyLog = () => {
             >
               <JumpyNudge
                 message={`You logged "${firstUnshared.title}" but haven't shared it yet. Want me to draft a post?`}
+                unsharedLabel={unsharedCount > 0 ? `${unsharedCount} unshared` : undefined}
                 ctaLabel="Draft it"
                 to={`/journey/${firstUnshared.id}`}
               />
@@ -164,8 +192,8 @@ const JourneyLog = () => {
           <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
             {/* Main column */}
             <div>
-              {/* Filter chips */}
-              <div className="mb-5 flex flex-wrap gap-2">
+              {/* Filter chips + edit */}
+              <div className="mb-5 flex flex-wrap items-center gap-2">
                 {FILTERS.map((f) => (
                   <motion.button
                     key={f.value}
@@ -182,7 +210,62 @@ const JourneyLog = () => {
                     {f.label}
                   </motion.button>
                 ))}
+                <div className="ml-auto flex flex-wrap items-center gap-2">
+                  {editMode ? (
+                    <>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="rounded-full text-xs font-bold"
+                        onClick={selectAllFiltered}
+                        disabled={filtered.length === 0}
+                      >
+                        Select all
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="rounded-full gap-1.5 text-xs font-bold"
+                        disabled={selectedIds.length === 0}
+                        onClick={deleteSelected}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Delete{selectedIds.length > 0 ? ` (${selectedIds.length})` : ""}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-full gap-1 text-xs font-bold"
+                        onClick={exitEditMode}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                        Done
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full gap-1.5 text-xs font-bold"
+                      onClick={() => setEditMode(true)}
+                      disabled={experiences.length === 0}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      Edit
+                    </Button>
+                  )}
+                </div>
               </div>
+
+              {editMode && (
+                <p className="mb-4 text-xs text-muted-foreground">
+                  Tap experiences to select them, then delete in bulk.
+                </p>
+              )}
 
               {filtered.length === 0 ? (
                 <motion.div 
@@ -203,7 +286,12 @@ const JourneyLog = () => {
                 >
                   {filtered.map((exp) => (
                     <motion.div key={exp.id} variants={itemVariants}>
-                      <ExperienceCard experience={exp} />
+                      <ExperienceCard
+                        experience={exp}
+                        selectMode={editMode}
+                        selected={selectedIds.includes(exp.id)}
+                        onToggleSelect={() => toggleSelect(exp.id)}
+                      />
                     </motion.div>
                   ))}
                 </motion.div>
@@ -212,26 +300,37 @@ const JourneyLog = () => {
 
             {/* Right rail */}
             <aside className="hidden space-y-4 lg:block">
-              <motion.button 
-                whileHover={{ y: -2, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="group flex w-full items-center gap-3 rounded-xl border border-border bg-surface p-4 text-left transition-all hover:border-coral"
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-coral text-coral-foreground">
-                  <Mic className="h-5 w-5" />
+              <div className="flex items-center gap-2 rounded-full border border-border bg-background p-2 pl-4">
+                <p className="min-w-0 flex-1 font-display text-sm font-normal text-foreground">
+                  Log new experience
+                </p>
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <motion.button
+                    type="button"
+                    whileHover={{ y: -2, scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() =>
+                      toast({
+                        title: "Voice log coming soon",
+                        description: "Tap again later to record a quick win.",
+                      })
+                    }
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-muted/50"
+                    aria-label="Voice log"
+                  >
+                    <Mic className="h-5 w-5" />
+                  </motion.button>
+                  <Link
+                    to="/journey/new"
+                    aria-label="Add new experience"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-coral text-coral-foreground transition-opacity hover:opacity-90"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </Link>
                 </div>
-                <div>
-                  <div className="font-display text-sm font-normal">Quick voice log</div>
-                  <div className="text-xs text-muted-foreground">Tap to record (coming soon)</div>
-                </div>
-              </motion.button>
+              </div>
 
               <StreakPanel />
-              {unsharedCount > 0 && (
-                <p className="rounded-2xl border border-border bg-surface px-3 py-2 text-xs text-muted-foreground">
-                  <span className="font-bold text-coral">{unsharedCount} unshared</span> · turn them into content
-                </p>
-              )}
             </aside>
           </div>
         </TabsContent>

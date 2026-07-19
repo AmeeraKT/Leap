@@ -10,7 +10,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { MilestoneGamePath, getActiveRoadmapPhaseIndex } from "@/components/MilestoneGamePath";
 import { Jumpy } from "@/components/Jumpy";
 import { ROADMAP_PHASE_ORDER, phaseShortLabel } from "@/lib/roadmap-alumni";
-import { RoadmapAlumniSection } from "@/components/RoadmapAlumniSection";
 import { JumpyNudge } from "@/components/JumpyNudge";
 import { useExperiences } from "@/lib/experiences-store";
 import { useToast } from "@/hooks/use-toast";
@@ -160,7 +159,6 @@ const Roadmap = () => {
           <div className="flex gap-4 md:gap-6">
             <Jumpy size="md" animate="float" glow className="hidden shrink-0 sm:block" />
             <div>
-              <p className="leap-mono-label">Roadmap planner</p>
               <h1 className="mt-2 font-display text-3xl font-normal tracking-tight md:text-4xl">
                 Guide your career goals
               </h1>
@@ -168,7 +166,7 @@ const Roadmap = () => {
                 {allStagesComplete
                   ? "You cleared every milestone — Jumpy is proud. Keep logging wins in Journey Log."
                   : activeStageLabel
-                    ? `Jumpy is waiting for you in ${activeStageLabel}. Complete milestones to hop to the next stage.`
+                    ? `You're in the ${activeStageLabel} level! Complete milestones to hop to the next level.`
                     : "A personalized roadmap that grows with your experiences and skills."}
               </p>
             </div>
@@ -189,14 +187,14 @@ const Roadmap = () => {
 
       <div className="space-y-6">
           <Tabs defaultValue="milestones" className="w-full">
-            <TabsList className="leap-tabs-list flex w-full flex-wrap justify-start font-display">
-              <TabsTrigger value="milestones" className="leap-tab-trigger rounded-lg px-4 py-2 font-display data-[state=active]:shadow-none">
+            <TabsList className="flex w-full sm:w-fit flex-wrap justify-start gap-1 rounded-2xl border border-border bg-surface p-1 font-display font-bold">
+              <TabsTrigger value="milestones" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
                 Personalized Milestones
               </TabsTrigger>
-              <TabsTrigger value="planner" className="leap-tab-trigger rounded-lg px-4 py-2 font-display data-[state=active]:shadow-none">
+              <TabsTrigger value="planner" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
                 Time Planner
               </TabsTrigger>
-              <TabsTrigger value="brand" className="leap-tab-trigger rounded-lg px-4 py-2 font-display data-[state=active]:shadow-none">
+              <TabsTrigger value="brand" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
                 Personal Brand Coaching
               </TabsTrigger>
             </TabsList>
@@ -210,7 +208,6 @@ const Roadmap = () => {
                   if (current) setMilestoneDone(id, done ?? !current.done);
                 }}
               />
-              <RoadmapAlumniSection />
             </TabsContent>
 
             {/* Time Planner Content */}
@@ -228,24 +225,20 @@ const Roadmap = () => {
                   </div>
 
                   {/* Sub tabs for planner */}
-                  <div className="flex bg-background rounded-xl p-1 border border-border h-10 w-fit items-center">
+                  <div className="flex h-10 w-fit items-center gap-1 rounded-2xl border border-border bg-surface p-1">
                     {(["week", "month", "year"] as const).map((t) => (
                       <button
                         key={t}
+                        type="button"
                         onClick={() => setActivePlannerTab(t)}
-                        className="relative rounded-lg px-4 text-xs font-bold capitalize h-8 transition-colors z-10 flex items-center justify-center"
-                        style={{ color: activePlannerTab === t ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
-                      >
-                        {activePlannerTab === t && (
-                          <motion.div
-                            layoutId="activePlannerTabBg"
-                            className="absolute inset-0 rounded-lg bg-secondary z-0"
-                            transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                          />
+                        className={cn(
+                          "flex h-8 items-center justify-center rounded-xl px-4 text-xs font-bold capitalize transition-all",
+                          activePlannerTab === t
+                            ? "bg-foreground text-background"
+                            : "text-muted-foreground hover:text-foreground",
                         )}
-                        <span className={cn("relative z-10", activePlannerTab === t ? "font-normal" : "hover:text-foreground")}>
-                          {t}
-                        </span>
+                      >
+                        {t}
                       </button>
                     ))}
                   </div>
