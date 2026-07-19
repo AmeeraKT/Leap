@@ -13,6 +13,7 @@ const WAITLIST_YEARS = [
   "Third",
   "Fourth",
   "Fifth or above",
+  "Graduated",
 ] as const;
 
 const WAITLIST_DEGREES = ["Bachelor", "Master", "PhD", "Diploma/Other"] as const;

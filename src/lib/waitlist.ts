@@ -6,6 +6,7 @@ export const WAITLIST_YEARS = [
   "Third",
   "Fourth",
   "Fifth or above",
+  "Graduated",
 ] as const;
 
 export const WAITLIST_DEGREES = ["Bachelor", "Master", "PhD", "Diploma/Other"] as const;
