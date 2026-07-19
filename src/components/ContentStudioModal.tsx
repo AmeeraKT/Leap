@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Copy, Loader2, RefreshCw, Save, Linkedin, Instagram, Twitter, Video, FileText } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,14 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 type Format = "linkedin" | "instagram" | "tiktok" | "twitter" | "portfolio";
+type ContentVariant =
+  | "default"
+  | "seal"
+  | "star"
+  | "story"
+  | "script"
+  | "post"
+  | "short-script";
 
 const FORMATS: { id: Format; label: string; icon: React.ComponentType<{ className?: string }>; color: string }[] = [
   { id: "linkedin", label: "LinkedIn", icon: Linkedin, color: "text-primary" },
@@ -21,19 +29,45 @@ const FORMATS: { id: Format; label: string; icon: React.ComponentType<{ classNam
   { id: "portfolio", label: "Portfolio", icon: FileText, color: "text-primary" },
 ];
 
+const VARIANT_LABELS: Record<ContentVariant, string> = {
+  default: "Standard",
+  seal: "SEAL interview",
+  star: "STAR interview",
+  story: "Story",
+  script: "Script",
+  post: "Post",
+  "short-script": "Short-form script",
+};
+
 interface Props {
   experience: Experience | null;
   initialFormat?: Format;
+  initialVariant?: ContentVariant;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const ContentStudioModal = ({ experience, initialFormat = "linkedin", open, onOpenChange }: Props) => {
+export const ContentStudioModal = ({
+  experience,
+  initialFormat = "linkedin",
+  initialVariant = "default",
+  open,
+  onOpenChange,
+}: Props) => {
   const [format, setFormat] = useState<Format>(initialFormat);
-  const [toneValue, setToneValue] = useState<number[]>([20]); // 0 = professional, 100 = casual
+  const [variant, setVariant] = useState<ContentVariant>(initialVariant);
+  const [toneValue, setToneValue] = useState<number[]>([20]);
   const [text, setText] = useState("");
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    setFormat(initialFormat);
+    setVariant(initialVariant);
+    setText("");
+    setHashtags([]);
+  }, [open, initialFormat, initialVariant, experience?.id]);
 
   const tone = toneValue[0] < 50 ? "professional" : "casual";
 
@@ -44,10 +78,9 @@ export const ContentStudioModal = ({ experience, initialFormat = "linkedin", ope
     setHashtags([]);
     try {
       const { data, error } = await supabase.functions.invoke("generate-content", {
-        body: { experience, format, tone },
+        body: { experience, format, variant, tone },
       });
       if (error) {
-        // supabase-js wraps non-2xx into error; surface message
         const msg = (error as { message?: string }).message ?? "Failed to generate";
         if (msg.includes("429")) toast.error("Too many requests — try again in a moment.");
         else if (msg.includes("402")) toast.error("AI credits exhausted. Add credits in Settings → Workspace.");
@@ -100,7 +133,6 @@ export const ContentStudioModal = ({ experience, initialFormat = "linkedin", ope
           </DialogTitle>
         </DialogHeader>
 
-        {/* Format tabs */}
         <div className="flex flex-wrap gap-2">
           {FORMATS.map((f) => {
             const Icon = f.icon;
@@ -108,7 +140,11 @@ export const ContentStudioModal = ({ experience, initialFormat = "linkedin", ope
             return (
               <button
                 key={f.id}
-                onClick={() => setFormat(f.id)}
+                type="button"
+                onClick={() => {
+                  setFormat(f.id);
+                  setVariant("default");
+                }}
                 className={cn(
                   "inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-all",
                   active
@@ -123,7 +159,12 @@ export const ContentStudioModal = ({ experience, initialFormat = "linkedin", ope
           })}
         </div>
 
-        {/* Tone slider */}
+        {variant !== "default" && (
+          <p className="text-xs text-muted-foreground">
+            Variant: <span className="font-semibold text-foreground">{VARIANT_LABELS[variant]}</span>
+          </p>
+        )}
+
         <div className="rounded-2xl border border-border bg-surface-soft p-4">
           <div className="mb-2 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-muted-foreground">
             <span>Professional</span>
@@ -135,11 +176,12 @@ export const ContentStudioModal = ({ experience, initialFormat = "linkedin", ope
           </div>
         </div>
 
-        {/* Output area */}
         {!text && !loading && (
           <div className="rounded-2xl border border-dashed border-border bg-background p-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Click <strong>Generate</strong> and Jumpy will draft a {FORMATS.find((f) => f.id === format)?.label} post from this experience.
+              Click <strong>Generate</strong> and Jumpy will draft a{" "}
+              {VARIANT_LABELS[variant] !== "Standard" ? `${VARIANT_LABELS[variant]} ` : ""}
+              {FORMATS.find((f) => f.id === format)?.label} post from this experience.
             </p>
           </div>
         )}
@@ -171,7 +213,6 @@ export const ContentStudioModal = ({ experience, initialFormat = "linkedin", ope
           </div>
         )}
 
-        {/* Actions */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
           <Button onClick={generate} disabled={loading} variant={text ? "outline" : "default"} className="rounded-full">
             {text ? <RefreshCw className="mr-2 h-4 w-4" /> : <Jumpy size="xs" animate="none" className="mr-1 scale-50" />}

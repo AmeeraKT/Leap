@@ -30,7 +30,7 @@ const DEFAULT_MILESTONES: Milestone[] = [
   { id: "m-5", title: "Optimize online professional portfolio", desc: "Publish logged wins and share custom bio link.", done: false, phase: "Phase 3: Launching", aiSuggested: true },
   { id: "m-6", title: "Apply for Summer Software Internships", desc: "Submit resume and portfolio to matched tech companies.", done: false, phase: "Phase 3: Launching", aiSuggested: false },
   { id: "m-7", title: "Attend 3 industry networking events", desc: "Meet peers and professionals; log contacts in Journey Log.", done: false, phase: "Phase 4: Connecting", aiSuggested: false },
-  { id: "m-8", title: "Book 5 informational interviews", desc: "Reach out to alumni or speakers for 20-minute career chats.", done: false, phase: "Phase 4: Connecting", aiSuggested: false },
+  { id: "m-8", title: "Book 5 informational interviews", desc: "Reach out to alumni or speakers for coffee chats.", done: false, phase: "Phase 4: Connecting", aiSuggested: false },
   { id: "m-9", title: "Ship an open-source or research contribution", desc: "One meaningful PR, lab output, or published case study.", done: false, phase: "Phase 5: Mastering", aiSuggested: false },
   { id: "m-10", title: "Earn a role-relevant certification", desc: "Cloud, UX, data, or security cert aligned to your target job.", done: false, phase: "Phase 5: Mastering", aiSuggested: true },
   { id: "m-11", title: "Mentor a junior student or run a workshop", desc: "Teach something you learned — builds leadership signal.", done: false, phase: "Phase 6: Leading", aiSuggested: false },
@@ -226,6 +226,7 @@ export const roadmapStore = {
 
     const next = list.map((m) => (m.id === id ? { ...m, done } : m));
     setLocalMilestones(next);
+    progressionStore.toggleRoadmapTask(id, done, item.done);
 
     if (currentUser) {
       await supabase.from("milestones").update({ done }).eq("id", id);

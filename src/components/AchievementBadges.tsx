@@ -28,7 +28,17 @@ export const AchievementBadges = ({ compact }: Props) => {
             title={a.description}
           >
             <div className="text-2xl">{unlocked ? a.emoji : "🔒"}</div>
-            <div className="mt-1 font-display text-xs font-normal leading-tight">{a.title}</div>
+            <div className="mt-1 flex items-start justify-between gap-1">
+              <div className="font-display text-xs font-normal leading-tight">{a.title}</div>
+              <span
+                className={cn(
+                  "shrink-0 rounded-pill px-1.5 py-0.5 font-display text-[10px] font-medium tabular-nums",
+                  unlocked ? "bg-coral/15 text-coral" : "bg-muted text-muted-foreground",
+                )}
+              >
+                +{a.points}
+              </span>
+            </div>
             {!compact && (
               <div className="mt-0.5 text-[10px] text-muted-foreground">{unlocked ? a.description : detail}</div>
             )}

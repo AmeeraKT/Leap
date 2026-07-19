@@ -286,7 +286,7 @@ const Waitlist = () => {
                 <RadioGroup
                   value={degree}
                   onValueChange={(v) => setDegree(v as WaitlistDegree)}
-                  className="grid gap-2 sm:grid-cols-3"
+                  className="grid grid-cols-4 gap-2"
                   aria-describedby={errors.degree ? `${formId}-degree-error` : undefined}
                 >
                   {WAITLIST_DEGREES.map((option) => (
@@ -294,7 +294,7 @@ const Waitlist = () => {
                       key={option}
                       htmlFor={`${formId}-degree-${option}`}
                       className={cn(
-                        "flex cursor-pointer items-center gap-2 rounded-lg border border-border px-3 py-3 text-sm font-normal transition-colors hover:bg-muted/40",
+                        "flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-border px-2 py-3 text-center text-xs font-normal leading-snug transition-colors hover:bg-muted/40 sm:flex-row sm:text-sm",
                         degree === option && "border-primary/40 bg-muted/30",
                       )}
                     >
@@ -386,27 +386,26 @@ const Waitlist = () => {
 
               <div className="space-y-2">
                 <Label htmlFor={`${formId}-presence`}>
-                  Online presence{" "}
-                  <span className="font-normal text-muted-foreground">(optional)</span>
+                  Professional online presence <span className="text-coral">*</span>
                 </Label>
                 <Select
                   value={onlinePresence || undefined}
-                  onValueChange={(v) =>
-                    setOnlinePresence(v === "__none__" ? "" : (v as WaitlistOnlinePresence))
-                  }
+                  onValueChange={(v) => setOnlinePresence(v as WaitlistOnlinePresence)}
                 >
                   <SelectTrigger
                     id={`${formId}-presence`}
-                    className="h-12 rounded-lg"
+                    className={cn(
+                      "h-12 rounded-lg",
+                      !onlinePresence && "text-muted-foreground",
+                    )}
                     aria-invalid={Boolean(errors.onlinePresence)}
                     aria-describedby={
                       errors.onlinePresence ? `${formId}-onlinePresence-error` : undefined
                     }
                   >
-                    <SelectValue placeholder="Select an option…" />
+                    <SelectValue placeholder="How often do you post on LinkedIn?" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="__none__">Prefer not to say</SelectItem>
                     {WAITLIST_ONLINE_PRESENCE.map((option) => (
                       <SelectItem key={option} value={option}>
                         {option}

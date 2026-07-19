@@ -231,12 +231,11 @@ const Dashboard = () => {
       {/* Header */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Student Hub</div>
           <h1 className="mt-1 font-display text-3xl font-normal md:text-4xl">
-            Welcome back, {userName} 🐸
+            Welcome back, {userName}
           </h1>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground font-bold">
-            <span>You're currently in the <span className="text-foreground">{steps[currentStep].label}</span> phase.</span>
+            <span>Current role: <span className="text-foreground">{steps[currentStep].label}</span></span>
             <span>•</span>
             <span className="text-coral">Lvl {level} · {xp.toLocaleString()} XP · {streakDays}-day streak</span>
           </div>
