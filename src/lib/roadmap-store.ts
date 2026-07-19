@@ -226,6 +226,7 @@ export const roadmapStore = {
 
     const next = list.map((m) => (m.id === id ? { ...m, done } : m));
     setLocalMilestones(next);
+    progressionStore.toggleRoadmapTask(id, done, item.done);
 
     if (currentUser) {
       await supabase.from("milestones").update({ done }).eq("id", id);

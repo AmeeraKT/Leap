@@ -1,99 +1,94 @@
-# Cursor Prompt: Rebuild Home.tsx landing sections
+# Cursor Prompt: Add "Gamified rewards" section to bottom of Features page
 
-Refactor the "How Leap works" and "Features" sections in `src/Home.tsx`.
-Keep all existing imports, the `Jumpy` component, framer-motion, `AnimatedPage`,
-theming tokens (`text-coral`, `leap-band-deep`, `bg-background`, etc.) and the
-Hero + Nav + CTA + Footer exactly as they are. Only rebuild the two middle sections
-and update their copy. Do NOT touch the hero at the top.
+Add a NEW section at the BOTTOM of the features area (after the last feature band,
+before the CTA). It sells the gamified loop: earn points for your work, redeem them
+for real rewards.
 
-## 1. Assets
-Look inside `src/assets` and find the Jumpy image files (PNG/SVG/WebP). Import one
-distinct Jumpy image per hero-journey phase (Explore, Engage, Capture, Showcase).
-If there are exactly four Jumpy poses, map one to each phase. If there are fewer,
-reuse sensibly but vary the pose/rotation so each section feels different. Use the
-static image files here, NOT the animated `<Jumpy>` component, for the journey
-sections.
+## Style
+Match the rest of LEAP: reuse Tailwind tokens (`text-coral`, `bg-secondary`,
+`bg-card`, `leap-band-deep`, `leap-panel`, `text-muted-foreground`, `font-display`),
+the `Jumpy` component, framer-motion, and the same `whileInView` fade-and-rise
+animation (`{ opacity:0, y:60 }` → `{ opacity:1, y:0 }`, easeOutExpo
+`ease:[0.16,1,0.3,1]`, `viewport:{ once:true, margin:"-120px" }`). Give it a coral or
+`leap-band-deep` accent so it pops as the "fun" section.
 
-## 2. "How LEAP works" — full-width alternating sections (replaces the 4-card grid)
+## Layout — two columns on desktop, stacked on mobile
+LEFT (or top on mobile): copy + the 3-step loop.
+RIGHT (or below on mobile): a placeholder for a GIF (I'll drop it in). Use an
+`<img>` with `src="/assets/rewards-loop.gif"` (create the folder/path reference,
+leave a labelled placeholder box if the file isn't there yet), rounded corners,
+soft shadow, and the hero's blurred glow blob behind it (`bg-secondary/30 blur-3xl`).
 
-Kill the card grid. Rebuild as FOUR stacked full-width sections, one phase each.
-Layout per section: a 2-column grid on desktop (`md:grid-cols-2`), text on one
-side, Jumpy image in the open white space on the opposite side. ALTERNATE sides:
-- Section 1 (Explore): text LEFT, Jumpy RIGHT
-- Section 2 (Engage): text RIGHT, Jumpy LEFT
-- Section 3 (Capture): text LEFT, Jumpy RIGHT
-- Section 4 (Showcase): text RIGHT, Jumpy LEFT
-Use Tailwind `order-*` utilities to flip column order on `md+` for the alternating
-sections. Give each section generous vertical padding (`py-24 md:py-32`) and lots of
-breathing room, Duolingo-style open space, NOT cramped cards.
+### Copy (use exactly)
+Eyebrow: "GAMIFIED"
+Heading: "Your effort actually pays off"
+Subtext: "Show up, log your wins, earn points — then cash them in for real rewards."
 
-Text block per section:
-- Small step number in muted/secondary colour (e.g. "01") above the title
-- Big bold CAPITALISED title using `font-display` (like `text-5xl md:text-6xl font-normal`)
-- One short flavour line below in `text-muted-foreground`, `text-lg`
+### The 3-step loop (render as three connected steps with arrows/chevrons between)
+Use lucide icons + short labels, laid out horizontally on desktop, vertical on mobile,
+with a small `ChevronRight` (or down-chevron on mobile) between each:
+1. Icon `CheckCircle` — "Complete tasks & attend events"
+2. Icon `Zap` (or `Sparkles`) — "Earn XP + points"
+3. Icon `Gift` (or `Ticket`) — "Redeem rewards"
 
-Jumpy image: large, centred in its column, with a soft blurred glow blob behind it
-(reuse the hero's `bg-secondary/30 blur-3xl` treatment).
+### Reward examples (small chips/badges under the loop)
+Row of pill badges: "Event ticket discounts", "Yochi vouchers", "Café & F&B deals",
+"and more". Style as rounded `bg-secondary` chips with icons where it fits.
 
-Section intro (keep above the four sections, centred):
-- Heading: "How LEAP works"
-- Subtext: "Four hops from sign-up to career momentum."
+### CTA
+A small `Link to="/rewards"` button: "See rewards" — reuse existing button variant.
 
-### Updated copy (use exactly):
-01 — EXPLORE
-"Not sure what career fits? Jumpy matches you with events, communities and paths that actually suit you."
+## Animation touch
+Stagger the three loop steps in one after another (delay each ~0.12s) so the loop
+"builds" as it scrolls into view. Keep it smooth, not bouncy.
 
-02 — ENGAGE
-"Show up and stand out. Join events, meet like-minded students, and get brand coaching that gets you noticed."
+## Mobile
+Single column, loop goes vertical with down-chevrons, GIF below the copy, chips wrap,
+no horizontal overflow at 375px.
 
-03 — CAPTURE
-"Never blank in an interview again. Log every event, project and connection as career-ready proof."
+# Cursor Prompt: Add slow text marquee of rewards to the Gamified section
 
-04 — SHOWCASE
-"Turn your logs into LinkedIn posts and a portfolio that employers actually see."
+In the "Gamified rewards" section at the bottom of the Features page, add a
+horizontal auto-scrolling text carousel (marquee) of available rewards.
 
-## 3. Features — two sections, two features each (replaces the 4-card horizontal row)
+## Content — 6 items, in this order
+- Event ticket discounts
+- Yochi vouchers
+- Café & F&B deals
+- Competition entry discounts
+- Networking event passes
+- Exclusive workshops
 
-Split the four features into TWO full-width bands, two features per band, arranged
-with open space instead of tight boxes. Drop the heavy card look. Each feature =
-icon + title (`font-display`) + short line, laid out cleanly with whitespace. Keep
-each feature linking to its `to` route. Keep the section heading "Recipe to your success".
+## Look
+- Big, bold text: `font-display font-bold text-3xl md:text-5xl`.
+- Each item separated by a DOT ("•") with EQUAL spacing on both sides of every dot,
+  so the rhythm is consistent (e.g. wrap each item and each dot so gaps are uniform —
+  use a fixed horizontal margin/padding like `mx-8` on both items and dots, don't rely
+  on inconsistent inline spaces).
+- Colour: use `text-foreground` for items and `text-coral` for the dots so the dots
+  pop. (Or reverse if it reads better on the section's background.)
+- Full-bleed width, no visible scrollbar, `overflow-hidden` on the container.
 
-### Updated copy (use exactly):
-Quiz & pathway plans — /quiz
-"Take a quick quiz, get your top 3 career matches, and compare plans built around your goals."
+## Motion
+- Continuous horizontal scroll, moving SLOWLY and smoothly (right → left), infinite loop
+  with NO visible jump — duplicate the list twice inside the track and translate the
+  track by -50% so it seamlessly repeats.
+- Implement with CSS keyframes (preferred for smoothness) OR framer-motion. If CSS:
+```css
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .marquee-track { animation: marquee 30s linear infinite; }
+```
+  Use a slow duration (~30–40s) so it drifts, not races.
+- Pause on hover (`:hover { animation-play-state: paused; }`) — nice touch.
+- Add soft fade masks on the left and right edges so text fades in/out instead of
+  hard-cutting (CSS `mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent)`).
 
-Quest roadmap — /roadmap
-"A six-stage career map with milestones, checklists, coaching and job predictions."
+## Structure
+- Track is a single flex row (`flex whitespace-nowrap w-max`) containing the 6 items +
+  dots, then the SAME set duplicated for the seamless loop.
+- Keep it accessible: `aria-hidden` on the duplicated copy so screen readers don't read
+  rewards twice.
 
-Journey log — /journey
-"Log your wins, draft social posts, keep your streak, and earn XP as your brand grows."
-
-Career Vision — /career-vision
-"AI job matches, resume feedback, and Jumpy on call when you're stuck."
-
-## 4. Scroll animations (the "expensive website" feel)
-
-Use framer-motion `whileInView`. For every journey section and feature block:
-- initial: `{ opacity: 0, y: 60 }`
-- whileInView: `{ opacity: 1, y: 0 }`
-- viewport: `{ once: true, margin: "-120px" }`
-- transition: `{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }`  // easeOutExpo, luxurious
-
-Stagger the text and image within a section slightly (image ~0.15s after text) using
-`delay`. Elements should rise up from below and fade in on that same bezier curve.
-Keep it smooth and slow, not bouncy. Define one reusable variants object and apply it
-across sections so timing is consistent.
-
-## 5. Mobile responsive (required)
-
-- On `<md`, collapse every 2-column section to a single column (`grid-cols-1`).
-- On mobile, stack Jumpy image ABOVE the text for ALL journey sections (ignore the
-  alternating order on mobile so it reads top-to-bottom cleanly).
-- Reduce Jumpy image size on mobile, scale titles down (`text-4xl` on mobile).
-- Reduce vertical padding on mobile (`py-16`).
-- Features: 1 column on mobile, 2 columns on `md+`.
-- Ensure nothing overflows horizontally at 375px width.
-
-Keep code clean and typed. Reuse existing Tailwind tokens and the existing
-`containerVariants` / `itemVariants` where sensible, or add new ones if clearer.
+## Mobile
+- Slightly smaller text on mobile (`text-3xl`), same slow scroll, still full-bleed and
+  seamless, no horizontal page overflow.

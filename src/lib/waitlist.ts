@@ -8,7 +8,7 @@ export const WAITLIST_YEARS = [
   "Fifth or above",
 ] as const;
 
-export const WAITLIST_DEGREES = ["Bachelor", "Master", "PhD"] as const;
+export const WAITLIST_DEGREES = ["Bachelor", "Master", "PhD", "Diploma/Other"] as const;
 
 export const WAITLIST_MAJORS = [
   "Agriculture / Animal Sciences",
@@ -43,7 +43,7 @@ export type WaitlistPayload = {
   degree: WaitlistDegree;
   majors: WaitlistMajor[];
   university: string | null;
-  onlinePresence: WaitlistOnlinePresence | null;
+  onlinePresence: WaitlistOnlinePresence;
   website: string;
 };
 
@@ -75,9 +75,9 @@ export const waitlistPayloadSchema = z
         message: "Duplicate majors are not allowed.",
       }),
     university: z.string().trim().max(120, "University must be at most 120 characters.").nullish(),
-    onlinePresence: z
-      .union([z.enum(WAITLIST_ONLINE_PRESENCE), z.literal(""), z.null()])
-      .optional(),
+    onlinePresence: z.enum(WAITLIST_ONLINE_PRESENCE, {
+      errorMap: () => ({ message: "Select how often you post on LinkedIn." }),
+    }),
     website: z.string().max(200).optional(),
   })
   .strict();
@@ -87,10 +87,6 @@ function normalizePayload(
 ): WaitlistPayload {
   const university =
     data.university && data.university.length > 0 ? data.university : null;
-  const onlinePresence =
-    data.onlinePresence && data.onlinePresence.length > 0
-      ? data.onlinePresence
-      : null;
 
   return {
     name: data.name,
@@ -99,7 +95,7 @@ function normalizePayload(
     degree: data.degree,
     majors: data.majors,
     university,
-    onlinePresence,
+    onlinePresence: data.onlinePresence,
     website: data.website ?? "",
   };
 }

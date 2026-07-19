@@ -15,7 +15,7 @@ const WAITLIST_YEARS = [
   "Fifth or above",
 ] as const;
 
-const WAITLIST_DEGREES = ["Bachelor", "Master", "PhD"] as const;
+const WAITLIST_DEGREES = ["Bachelor", "Master", "PhD", "Diploma/Other"] as const;
 
 const WAITLIST_MAJORS = [
   "Agriculture / Animal Sciences",
@@ -59,10 +59,7 @@ const serverSchema = z
       .nullable()
       .optional()
       .transform((v) => (v && v.length > 0 ? v : null)),
-    onlinePresence: z
-      .union([z.enum(WAITLIST_ONLINE_PRESENCE), z.literal(""), z.null(), z.undefined()])
-      .optional()
-      .transform((v) => (v && v.length > 0 ? v : null)),
+    onlinePresence: z.enum(WAITLIST_ONLINE_PRESENCE),
     website: z.string().optional().default(""),
   })
   .strict();

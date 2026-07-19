@@ -66,6 +66,7 @@ interface DiscoverEvent {
 const Discover = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeInterestFilter, setActiveInterestFilter] = useState("All");
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const discoverStates = useDiscoverStates();
 
@@ -263,7 +264,23 @@ const Discover = () => {
       (activeInterestFilter === "All" || e.interest === activeInterestFilter)
   );
 
-  const categories = ["All", "Tech & Coding", "Artificial Intelligence", "UI/UX Design", "Career Growth"];
+  const categories = [
+    "All",
+    "Tech & Coding",
+    "Artificial Intelligence",
+    "UI/UX Design",
+    "Career Growth",
+    "Business & Economics",
+    "Engineering",
+    "Health & Medicine",
+    "Law",
+    "Science & Mathematics",
+    "Education",
+    "Arts & Humanities",
+    "Environment & Sustainability",
+    "Architecture & Design",
+    "Agriculture & Animal Sciences",
+  ];
 
   return (
     <AnimatedPage className="container py-8 md:py-10 space-y-6 overflow-x-hidden">
@@ -276,35 +293,59 @@ const Discover = () => {
       </div>
 
       {/* Search & Category Filter Section */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-        <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search communities, chat groups, skills (e.g. Mistral, Figma)..."
-            className="h-12 rounded-full border pl-11 pr-4 text-sm focus-visible:ring-secondary"
-          />
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search communities, skills, events..."
+              className="h-12 rounded-full border pl-11 pr-4 text-sm focus-visible:ring-secondary"
+            />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-12 shrink-0 gap-2 rounded-full px-4"
+            onClick={() => setFilterOpen((o) => !o)}
+            aria-expanded={filterOpen}
+          >
+            <Filter className="h-4 w-4" />
+            Filter
+            {activeInterestFilter !== "All" && (
+              <span className="rounded-full bg-foreground px-2 py-0.5 text-[10px] font-bold text-background">
+                {activeInterestFilter}
+              </span>
+            )}
+          </Button>
         </div>
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
-          <Filter className="h-4 w-4 shrink-0 text-muted-foreground hidden sm:block" />
-          {categories.map((cat) => (
-            <motion.button
-              key={cat}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setActiveInterestFilter(cat)}
-              className={cn(
-                "rounded-full px-4 py-1.5 text-xs font-normal whitespace-nowrap transition-all border",
-                activeInterestFilter === cat
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border bg-surface text-muted-foreground hover:border-foreground/30",
-              )}
-            >
-              {cat}
-            </motion.button>
-          ))}
-        </div>
+
+        {filterOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-wrap gap-2 rounded-xl border border-border bg-surface p-3"
+          >
+            {categories.map((cat) => (
+              <motion.button
+                key={cat}
+                type="button"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => setActiveInterestFilter(cat)}
+                className={cn(
+                  "rounded-full px-4 py-1.5 text-xs font-normal whitespace-nowrap transition-all border",
+                  activeInterestFilter === cat
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border bg-background text-muted-foreground hover:border-foreground/30",
+                )}
+              >
+                {cat}
+              </motion.button>
+            ))}
+          </motion.div>
+        )}
       </div>
 
       <Tabs defaultValue="communities" className="w-full">

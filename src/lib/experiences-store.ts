@@ -16,6 +16,8 @@ export interface Experience {
   skills: string[];
   impact?: string;
   posted: { linkedin: boolean; instagram: boolean; tiktok: boolean; twitter: boolean };
+  /** Extra photos/videos for the experience gallery. */
+  media?: { url: string; kind: "image" | "video" }[];
 }
 
 const STORAGE_KEY = "leap.experiences.v1";
@@ -354,6 +356,22 @@ export const experiencesStore = {
     if (!alreadyPosted) {
       progressionStore.grantContentPosted(id, format);
     }
+  },
+
+  removeMany: async (ids: string[]) => {
+    const idSet = new Set(ids);
+    if (idSet.size === 0) return;
+
+    if (currentUser) {
+      const { error } = await supabase.from("experiences").delete().in("id", [...idSet]);
+      if (!error) {
+        cache = getAll().filter((e) => !idSet.has(e.id));
+        listeners.forEach((l) => l());
+        return;
+      }
+    }
+
+    setAllLocal(getAll().filter((e) => !idSet.has(e.id)));
   },
 };
 

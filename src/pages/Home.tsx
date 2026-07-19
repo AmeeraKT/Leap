@@ -4,17 +4,33 @@ import {
   BookOpen,
   Brain,
   Route,
+  CheckCircle,
+  Zap,
+  Gift,
+  ChevronRight,
+  ChevronDown,
+  Ticket,
+  Coffee,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Jumpy } from "@/components/Jumpy";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { motion } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useReducedMotion,
+  cubicBezier,
+} from "framer-motion";
 import { AnimatedPage } from "@/components/AnimatedPage";
 import jumpyThink from "@/assets/jumpy-think.png";
 import jumpyTalk from "@/assets/jumpy-talk.png";
 import jumpyBlink from "@/assets/jumpy-blink.png";
 import jumpyHappy from "@/assets/jumpy-happy.png";
+import { toast } from "sonner";
+import { enterDemoAccount } from "@/lib/demo-account";
 
 const features = [
   {
@@ -55,7 +71,7 @@ const howItWorks = [
   {
     step: "02",
     title: "ENGAGE",
-    body: "Show up and stand out. Join events, meet like-minded students, and get brand coaching that gets you noticed.",
+    body: "Show up and stand out. Join events, meet like-minded students, and get brand coaching that gets you noticed. Attend skill workshops hosted by student ambassadors near you!",
     image: jumpyTalk,
     imageAlt: "Jumpy talking and engaging",
     imageLeft: true,
@@ -71,7 +87,7 @@ const howItWorks = [
   {
     step: "04",
     title: "SHOWCASE",
-    body: "Turn your logs into LinkedIn posts and a portfolio that employers actually see.",
+    body: "Turn your logs into LinkedIn posts and a portfolio that employers actually see. With just a click.",
     image: jumpyHappy,
     imageAlt: "Jumpy showcasing wins",
     imageLeft: true,
@@ -124,9 +140,278 @@ const featureBands = [
   [features[2], features[3]],
 ] as const;
 
-const Home = () => {
+function FeatureCard({
+  feature,
+}: {
+  feature: (typeof features)[number];
+}) {
   return (
-    <AnimatedPage className="min-h-screen bg-background overflow-x-hidden">
+    <Link
+      to={feature.to}
+      className="group flex h-full flex-col rounded-2xl border border-border/60 bg-white p-4 text-foreground shadow-sm transition-transform hover:-translate-y-0.5 md:p-5"
+    >
+      <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-coral/10 text-coral">
+        <feature.icon className="h-4 w-4" />
+      </div>
+      <h3 className="font-display text-lg font-normal leading-snug md:text-xl">{feature.title}</h3>
+      <p className="mt-1.5 line-clamp-3 flex-1 text-xs leading-relaxed text-muted-foreground md:text-sm">
+        {feature.body}
+      </p>
+      <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-coral transition-transform group-hover:translate-x-1">
+        Open
+        <ArrowRight className="h-3.5 w-3.5" />
+      </span>
+    </Link>
+  );
+}
+
+function RecipeSuccessSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Full-viewport travel; ease-out bezier = fast start, slow settle
+  const cardEase = cubicBezier(0.16, 1, 0.3, 1);
+  const topX = useTransform(scrollYProgress, [0, 0.38], ["-100vw", "0vw"], {
+    ease: cardEase,
+  });
+  const bottomX = useTransform(scrollYProgress, [0.35, 0.72], ["100vw", "0vw"], {
+    ease: cardEase,
+  });
+  const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
+  if (prefersReducedMotion) {
+    return (
+      <section id="features" className="leap-band-deep overflow-x-hidden">
+        <div className="container py-16 md:py-20">
+          <div className="mx-auto mb-8 max-w-2xl text-center">
+            <h2 className="font-display text-3xl font-normal text-white md:text-4xl">
+              Recipe to your success
+            </h2>
+          </div>
+          <div className="mx-auto grid max-w-4xl grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+            {features.map((f) => (
+              <FeatureCard key={f.title} feature={f} />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section
+      id="features"
+      ref={sectionRef}
+      className="relative h-[200vh] leap-band-deep"
+    >
+      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-x-hidden overflow-y-hidden py-6">
+        <div className="container flex max-h-full flex-col gap-5 md:gap-6">
+          <div className="mx-auto max-w-2xl shrink-0 text-center">
+            <h2 className="font-display text-3xl font-normal text-white md:text-4xl">
+              Recipe to your success
+            </h2>
+            <p className="mt-2 text-xs text-white/70 md:text-sm">
+              Scroll to assemble your recipe
+            </p>
+          </div>
+
+          {/* No overflow clip here — rows travel from true viewport edges */}
+          <div className="relative mx-auto w-full max-w-4xl">
+            <div className="flex flex-col gap-3 sm:gap-4">
+              <motion.div
+                style={{ x: topX }}
+                className="grid grid-cols-1 gap-3 opacity-100 sm:grid-cols-2 sm:gap-4"
+              >
+                {featureBands[0].map((f) => (
+                  <FeatureCard key={f.title} feature={f} />
+                ))}
+              </motion.div>
+              <motion.div
+                style={{ x: bottomX }}
+                className="grid grid-cols-1 gap-3 opacity-100 sm:grid-cols-2 sm:gap-4"
+              >
+                {featureBands[1].map((f) => (
+                  <FeatureCard key={f.title} feature={f} />
+                ))}
+              </motion.div>
+            </div>
+          </div>
+
+          <div className="mx-auto w-full max-w-xs shrink-0">
+            <div className="h-1 overflow-hidden rounded-full bg-white/20">
+              <motion.div
+                className="h-full rounded-full bg-coral"
+                style={{ width: progressWidth }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const REWARD_LOOP_STEPS = [
+  { icon: CheckCircle, label: "Complete tasks & attend events" },
+  { icon: Zap, label: "Earn XP + points" },
+  { icon: Gift, label: "Redeem rewards" },
+] as const;
+
+const MARQUEE_REWARDS = [
+  "Event ticket discounts",
+  "Yochi vouchers",
+  "Café & F&B deals",
+  "Competition entry discounts",
+  "Networking event passes",
+  "Exclusive workshops",
+] as const;
+
+const gamifyReveal = {
+  initial: { opacity: 0, y: 60 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-120px" as const },
+  transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] as const },
+};
+
+function RewardsMarquee() {
+  const items = [...MARQUEE_REWARDS, ...MARQUEE_REWARDS];
+
+  return (
+    <div className="marquee-mask mt-12 w-full overflow-hidden py-4">
+      <div className="marquee-track flex w-max whitespace-nowrap">
+        {items.map((label, i) => {
+          const isDupe = i >= MARQUEE_REWARDS.length;
+          return (
+            <span key={`${label}-${i}`} className="flex items-center" aria-hidden={isDupe || undefined}>
+              <span className="mx-8 font-display text-3xl font-bold text-foreground md:text-5xl">
+                {label}
+              </span>
+              <span className="mx-8 font-display text-3xl font-bold text-coral md:text-5xl" aria-hidden>
+                •
+              </span>
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function GamifiedRewardsSection() {
+  const [gifFailed, setGifFailed] = useState(false);
+
+  return (
+    <section className="overflow-x-hidden bg-coral/10 py-16 md:py-24">
+      <div className="container">
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+          <motion.div {...gamifyReveal} className="space-y-6">
+            <h2 className="font-display text-3xl font-normal text-foreground md:text-5xl">
+              Your effort actually pays off
+            </h2>
+            <p className="max-w-lg text-base text-muted-foreground md:text-lg">
+              Show up, log your wins, earn points — then cash them in for real rewards.
+            </p>
+
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-2">
+              {REWARD_LOOP_STEPS.map((step, i) => {
+                const Icon = step.icon;
+                return (
+                  <div key={step.label} className="flex flex-col items-center gap-2 sm:flex-row sm:contents">
+                    <motion.div
+                      initial={{ opacity: 0, y: 60 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-120px" }}
+                      transition={{
+                        duration: 0.9,
+                        ease: [0.16, 1, 0.3, 1],
+                        delay: i * 0.12,
+                      }}
+                      className="flex w-full min-w-0 flex-1 items-start gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-coral/15 text-coral">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <p className="text-sm font-semibold leading-snug text-foreground">{step.label}</p>
+                    </motion.div>
+                    {i < REWARD_LOOP_STEPS.length - 1 && (
+                      <>
+                        <ChevronRight className="hidden h-5 w-5 shrink-0 self-center text-coral sm:block" aria-hidden />
+                        <ChevronDown className="h-5 w-5 shrink-0 text-coral sm:hidden" aria-hidden />
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <Link to="/rewards">
+              <Button variant="hero" size="sm" className="mt-2 gap-1.5">
+                See rewards
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </motion.div>
+
+          <motion.div
+            {...gamifyReveal}
+            transition={{ ...gamifyReveal.transition, delay: 0.15 }}
+            className="relative mx-auto w-full max-w-md lg:max-w-none"
+          >
+            <div
+              className="pointer-events-none absolute inset-0 m-auto h-48 w-48 rounded-full bg-secondary/30 blur-3xl md:h-64 md:w-64"
+              aria-hidden
+            />
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-md">
+              {!gifFailed ? (
+                <img
+                  src="/assets/rewards-loop.gif"
+                  alt="Gamified rewards loop — earn points and redeem perks"
+                  className="aspect-[4/3] w-full object-cover"
+                  onError={() => setGifFailed(true)}
+                />
+              ) : (
+                <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 bg-muted/40 p-6 text-center">
+                  <Jumpy size="sm" animate="hop" />
+                  <p className="font-display text-lg text-foreground">Rewards loop GIF</p>
+                  <p className="max-w-xs text-xs text-muted-foreground">
+                    Drop your file at <code className="text-coral">public/assets/rewards-loop.gif</code>
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      <RewardsMarquee />
+    </section>
+  );
+}
+
+const Home = () => {
+  const navigate = useNavigate();
+  const [demoLoading, setDemoLoading] = useState(false);
+
+  const startDemo = async () => {
+    if (demoLoading) return;
+    setDemoLoading(true);
+    try {
+      await enterDemoAccount();
+      toast.success("Signed in as Alex Chen");
+      navigate("/dashboard");
+    } catch {
+      toast.error("Couldn't start the demo. Try again.");
+    } finally {
+      setDemoLoading(false);
+    }
+  };
+
+  return (
+    <AnimatedPage className="min-h-screen bg-background">
       {/* Nav */}
       <header className="container flex items-center justify-between py-6">
         <div className="flex items-center gap-2">
@@ -146,7 +431,7 @@ const Home = () => {
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link to="/quiz">
+          <Link to="/signin">
             <Button variant="outline" size="sm">
               Sign in
             </Button>
@@ -188,13 +473,18 @@ const Home = () => {
                   </Button>
                 </motion.div>
               </Link>
-              <Link to="/quiz" className="min-w-0 flex-1">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="h-full w-full">
-                  <Button variant="outline" size="lg" className="h-full w-full font-bold">
-                    Try demo account
-                  </Button>
-                </motion.div>
-              </Link>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="min-w-0 flex-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  className="h-full w-full font-bold"
+                  onClick={startDemo}
+                  disabled={demoLoading}
+                >
+                  {demoLoading ? "Loading demo…" : "Try demo account"}
+                </Button>
+              </motion.div>
             </div>
 
             <Link to="/waitlist" className="block w-full">
@@ -275,58 +565,10 @@ const Home = () => {
         ))}
       </section>
 
-      {/* Features */}
-      <section id="features" className="leap-band-deep overflow-x-hidden">
-        <div className="container py-16 md:py-24">
-          <motion.div {...textReveal} className="mx-auto mb-12 max-w-2xl text-center md:mb-20">
-            <h2 className="font-display text-4xl font-normal text-white md:text-5xl">
-              Recipe to your success
-            </h2>
-          </motion.div>
+      {/* Features — sticky scroll: 2 white cards at a time, then continue to CTA */}
+      <RecipeSuccessSection />
 
-          <div className="space-y-16 md:space-y-24">
-            {featureBands.map((band, bandIndex) => (
-              <div
-                key={bandIndex}
-                className="grid gap-12 md:grid-cols-2 md:gap-20"
-              >
-                {band.map((f, featureIndex) => (
-                  <motion.div
-                    key={f.title}
-                    initial={{ opacity: 0, y: 60 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={revealViewport}
-                    transition={{
-                      duration: 0.9,
-                      ease: revealEase,
-                      delay: featureIndex * 0.12,
-                    }}
-                  >
-                    <Link
-                      to={f.to}
-                      className="group block space-y-4 text-white transition-opacity hover:opacity-90"
-                    >
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 text-white">
-                        <f.icon className="h-5 w-5" />
-                      </div>
-                      <h3 className="font-display text-3xl font-normal md:text-4xl">
-                        {f.title}
-                      </h3>
-                      <p className="max-w-md text-base leading-relaxed text-white/75 md:text-lg">
-                        {f.body}
-                      </p>
-                      <span className="inline-flex items-center gap-1 text-sm font-semibold text-white/90 transition-transform group-hover:translate-x-1">
-                        Open
-                        <ArrowRight className="h-4 w-4" />
-                      </span>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <GamifiedRewardsSection />
 
       {/* CTA */}
       <section id="about" className="container pb-20 pt-20">
@@ -341,17 +583,20 @@ const Home = () => {
             <div>
               <h2 className="font-display text-3xl font-normal text-white md:text-5xl">Ready to make the leap?</h2>
               <p className="mt-3 max-w-xl text-white/80">
-                Jump into the demo as Alex Chen, explore the quest map, log a win, and watch your XP climb on
-                the dashboard.
+                Jump into the demo as Alex Chen, a computer science student and explore!
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link to="/quiz">
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button variant="default" size="xl">
-                      Try demo account
-                    </Button>
-                  </motion.div>
-                </Link>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="xl"
+                    onClick={startDemo}
+                    disabled={demoLoading}
+                  >
+                    {demoLoading ? "Loading demo…" : "Try demo account"}
+                  </Button>
+                </motion.div>
                 <Link to="/quiz">
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button variant="outline" size="xl" className="bg-background/80">

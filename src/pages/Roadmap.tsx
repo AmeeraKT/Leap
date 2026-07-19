@@ -187,14 +187,14 @@ const Roadmap = () => {
 
       <div className="space-y-6">
           <Tabs defaultValue="milestones" className="w-full">
-            <TabsList className="leap-tabs-list flex w-full flex-wrap justify-start font-display">
-              <TabsTrigger value="milestones" className="leap-tab-trigger rounded-lg px-4 py-2 font-display data-[state=active]:shadow-none">
+            <TabsList className="flex w-full sm:w-fit flex-wrap justify-start gap-1 rounded-2xl border border-border bg-surface p-1 font-display font-bold">
+              <TabsTrigger value="milestones" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
                 Personalized Milestones
               </TabsTrigger>
-              <TabsTrigger value="planner" className="leap-tab-trigger rounded-lg px-4 py-2 font-display data-[state=active]:shadow-none">
+              <TabsTrigger value="planner" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
                 Time Planner
               </TabsTrigger>
-              <TabsTrigger value="brand" className="leap-tab-trigger rounded-lg px-4 py-2 font-display data-[state=active]:shadow-none">
+              <TabsTrigger value="brand" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
                 Personal Brand Coaching
               </TabsTrigger>
             </TabsList>
@@ -225,24 +225,20 @@ const Roadmap = () => {
                   </div>
 
                   {/* Sub tabs for planner */}
-                  <div className="flex bg-background rounded-xl p-1 border border-border h-10 w-fit items-center">
+                  <div className="flex h-10 w-fit items-center gap-1 rounded-2xl border border-border bg-surface p-1">
                     {(["week", "month", "year"] as const).map((t) => (
                       <button
                         key={t}
+                        type="button"
                         onClick={() => setActivePlannerTab(t)}
-                        className="relative rounded-lg px-4 text-xs font-bold capitalize h-8 transition-colors z-10 flex items-center justify-center"
-                        style={{ color: activePlannerTab === t ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))" }}
-                      >
-                        {activePlannerTab === t && (
-                          <motion.div
-                            layoutId="activePlannerTabBg"
-                            className="absolute inset-0 rounded-lg bg-secondary z-0"
-                            transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                          />
+                        className={cn(
+                          "flex h-8 items-center justify-center rounded-xl px-4 text-xs font-bold capitalize transition-all",
+                          activePlannerTab === t
+                            ? "bg-foreground text-background"
+                            : "text-muted-foreground hover:text-foreground",
                         )}
-                        <span className={cn("relative z-10", activePlannerTab === t ? "font-normal" : "hover:text-foreground")}>
-                          {t}
-                        </span>
+                      >
+                        {t}
                       </button>
                     ))}
                   </div>

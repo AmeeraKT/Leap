@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Calendar, MapPin, Sparkles, Users } from "lucide-react";
+import { Calendar, MapPin, Sparkles, Users, Check } from "lucide-react";
 import type { Experience } from "@/lib/experiences-store";
 import { cn } from "@/lib/utils";
 
@@ -12,22 +12,34 @@ const TYPE_STYLES: Record<Experience["type"], string> = {
   Competition: "bg-secondary/40 text-foreground",
 };
 
-export const ExperienceCard = ({ experience }: { experience: Experience }) => {
+interface ExperienceCardProps {
+  experience: Experience;
+  selectMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: () => void;
+}
+
+export const ExperienceCard = ({
+  experience,
+  selectMode = false,
+  selected = false,
+  onToggleSelect,
+}: ExperienceCardProps) => {
   const e = experience;
   const postedCount = Object.values(e.posted).filter(Boolean).length;
 
-  return (
-    <Link
-      to={`/journey/${e.id}`}
-      className="group block overflow-hidden rounded-xl border border-border bg-surface transition-all hover:-translate-y-1 hover:border-secondary hover:"
-    >
+  const body = (
+    <>
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {e.photoUrl ? (
           <img
             src={e.photoUrl}
             alt={e.title}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className={cn(
+              "h-full w-full object-cover transition-transform duration-500",
+              !selectMode && "group-hover:scale-105",
+            )}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-4xl">📔</div>
@@ -40,10 +52,24 @@ export const ExperienceCard = ({ experience }: { experience: Experience }) => {
         >
           {e.type}
         </span>
-        {postedCount > 0 && (
-          <span className="absolute right-3 top-3 rounded-full bg-foreground/90 px-2.5 py-1 text-[11px] font-bold text-background">
-            ✓ Shared {postedCount}×
+        {selectMode ? (
+          <span
+            className={cn(
+              "absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full border-2 transition-colors",
+              selected
+                ? "border-coral bg-coral text-coral-foreground"
+                : "border-background/80 bg-background/90 text-transparent",
+            )}
+            aria-hidden
+          >
+            <Check className="h-4 w-4" />
           </span>
+        ) : (
+          postedCount > 0 && (
+            <span className="absolute right-3 top-3 rounded-full bg-foreground/90 px-2.5 py-1 text-[11px] font-bold text-background">
+              ✓ Shared {postedCount}×
+            </span>
+          )
         )}
       </div>
 
@@ -68,6 +94,33 @@ export const ExperienceCard = ({ experience }: { experience: Experience }) => {
           </span>
         </div>
       </div>
+    </>
+  );
+
+  if (selectMode) {
+    return (
+      <button
+        type="button"
+        onClick={onToggleSelect}
+        aria-pressed={selected}
+        className={cn(
+          "group block w-full overflow-hidden rounded-xl border bg-surface text-left transition-all",
+          selected
+            ? "border-coral ring-2 ring-coral/30"
+            : "border-border hover:border-coral/40",
+        )}
+      >
+        {body}
+      </button>
+    );
+  }
+
+  return (
+    <Link
+      to={`/journey/${e.id}`}
+      className="group block overflow-hidden rounded-xl border border-border bg-surface transition-all hover:-translate-y-1 hover:border-secondary"
+    >
+      {body}
     </Link>
   );
 };

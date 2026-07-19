@@ -87,7 +87,7 @@ export const Navbar = () => {
                 <>
                   {l.label}
                   {isActive && (
-                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-secondary" />
+                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-coral" />
                   )}
                 </>
               )}
@@ -100,20 +100,20 @@ export const Navbar = () => {
           {user ? (
             <>
               <Link
-                to="/about-me"
-                className="leap-chip-coral flex items-center gap-2 rounded-pill px-3.5 py-1.5 transition-opacity hover:opacity-90"
-                aria-label={`${xp.toLocaleString()} experience points, level ${level}`}
+                to="/rewards"
+                className="flex items-center gap-2.5 rounded-md px-1.5 py-1 text-sm transition-colors hover:bg-coral/10"
+                aria-label={`${xp.toLocaleString()} experience points, level ${level}. Open rewards`}
+                title="Rewards"
               >
-                <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
-                <span className="font-display text-lg tabular-nums leading-none">
+                <span className="font-display text-base tabular-nums leading-none text-coral">
                   {xp.toLocaleString()}
                 </span>
-                <span className="text-[10px] font-medium uppercase tracking-wider">XP</span>
+                <span className="text-[10px] font-medium uppercase tracking-wider text-coral">XP</span>
+                <span className="h-4 w-px shrink-0 bg-border" aria-hidden />
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  LVL {level}
+                </span>
               </Link>
-              <div className="hidden items-center gap-2 rounded-pill border border-border bg-muted/50 px-3 py-1.5 lg:flex">
-                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Lvl</span>
-                <span className="font-display text-sm font-medium text-foreground">{level}</span>
-              </div>
               <Link to="/about-me" title="Profile Details">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted font-display text-sm font-medium text-foreground hover:bg-muted/80 transition-colors">
                   {userInitial}
@@ -130,7 +130,7 @@ export const Navbar = () => {
               </Button>
             </>
           ) : (
-            <Link to="/quiz">
+            <Link to="/signin">
               <Button variant="hero" size="sm">
                 Sign In
               </Button>
@@ -140,9 +140,10 @@ export const Navbar = () => {
 
         <div className="flex items-center gap-2 md:hidden">
           <Link
-            to="/about-me"
-            className="leap-chip-coral flex items-center gap-1.5 rounded-pill px-2.5 py-1"
-            aria-label={`${xp.toLocaleString()} experience points`}
+            to="/rewards"
+            className="leap-chip-coral flex items-center gap-1.5 rounded-pill px-2.5 py-1 transition-opacity hover:opacity-90"
+            aria-label={`${xp.toLocaleString()} experience points. Open rewards`}
+            title="Rewards"
           >
             <span className="font-display text-base tabular-nums leading-none">
               {xp.toLocaleString()}
@@ -159,9 +160,10 @@ export const Navbar = () => {
             <SheetContent side="right" className="w-72 flex flex-col justify-between">
               <div className="mt-8 flex flex-col gap-1">
                 <Link
-                  to="/about-me"
+                  to="/rewards"
                   onClick={() => setOpen(false)}
-                  className="leap-chip-coral mx-4 mb-4 flex items-center justify-center gap-2 rounded-lg px-4 py-3"
+                  className="leap-chip-coral mx-4 mb-4 flex items-center justify-center gap-2 rounded-lg px-4 py-3 transition-opacity hover:opacity-90"
+                  aria-label="Open rewards"
                 >
                   <Sparkles className="h-5 w-5" aria-hidden />
                   <span className="font-display text-2xl tabular-nums">
@@ -216,7 +218,7 @@ export const Navbar = () => {
                     </Button>
                   </div>
                 ) : (
-                  <Link to="/quiz" onClick={() => setOpen(false)}>
+                  <Link to="/signin" onClick={() => setOpen(false)}>
                     <Button variant="hero" className="w-full">
                       Sign In
                     </Button>

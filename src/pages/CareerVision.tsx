@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AnimatedPage } from "@/components/AnimatedPage";
-import { Brain, Sparkles, Send, RefreshCw, Key, Plus, Upload, FileText, Flame } from "lucide-react";
+import { Brain, Sparkles, Send, RefreshCw, Key, Plus, Upload, FileText, Flame, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Jumpy } from "@/components/Jumpy";
@@ -78,6 +79,7 @@ const CareerVision = () => {
   // Career Predictor State
   const [isPredicting, setIsPredicting] = useState(false);
   const [predictions, setPredictions] = useState<JobPrediction[] | null>(null);
+  const [preferenceInput, setPreferenceInput] = useState("");
 
   // Chat Coach State
   const [chatInput, setChatInput] = useState("");
@@ -175,13 +177,30 @@ const CareerVision = () => {
 
   // Run Job Predictor
   const runPredictor = async () => {
+    const prefs = preferenceInput.trim();
+    if (selectedEventIds.length === 0 && !prefs) {
+      toast({
+        variant: "destructive",
+        title: "Add some context",
+        description: "Select logged events or describe your preferences first.",
+      });
+      return;
+    }
+
     setIsPredicting(true);
     const selectedEventsText = experiences
       .filter(e => selectedEventIds.includes(e.id))
       .map(e => `${e.title} (${e.skills.join(", ")})`)
       .join("; ");
 
-    const prompt = `Based on these attended events and workshops: "${selectedEventsText}". Predict the top 5 job titles the student is most inclined to do. Provide a match score (0-100), a short reason, and key skills to focus on. Ensure the response format is exactly JSON: [{"title":"Job Title","score":95,"reason":"why","skillsNeeded":["skill1","skill2"]}]`;
+    const prefsClause = prefs
+      ? ` Student self-description / preferences: "${prefs}".`
+      : "";
+    const eventsClause = selectedEventsText
+      ? ` Attended events and workshops: "${selectedEventsText}".`
+      : "";
+
+    const prompt = `Based on the following student profile.${eventsClause}${prefsClause} Predict the top 5 job titles the student is most inclined to do. Provide a match score (0-100), a short reason, and key skills to focus on. Ensure the response format is exactly JSON: [{"title":"Job Title","score":95,"reason":"why","skillsNeeded":["skill1","skill2"]}]`;
 
     try {
       if (apiKey) {
@@ -446,8 +465,53 @@ const CareerVision = () => {
                 <h2 className="font-display text-lg font-normal text-foreground">AI Career Predictor</h2>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Select which logged events or workshops to feed into the Mistral model to predict your top 5 inclined jobs.
+                Select logged events, or voice / chat your preferences, to predict your top 5 inclined jobs.
               </p>
+
+              {/* Voice or chat preferences (from Quick fill pattern) */}
+              <div className="rounded-xl border border-border bg-background p-4 space-y-3">
+                <div>
+                  <h3 className="font-display text-base font-normal text-foreground">Quick fill</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Voice or chat your preferences and let AI personalise your prediction.
+                  </p>
+                </div>
+                <Textarea
+                  value={preferenceInput}
+                  onChange={(e) => setPreferenceInput(e.target.value)}
+                  placeholder="Describe yourself, your personality, experiences, skills and interests"
+                  className="min-h-[88px] resize-none rounded-xl border text-sm"
+                />
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="h-10 w-10 rounded-full"
+                    aria-label="Voice preferences"
+                    onClick={() =>
+                      toast({
+                        title: "Voice input coming soon",
+                        description: "For now, type your preferences in the field above.",
+                      })
+                    }
+                  >
+                    <Mic className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="hero"
+                    size="icon"
+                    className="h-10 w-10 rounded-full"
+                    aria-label="Use preferences for prediction"
+                    disabled={!preferenceInput.trim() || isPredicting}
+                    onClick={() => runPredictor()}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
               {/* Event checklist */}
               <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
                 {attendedEvents.length === 0 ? (
@@ -507,7 +571,7 @@ const CareerVision = () => {
               )}
             </div>
             <div className="pt-4 border-t border-border">
-              <Button onClick={runPredictor} disabled={isPredicting || selectedEventIds.length === 0} variant="hero" className="w-full font-normal py-5 gap-2">
+              <Button onClick={runPredictor} disabled={isPredicting || (selectedEventIds.length === 0 && !preferenceInput.trim())} variant="hero" className="w-full font-normal py-5 gap-2">
                 {isPredicting ? <><RefreshCw className="h-4 w-4 animate-spin" /> Analysing Skills...</> : <><Brain className="h-4 w-4" /> Run Mistral Career Predictor</>}
               </Button>
             </div>
