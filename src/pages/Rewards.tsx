@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Coffee, UtensilsCrossed, Ticket, Trophy, type LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
 import { AnimatedPage } from "@/components/AnimatedPage";
 import { Jumpy } from "@/components/Jumpy";
+import { JumpyCelebration } from "@/components/JumpyCelebration";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useProgression, xpProgressInLevel } from "@/lib/progression-store";
+import { useProgression, xpProgressInLevel, type CelebrationEvent } from "@/lib/progression-store";
 import { cn } from "@/lib/utils";
 
 type RewardCategory = "food" | "event";
@@ -21,10 +21,10 @@ interface RewardItem {
 }
 
 const REWARDS: RewardItem[] = [
-  { id: "yoshi", category: "food", title: "Yoshi", discount: "$5 off", cost: 200, icon: UtensilsCrossed },
+  { id: "yochi-yoghurt", category: "food", title: "Yochi Yogurt", discount: "$5 off", cost: 200, icon: UtensilsCrossed },
   { id: "share-tea", category: "food", title: "Share Tea", discount: "$5 off", cost: 200, icon: Coffee },
-  { id: "sushi-hut", category: "food", title: "Sushi Hut", discount: "$5 off", cost: 250, icon: UtensilsCrossed },
-  { id: "sushi-kun-koo", category: "food", title: "Sushi Kun Koo", discount: "$5 off", cost: 250, icon: UtensilsCrossed },
+  { id: "sushi-hub", category: "food", title: "Sushi Hub", discount: "$5 off", cost: 250, icon: UtensilsCrossed },
+  { id: "hungry-jacks", category: "food", title: "Hungry Jacks", discount: "$5 off", cost: 250, icon: UtensilsCrossed },
   { id: "campus-cafe", category: "food", title: "Campus Brew Co.", discount: "$5 off", cost: 180, icon: Coffee },
   { id: "garden-cafe", category: "food", title: "Garden Lane Café", discount: "$8 off", cost: 320, icon: Coffee },
   { id: "networking", category: "event", title: "Networking event", discount: "$5 off next event", cost: 300, icon: Ticket },
@@ -33,8 +33,8 @@ const REWARDS: RewardItem[] = [
   { id: "hackathon", category: "event", title: "Hackathon weekend", discount: "$15 off entry", cost: 650, icon: Trophy },
 ];
 
-const REDEEM_POINTS_KEY = "leap.rewards.points";
-const DEFAULT_REDEEM_POINTS = 640;
+const REDEEM_POINTS_KEY = "leap.rewards.points.v3";
+const DEFAULT_REDEEM_POINTS = 1600;
 
 function loadRedeemPoints(): number {
   try {
@@ -64,6 +64,7 @@ const Rewards = () => {
   const { xp, level } = useProgression();
   const [points, setPoints] = useState(loadRedeemPoints);
   const [tab, setTab] = useState<"food" | "event">("food");
+  const [celebration, setCelebration] = useState<CelebrationEvent | null>(null);
   const progress = xpProgressInLevel(xp);
   const xpToNext = Math.max(0, progress.needed - progress.current);
   const foodRewards = REWARDS.filter((r) => r.category === "food");
@@ -76,8 +77,14 @@ const Rewards = () => {
       saveRedeemPoints(next);
       return next;
     });
-    toast.success(`Redeemed ${reward.title}`, {
-      description: `${reward.discount} · ${reward.cost} pts spent`,
+    const voucherLabel =
+      reward.category === "food" ? `${reward.title} voucher` : `${reward.title} deal`;
+    setCelebration({
+      id: `redeem-${reward.id}-${Date.now()}`,
+      kind: "achievement",
+      title: "Yay!",
+      message: `You redeemed the ${voucherLabel}`,
+      emoji: "🎁",
     });
   };
 
@@ -124,6 +131,8 @@ const Rewards = () => {
 
   return (
     <AnimatedPage className="container space-y-10 overflow-x-hidden py-8 md:py-10">
+      <JumpyCelebration event={celebration} onClose={() => setCelebration(null)} />
+
       <motion.section
         variants={reveal}
         initial="hidden"

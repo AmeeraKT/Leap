@@ -22,7 +22,7 @@ soft shadow, and the hero's blurred glow blob behind it (`bg-secondary/30 blur-3
 ### Copy (use exactly)
 Eyebrow: "GAMIFIED"
 Heading: "Your effort actually pays off"
-Subtext: "Show up, log your wins, earn points — then cash them in for real rewards."
+Subtext: "Show up, log your wins, earn points — then exchange for real rewards."
 
 ### The 3-step loop (render as three connected steps with arrows/chevrons between)
 Use lucide icons + short labels, laid out horizontally on desktop, vertical on mobile,

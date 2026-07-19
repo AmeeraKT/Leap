@@ -7,10 +7,7 @@ import {
   CheckCircle,
   Zap,
   Gift,
-  ChevronRight,
   ChevronDown,
-  Ticket,
-  Coffee,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
@@ -25,12 +22,21 @@ import {
   cubicBezier,
 } from "framer-motion";
 import { AnimatedPage } from "@/components/AnimatedPage";
+import exploreGif from "@/assets/GIFS/EXPLORE.gif";
+import engageGif from "@/assets/GIFS/ENGAGE.gif";
+import captureGif from "@/assets/GIFS/CAPTURE.gif";
+import showcaseGif from "@/assets/GIFS/SHOWCASE.gif";
+import rewardGif from "@/assets/GIFS/REWARD.gif";
 import jumpyThink from "@/assets/jumpy-think.png";
 import jumpyTalk from "@/assets/jumpy-talk.png";
-import jumpyBlink from "@/assets/jumpy-blink.png";
 import jumpyHappy from "@/assets/jumpy-happy.png";
+import jumpyHop from "@/assets/jumpy-hop.png";
 import { toast } from "sonner";
 import { enterDemoAccount } from "@/lib/demo-account";
+import { cn } from "@/lib/utils";
+
+const MEDIA_FRAME =
+  "relative w-full overflow-hidden rounded-2xl border-[4px] border-[#FF7657] bg-card";
 
 const features = [
   {
@@ -64,35 +70,74 @@ const howItWorks = [
     step: "01",
     title: "EXPLORE",
     body: "Not sure what career fits? Jumpy matches you with events, communities and paths that actually suit you.",
-    image: jumpyThink,
-    imageAlt: "Jumpy thinking about career paths",
-    imageLeft: false,
+    media: exploreGif,
+    mediaAlt: "Explore pathways and matches in Leap",
+    jumpy: jumpyThink,
+    mediaLeft: false,
   },
   {
     step: "02",
     title: "ENGAGE",
     body: "Show up and stand out. Join events, meet like-minded students, and get brand coaching that gets you noticed. Attend skill workshops hosted by student ambassadors near you!",
-    image: jumpyTalk,
-    imageAlt: "Jumpy talking and engaging",
-    imageLeft: true,
+    media: engageGif,
+    mediaAlt: "Engage with events and student communities",
+    jumpy: jumpyTalk,
+    mediaLeft: true,
   },
   {
     step: "03",
     title: "CAPTURE",
     body: "Never blank in an interview again. Log every event, project and connection as career-ready proof.",
-    image: jumpyBlink,
-    imageAlt: "Jumpy capturing a moment",
-    imageLeft: false,
+    media: captureGif,
+    mediaAlt: "Capture wins in the Journey Log",
+    jumpy: jumpyHappy,
+    mediaLeft: false,
   },
   {
     step: "04",
     title: "SHOWCASE",
     body: "Turn your logs into LinkedIn posts and a portfolio that employers actually see. With just a click.",
-    image: jumpyHappy,
-    imageAlt: "Jumpy showcasing wins",
-    imageLeft: true,
+    media: showcaseGif,
+    mediaAlt: "Showcase your portfolio and posts",
+    jumpy: jumpyHop,
+    mediaLeft: true,
   },
 ];
+
+function FeatureMediaFrame({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div className={MEDIA_FRAME}>
+      <img
+        src={src}
+        alt={alt}
+        className="aspect-[16/11] w-full object-cover object-top md:aspect-[16/10] lg:min-h-[28rem]"
+        draggable={false}
+      />
+    </div>
+  );
+}
+
+function HoppingJumpy({
+  src,
+  className,
+  alt = "",
+}: {
+  src: string;
+  className?: string;
+  alt?: string;
+}) {
+  return (
+    <span className="jumpy-squish-hop shrink-0">
+      <img
+        src={src}
+        alt={alt}
+        className={cn("object-contain select-none", className)}
+        draggable={false}
+        aria-hidden={!alt || undefined}
+      />
+    </span>
+  );
+}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -154,7 +199,7 @@ function FeatureCard({
         <feature.icon className="h-4 w-4" />
       </div>
       <h3 className="font-display text-lg font-normal leading-snug md:text-xl">{feature.title}</h3>
-      <p className="mt-1.5 line-clamp-3 flex-1 text-xs leading-relaxed text-muted-foreground md:text-sm">
+      <p className="mt-1.5 flex-1 text-xs leading-relaxed text-muted-foreground md:line-clamp-3 md:text-sm">
         {feature.body}
       </p>
       <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-coral transition-transform group-hover:translate-x-1">
@@ -173,7 +218,6 @@ function RecipeSuccessSection() {
     offset: ["start start", "end end"],
   });
 
-  // Full-viewport travel; ease-out bezier = fast start, slow settle
   const cardEase = cubicBezier(0.16, 1, 0.3, 1);
   const topX = useTransform(scrollYProgress, [0, 0.38], ["-100vw", "0vw"], {
     ease: cardEase,
@@ -182,6 +226,14 @@ function RecipeSuccessSection() {
     ease: cardEase,
   });
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+
+  const allCards = (
+    <div className="mx-auto grid max-w-4xl grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+      {features.map((f) => (
+        <FeatureCard key={f.title} feature={f} />
+      ))}
+    </div>
+  );
 
   if (prefersReducedMotion) {
     return (
@@ -192,11 +244,7 @@ function RecipeSuccessSection() {
               Recipe to your success
             </h2>
           </div>
-          <div className="mx-auto grid max-w-4xl grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-            {features.map((f) => (
-              <FeatureCard key={f.title} feature={f} />
-            ))}
-          </div>
+          {allCards}
         </div>
       </section>
     );
@@ -206,9 +254,20 @@ function RecipeSuccessSection() {
     <section
       id="features"
       ref={sectionRef}
-      className="relative h-[200vh] leap-band-deep"
+      className="leap-band-deep relative md:h-[200vh]"
     >
-      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-x-hidden overflow-y-hidden py-6">
+      {/* Mobile: all four cards visible — no sticky clip */}
+      <div className="container py-16 md:hidden">
+        <div className="mx-auto mb-8 max-w-2xl text-center">
+          <h2 className="font-display text-3xl font-normal text-white">
+            Recipe to your success
+          </h2>
+        </div>
+        {allCards}
+      </div>
+
+      {/* Desktop: sticky scroll assemble */}
+      <div className="sticky top-0 hidden h-screen flex-col justify-center overflow-x-hidden overflow-y-hidden py-6 md:flex">
         <div className="container flex max-h-full flex-col gap-5 md:gap-6">
           <div className="mx-auto max-w-2xl shrink-0 text-center">
             <h2 className="font-display text-3xl font-normal text-white md:text-4xl">
@@ -219,7 +278,6 @@ function RecipeSuccessSection() {
             </p>
           </div>
 
-          {/* No overflow clip here — rows travel from true viewport edges */}
           <div className="relative mx-auto w-full max-w-4xl">
             <div className="flex flex-col gap-3 sm:gap-4">
               <motion.div
@@ -302,87 +360,81 @@ function RewardsMarquee() {
 }
 
 function GamifiedRewardsSection() {
-  const [gifFailed, setGifFailed] = useState(false);
-
   return (
-    <section className="overflow-x-hidden bg-coral/10 py-16 md:py-24">
+    <section className="overflow-x-hidden bg-white py-16 md:py-24">
       <div className="container">
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
-          <motion.div {...gamifyReveal} className="space-y-6">
-            <h2 className="font-display text-3xl font-normal text-foreground md:text-5xl">
-              Your effort actually pays off
-            </h2>
-            <p className="max-w-lg text-base text-muted-foreground md:text-lg">
-              Show up, log your wins, earn points — then cash them in for real rewards.
-            </p>
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.75fr)] lg:gap-14">
+          <motion.div
+            {...gamifyReveal}
+            transition={{ ...gamifyReveal.transition, delay: 0.1 }}
+            className="w-full"
+          >
+            <FeatureMediaFrame
+              src={rewardGif}
+              alt="Gamified rewards — earn points and redeem perks"
+            />
+          </motion.div>
 
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-2">
+          <motion.div
+            {...gamifyReveal}
+            transition={{ ...gamifyReveal.transition, delay: 0.18 }}
+            className="flex flex-col justify-center gap-5"
+          >
+            <div className="space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF7657]">
+                Gamified
+              </p>
+              <h2 className="font-display text-3xl font-normal text-foreground md:text-4xl lg:text-5xl">
+                Your effort actually pays off
+              </h2>
+              <p className="text-base text-muted-foreground md:text-lg">
+                Show up, log wins, earn points then exchange for REAL rewards.
+              </p>
+            </div>
+
+            <HoppingJumpy
+              src={jumpyHappy}
+              alt="Jumpy"
+              className="h-20 w-20 md:h-24 md:w-24"
+            />
+
+            <div className="flex flex-col gap-1">
               {REWARD_LOOP_STEPS.map((step, i) => {
                 const Icon = step.icon;
                 return (
-                  <div key={step.label} className="flex flex-col items-center gap-2 sm:flex-row sm:contents">
+                  <div key={step.label} className="flex flex-col items-center">
                     <motion.div
-                      initial={{ opacity: 0, y: 60 }}
+                      initial={{ opacity: 0, y: 40 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-120px" }}
+                      viewport={{ once: true, margin: "-80px" }}
                       transition={{
-                        duration: 0.9,
+                        duration: 0.7,
                         ease: [0.16, 1, 0.3, 1],
                         delay: i * 0.12,
                       }}
-                      className="flex w-full min-w-0 flex-1 items-start gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm"
+                      className="flex w-full items-start gap-3 py-3"
                     >
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-coral/15 text-coral">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-coral/15 text-coral">
                         <Icon className="h-5 w-5" />
                       </div>
-                      <p className="text-sm font-semibold leading-snug text-foreground">{step.label}</p>
+                      <p className="pt-2 text-sm font-semibold leading-snug text-foreground md:text-base">
+                        {step.label}
+                      </p>
                     </motion.div>
                     {i < REWARD_LOOP_STEPS.length - 1 && (
-                      <>
-                        <ChevronRight className="hidden h-5 w-5 shrink-0 self-center text-coral sm:block" aria-hidden />
-                        <ChevronDown className="h-5 w-5 shrink-0 text-coral sm:hidden" aria-hidden />
-                      </>
+                      <ChevronDown className="h-5 w-5 shrink-0 text-coral" aria-hidden />
                     )}
                   </div>
                 );
               })}
             </div>
 
-            <Link to="/rewards">
-              <Button variant="hero" size="sm" className="mt-2 gap-1.5">
+            <Link to="/rewards" className="w-fit">
+              <Button variant="hero" size="sm" className="gap-1.5">
                 See rewards
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
-          </motion.div>
-
-          <motion.div
-            {...gamifyReveal}
-            transition={{ ...gamifyReveal.transition, delay: 0.15 }}
-            className="relative mx-auto w-full max-w-md lg:max-w-none"
-          >
-            <div
-              className="pointer-events-none absolute inset-0 m-auto h-48 w-48 rounded-full bg-secondary/30 blur-3xl md:h-64 md:w-64"
-              aria-hidden
-            />
-            <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-md">
-              {!gifFailed ? (
-                <img
-                  src="/assets/rewards-loop.gif"
-                  alt="Gamified rewards loop — earn points and redeem perks"
-                  className="aspect-[4/3] w-full object-cover"
-                  onError={() => setGifFailed(true)}
-                />
-              ) : (
-                <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 bg-muted/40 p-6 text-center">
-                  <Jumpy size="sm" animate="hop" />
-                  <p className="font-display text-lg text-foreground">Rewards loop GIF</p>
-                  <p className="max-w-xs text-xs text-muted-foreground">
-                    Drop your file at <code className="text-coral">public/assets/rewards-loop.gif</code>
-                  </p>
-                </div>
-              )}
-            </div>
           </motion.div>
         </div>
       </div>
@@ -503,9 +555,13 @@ const Home = () => {
           transition={{ type: "spring", stiffness: 60, damping: 15, delay: 0.3 }}
           className="relative flex items-center justify-center"
         >
-          <div className="absolute inset-0 -z-10 m-auto h-80 w-80 rounded-full bg-secondary/30 blur-3xl" />
+          <div className="absolute inset-0 -z-10 m-auto h-96 w-96 rounded-full bg-secondary/30 blur-3xl md:h-[28rem] md:w-[28rem]" />
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 300, damping: 10 }}>
-            <Jumpy size="xl" animate="hop" glow />
+            <HoppingJumpy
+              src={jumpyHop}
+              alt="Jumpy the frog mascot"
+              className="h-80 w-80 md:h-96 md:w-96 lg:h-[28rem] lg:w-[28rem]"
+            />
           </motion.div>
         </motion.div>
       </section>
@@ -524,21 +580,27 @@ const Home = () => {
 
         {howItWorks.map((phase) => (
           <div key={phase.step} className="container py-16 md:py-24 lg:py-32">
-            <div className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
+            <div
+              className={`flex flex-col items-center gap-10 md:items-center md:gap-12 lg:gap-16 ${
+                phase.mediaLeft ? "md:flex-row-reverse" : "md:flex-row"
+              }`}
+            >
               <motion.div
                 {...textReveal}
-                className={
-                  phase.imageLeft
-                    ? "order-2 space-y-4 md:order-2"
-                    : "order-2 space-y-4 md:order-1"
-                }
+                className="order-2 w-full shrink-0 space-y-4 md:order-none md:max-w-sm lg:max-w-md"
               >
                 <p className="text-sm font-semibold tracking-widest text-muted-foreground">
                   {phase.step}
                 </p>
-                <h3 className="font-display text-4xl font-normal uppercase leading-[1.05] text-foreground md:text-5xl lg:text-6xl">
-                  {phase.title}
-                </h3>
+                <div className="flex items-center gap-3 md:gap-4">
+                  <h3 className="font-display text-4xl font-normal uppercase leading-[1.05] text-foreground md:text-5xl lg:text-6xl">
+                    {phase.title}
+                  </h3>
+                  <HoppingJumpy
+                    src={phase.jumpy}
+                    className="h-16 w-16 md:h-20 md:w-20"
+                  />
+                </div>
                 <p className="max-w-md text-lg leading-relaxed text-muted-foreground">
                   {phase.body}
                 </p>
@@ -546,19 +608,9 @@ const Home = () => {
 
               <motion.div
                 {...imageReveal}
-                className={
-                  phase.imageLeft
-                    ? "order-1 relative flex items-center justify-center md:order-1"
-                    : "order-1 relative flex items-center justify-center md:order-2"
-                }
+                className="order-1 relative w-full min-w-0 flex-1 md:order-none md:min-w-[55%]"
               >
-                <div className="absolute inset-0 -z-10 m-auto h-56 w-56 rounded-full bg-secondary/30 blur-3xl md:h-80 md:w-80" />
-                <img
-                  src={phase.image}
-                  alt={phase.imageAlt}
-                  className="relative h-44 w-44 object-contain select-none md:h-64 md:w-64 lg:h-72 lg:w-72"
-                  draggable={false}
-                />
+                <FeatureMediaFrame src={phase.media} alt={phase.mediaAlt} />
               </motion.div>
             </div>
           </div>
