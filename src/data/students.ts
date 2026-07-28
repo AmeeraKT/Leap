@@ -49,11 +49,70 @@ export type Student = {
   isPremiumProfile: boolean;
 };
 
-const placeholderPhoto = (text: string) =>
-  `https://placehold.co/240x240/png?text=${encodeURIComponent(text)}`;
-
-const placeholderVideoThumb = (text: string) =>
-  `https://placehold.co/640x360/png?text=${encodeURIComponent(text)}`;
+const images = {
+  profiles: {
+    alex:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80",
+    samira:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80",
+    noah:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80",
+    emma:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=600&q=80",
+    luca:
+      "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?auto=format&fit=crop&w=600&q=80",
+    hana:
+      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=600&q=80",
+    maya:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80",
+    ethan:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
+  },
+  videos: {
+    alex:
+      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80",
+    samira:
+      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
+    noah:
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
+    emma:
+      "https://images.unsplash.com/photo-1516321165247-4aa89a48be28?auto=format&fit=crop&w=1200&q=80",
+    luca:
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
+    hana:
+      "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200&q=80",
+    maya:
+      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
+    ethan:
+      "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=1200&q=80",
+  },
+  journey: {
+    samiraPitch:
+      "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=900&q=80",
+    samiraWorkshop:
+      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=900&q=80",
+    noahPipeline:
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80",
+    noahInternship:
+      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80",
+    emmaPredictor:
+      "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&w=900&q=80",
+    emmaEthics:
+      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=900&q=80",
+    lucaDataset:
+      "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=900&q=80",
+    hanaOnboarding:
+      "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&w=900&q=80",
+    hanaMeetup:
+      "https://images.unsplash.com/photo-1515169067868-5387ec356754?auto=format&fit=crop&w=900&q=80",
+    mayaScheduling:
+      "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=900&q=80",
+    ethanRobotics:
+      "https://images.unsplash.com/photo-1561144257-e32e8efc6c4f?auto=format&fit=crop&w=900&q=80",
+    ethanChallenge:
+      "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=900&q=80",
+  },
+};
 
 const alexJourney = EXPERIENCES_SEED.map(experienceToJourneyEntry);
 
@@ -61,7 +120,7 @@ export const students: Student[] = [
   {
     id: "st-alex-chen",
     name: "Alex Chen",
-    photo: placeholderPhoto("Alex"),
+    photo: images.profiles.alex,
     oneLiner: "Built an AI study tool that hit 2k users in a semester.",
     degree: "Computer Science",
     majors: ["Artificial Intelligence", "Software Engineering"],
@@ -71,7 +130,7 @@ export const students: Student[] = [
     personalityTraits: ["Insightful", "Builder", "Ambitious"],
     featured: true,
     video: {
-      thumbnail: placeholderVideoThumb("Alex Demo"),
+      thumbnail: images.videos.alex,
       url: "https://example.com/video/alex",
       caption: "Rapid prototyping + measurable outcomes",
     },
@@ -85,7 +144,7 @@ export const students: Student[] = [
   {
     id: "st-samira-khan",
     name: "Samira Khan",
-    photo: placeholderPhoto("Samira"),
+    photo: images.profiles.samira,
     oneLiner: "Won a hackathon by turning interviews into a hiring-ready portfolio.",
     degree: "IT",
     majors: ["Information Systems", "Data Analytics"],
@@ -95,7 +154,7 @@ export const students: Student[] = [
     personalityTraits: ["Communicator", "Empathetic", "Resourceful"],
     featured: true,
     video: {
-      thumbnail: placeholderVideoThumb("Samira Pitch"),
+      thumbnail: images.videos.samira,
       url: "https://example.com/video/samira",
       caption: "Turning insights into decisions",
     },
@@ -104,7 +163,7 @@ export const students: Student[] = [
         type: "Competition",
         title: "Startup Pitch Night",
         date: "2026-04-20T00:00:00.000Z",
-        photo: placeholderPhoto("Pitch"),
+        photo: images.journey.samiraPitch,
         reflection:
           "Crafted a clear narrative for impact and user value. Practiced Q&A until I sounded confident under pressure.",
         skills: ["Storytelling", "Impact metrics"],
@@ -113,7 +172,7 @@ export const students: Student[] = [
         type: "Volunteer",
         title: "Student Ambassador Workshop",
         date: "2026-03-19T00:00:00.000Z",
-        photo: placeholderPhoto("Ambassador"),
+        photo: images.journey.samiraWorkshop,
         reflection:
           "Helped new students plan projects and stay consistent. Watching others succeed made me sharpen my mentorship approach.",
         skills: ["Mentoring", "Workshop facilitation"],
@@ -128,7 +187,7 @@ export const students: Student[] = [
   {
     id: "st-noah-park",
     name: "Noah Park",
-    photo: placeholderPhoto("Noah"),
+    photo: images.profiles.noah,
     oneLiner: "Shipped a portfolio pipeline that auto-generates case studies.",
     degree: "Computer Science",
     majors: ["Human-Computer Interaction", "Software Engineering"],
@@ -138,7 +197,7 @@ export const students: Student[] = [
     personalityTraits: ["Creative", "Thoughtful", "Reliable"],
     featured: false,
     video: {
-      thumbnail: placeholderVideoThumb("Noah Build"),
+      thumbnail: images.videos.noah,
       url: "https://example.com/video/noah",
       caption: "Clean architecture + delightful UX",
     },
@@ -147,7 +206,7 @@ export const students: Student[] = [
         type: "Project",
         title: "Portfolio Pipeline (Auto Case Studies)",
         date: "2026-02-14T00:00:00.000Z",
-        photo: placeholderPhoto("Pipeline"),
+        photo: images.journey.noahPipeline,
         reflection:
           "Built an end-to-end workflow: ingestion, summarization, formatting, and review. Reduced time-to-post by ~70%.",
         skills: ["Automation", "Front-end engineering"],
@@ -156,7 +215,7 @@ export const students: Student[] = [
         type: "Internship",
         title: "Frontend Internship (Design Systems)",
         date: "2026-01-09T00:00:00.000Z",
-        photo: placeholderPhoto("Internship"),
+        photo: images.journey.noahInternship,
         reflection:
           "Learned to ship with design tokens and measured accessibility improvements with real user feedback.",
         skills: ["Accessibility", "Design tokens"],
@@ -171,7 +230,7 @@ export const students: Student[] = [
   {
     id: "st-emma-ross",
     name: "Emma Ross",
-    photo: placeholderPhoto("Emma"),
+    photo: images.profiles.emma,
     oneLiner: "Developed a hiring simulator that predicts skill-fit from resumes.",
     degree: "Double Degree",
     majors: ["Computer Science", "Psychology"],
@@ -181,7 +240,7 @@ export const students: Student[] = [
     personalityTraits: ["Analytical", "Insightful", "Leader"],
     featured: true,
     video: {
-      thumbnail: placeholderVideoThumb("Emma Demo"),
+      thumbnail: images.videos.emma,
       url: "https://example.com/video/emma",
       caption: "Skill-fit experiments with responsible evaluation",
     },
@@ -190,7 +249,7 @@ export const students: Student[] = [
         type: "Project",
         title: "Resume-to-Skill Fit Predictor",
         date: "2026-05-27T00:00:00.000Z",
-        photo: placeholderPhoto("Fit"),
+        photo: images.journey.emmaPredictor,
         reflection:
           "Designed experiments and built interpretable scoring so recruiters can understand why results happen—not just trust numbers.",
         skills: ["NLP", "Interpretability"],
@@ -199,7 +258,7 @@ export const students: Student[] = [
         type: "Event",
         title: "AI Ethics Roundtable",
         date: "2026-06-02T00:00:00.000Z",
-        photo: placeholderPhoto("Ethics"),
+        photo: images.journey.emmaEthics,
         reflection:
           "Collaborated on guidelines for fair evaluation and bias checks in model-driven screening.",
         skills: ["Ethical AI", "Collaboration"],
@@ -214,7 +273,7 @@ export const students: Student[] = [
   {
     id: "st-luca-bianchi",
     name: "Luca Bianchi",
-    photo: placeholderPhoto("Luca"),
+    photo: images.profiles.luca,
     oneLiner: "Led a volunteer engineering squad that built a community dataset.",
     degree: "IT",
     majors: ["Cybersecurity", "Data Analytics"],
@@ -224,7 +283,7 @@ export const students: Student[] = [
     personalityTraits: ["Leader", "Dependable", "Collaborative"],
     featured: false,
     video: {
-      thumbnail: placeholderVideoThumb("Luca Team"),
+      thumbnail: images.videos.luca,
       url: "https://example.com/video/luca",
       caption: "Community impact + consistent execution",
     },
@@ -233,7 +292,7 @@ export const students: Student[] = [
         type: "Volunteer",
         title: "Community Dataset Build Sprint",
         date: "2026-03-01T00:00:00.000Z",
-        photo: placeholderPhoto("Dataset"),
+        photo: images.journey.lucaDataset,
         reflection:
           "Organized tasks, improved documentation, and kept quality checks simple but consistent for the whole team.",
         skills: ["Data quality", "Leadership"],
@@ -248,7 +307,7 @@ export const students: Student[] = [
   {
     id: "st-hana-tanaka",
     name: "Hana Tanaka",
-    photo: placeholderPhoto("Hana"),
+    photo: images.profiles.hana,
     oneLiner: "Shipped a chatbot onboarding flow and improved activation by 25%.",
     degree: "Computer Science",
     majors: ["Software Engineering", "Product Design"],
@@ -258,7 +317,7 @@ export const students: Student[] = [
     personalityTraits: ["Curious", "Creative", "Builder"],
     featured: true,
     video: {
-      thumbnail: placeholderVideoThumb("Hana Growth"),
+      thumbnail: images.videos.hana,
       url: "https://example.com/video/hana",
       caption: "Measuring outcomes, not assumptions",
     },
@@ -267,7 +326,7 @@ export const students: Student[] = [
         type: "Project",
         title: "Chatbot Onboarding + Activation Tracking",
         date: "2026-04-09T00:00:00.000Z",
-        photo: placeholderPhoto("Onboarding"),
+        photo: images.journey.hanaOnboarding,
         reflection:
           "Created event tracking and iterated on onboarding messages until activation improved with clear signals.",
         skills: ["Analytics", "UX writing"],
@@ -276,7 +335,7 @@ export const students: Student[] = [
         type: "Event",
         title: "Product Builders Meetup",
         date: "2026-05-18T00:00:00.000Z",
-        photo: placeholderPhoto("Meetup"),
+        photo: images.journey.hanaMeetup,
         reflection:
           "Shared experiments and learned how other builders run rapid cycles with better documentation.",
         skills: ["Community", "Experimentation"],
@@ -291,7 +350,7 @@ export const students: Student[] = [
   {
     id: "st-maya-singh",
     name: "Maya Singh",
-    photo: placeholderPhoto("Maya"),
+    photo: images.profiles.maya,
     oneLiner: "Built a scheduling tool for teams and automated reports for stakeholders.",
     degree: "IT",
     majors: ["Business Systems", "Software Engineering"],
@@ -301,7 +360,7 @@ export const students: Student[] = [
     personalityTraits: ["Organized", "Communicator", "Proactive"],
     featured: false,
     video: {
-      thumbnail: placeholderVideoThumb("Maya Tools"),
+      thumbnail: images.videos.maya,
       url: "https://example.com/video/maya",
       caption: "Operations that scale with the team",
     },
@@ -310,7 +369,7 @@ export const students: Student[] = [
         type: "Project",
         title: "Team Scheduling + Auto Reports",
         date: "2026-02-22T00:00:00.000Z",
-        photo: placeholderPhoto("Scheduling"),
+        photo: images.journey.mayaScheduling,
         reflection:
           "Replaced manual reporting with templates and automated summaries. Stakeholders got answers faster and with less friction.",
         skills: ["Automation", "Process design"],
@@ -325,7 +384,7 @@ export const students: Student[] = [
   {
     id: "st-ethan-wright",
     name: "Ethan Wright",
-    photo: placeholderPhoto("Ethan"),
+    photo: images.profiles.ethan,
     oneLiner: "Interned in robotics and documented experiments like a scientist.",
     degree: "Double Degree",
     majors: ["Engineering", "Computer Science"],
@@ -335,7 +394,7 @@ export const students: Student[] = [
     personalityTraits: ["Methodical", "Resilient", "Builder"],
     featured: false,
     video: {
-      thumbnail: placeholderVideoThumb("Ethan Robot"),
+      thumbnail: images.videos.ethan,
       url: "https://example.com/video/ethan",
       caption: "Learning loops from real tests",
     },
@@ -344,7 +403,7 @@ export const students: Student[] = [
         type: "Internship",
         title: "Robotics Lab Intern",
         date: "2026-01-22T00:00:00.000Z",
-        photo: placeholderPhoto("Robotics"),
+        photo: images.journey.ethanRobotics,
         reflection:
           "Built repeatable experiment notes and improved calibration reliability by ~15% with better logging.",
         skills: ["Robotics", "Experimentation"],
@@ -353,7 +412,7 @@ export const students: Student[] = [
         type: "Competition",
         title: "Campus Robotics Challenge",
         date: "2026-05-05T00:00:00.000Z",
-        photo: placeholderPhoto("Challenge"),
+        photo: images.journey.ethanChallenge,
         reflection:
           "Collaborated on strategy and iterated the control logic quickly once constraints were understood.",
         skills: ["Teamwork", "Iterative engineering"],
