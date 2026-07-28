@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { DEMO_EMAIL, DEMO_PASSWORD, enterDemoAccount } from "@/lib/demo-account";
+import { enterDemoAccount } from "@/lib/demo-account";
+import { cn } from "@/lib/utils";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [demoLoading, setDemoLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<"student" | "recruiter" | null>(null);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,6 +79,46 @@ const SignIn = () => {
           </p>
         </div>
 
+        <div className="grid gap-3 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={() => setSelectedRole("student")}
+            className={cn(
+              "leap-panel flex flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left transition-colors",
+              selectedRole === "student"
+                ? "border-black bg-black text-white"
+                : "border-border hover:bg-muted/30",
+            )}
+            aria-pressed={selectedRole === "student"}
+          >
+            <span className="font-display text-base font-bold">I'm a Student</span>
+            <span className={cn("text-sm", selectedRole === "student" ? "text-white/80" : "text-muted-foreground")}>
+              Select student sign-in mode
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSelectedRole("recruiter")}
+            className={cn(
+              "leap-panel flex flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left transition-colors",
+              selectedRole === "recruiter"
+                ? "border-black bg-black text-white"
+                : "border-border hover:bg-muted/30",
+            )}
+            aria-pressed={selectedRole === "recruiter"}
+          >
+            <span className="font-display text-base font-bold">I'm a Recruiter</span>
+            <span className={cn("text-sm", selectedRole === "recruiter" ? "text-white/80" : "text-muted-foreground")}>
+              Select recruiter sign-in mode
+            </span>
+          </button>
+        </div>
+
+        <Button type="button" variant="outline" onClick={onDemo} disabled={demoLoading}>
+          {demoLoading ? "Starting demo…" : "Try demo"}
+        </Button>
+
         <form onSubmit={onSubmit} className="leap-panel space-y-4 rounded-2xl border border-border bg-card p-5 md:p-6">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -112,31 +154,6 @@ const SignIn = () => {
             )}
           </Button>
         </form>
-
-        <div className="relative text-center text-xs text-muted-foreground">
-          <span className="bg-background px-2">or</span>
-          <div className="absolute inset-x-0 top-1/2 -z-10 h-px bg-border" />
-        </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          size="lg"
-          className="w-full font-bold"
-          onClick={onDemo}
-          disabled={demoLoading}
-        >
-          {demoLoading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" /> Loading demo…
-            </>
-          ) : (
-            "Try demo account"
-          )}
-        </Button>
-        <p className="text-center text-xs text-muted-foreground">
-          Demo: {DEMO_EMAIL} / {DEMO_PASSWORD}
-        </p>
 
         <p className="text-center text-sm text-muted-foreground">
           New here?{" "}

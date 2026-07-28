@@ -22,7 +22,7 @@ export interface Experience {
 
 const STORAGE_KEY = "leap.experiences.v1";
 
-const SEED: Experience[] = [
+export const EXPERIENCES_SEED: Experience[] = [
   {
     id: "ex1",
     title: "UQ Innovation Summit 2026",
@@ -199,14 +199,14 @@ const mapToDb = (exp: Partial<Experience>) => {
 };
 
 function loadLocal(): Experience[] {
-  if (typeof window === "undefined") return SEED;
+  if (typeof window === "undefined") return EXPERIENCES_SEED;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return SEED;
+    if (!raw) return EXPERIENCES_SEED;
     const parsed = JSON.parse(raw) as Experience[];
-    return Array.isArray(parsed) && parsed.length ? parsed : SEED;
+    return Array.isArray(parsed) && parsed.length ? parsed : EXPERIENCES_SEED;
   } catch {
-    return SEED;
+    return EXPERIENCES_SEED;
   }
 }
 

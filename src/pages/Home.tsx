@@ -26,6 +26,7 @@ import jumpyThink from "@/assets/jumpy-think.png";
 import jumpyTalk from "@/assets/jumpy-talk.png";
 import jumpyHappy from "@/assets/jumpy-happy.png";
 import jumpyHop from "@/assets/jumpy-hop.png";
+import { LandingAudienceToggle } from "@/components/LandingAudienceToggle";
 import { toast } from "sonner";
 import { enterDemoAccount } from "@/lib/demo-account";
 import { cn } from "@/lib/utils";
@@ -468,29 +469,32 @@ const Home = () => {
   return (
     <AnimatedPage className="min-h-screen bg-background">
       {/* Nav */}
-      <header className="container flex items-center justify-between py-6">
-        <div className="flex items-center gap-2">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
+        <div className="container flex items-center justify-between py-4">
+          <div className="flex items-center gap-2">
           <Jumpy size="xs" animate="none" />
           <span className="font-display text-2xl font-normal text-foreground">LEAP</span>
-        </div>
-        <nav className="hidden items-center gap-8 md:flex">
-          <a href="#features" className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
-            Features
-          </a>
-          <a href="#how" className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
-            How it works
-          </a>
-          <a href="#about" className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
-            Get started
-          </a>
-        </nav>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <Link to="/signin">
-            <Button variant="outline" size="sm">
-              Sign in
-            </Button>
-          </Link>
+          </div>
+          <nav className="hidden items-center gap-8 md:flex">
+            <a href="#features" className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
+              Features
+            </a>
+            <a href="#how" className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
+              How it works
+            </a>
+            <a href="#about" className="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
+              Get started
+            </a>
+          </nav>
+          <div className="flex items-center gap-2">
+            <LandingAudienceToggle active="students" />
+            <ThemeToggle />
+            <Link to="/signin">
+              <Button variant="outline" size="sm">
+                Sign in
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 

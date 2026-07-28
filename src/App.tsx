@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ScrollInertiaController } from "@/components/ScrollInertiaController";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,23 +23,42 @@ import Rewards from "./pages/Rewards.tsx";
 import Waitlist from "./pages/Waitlist.tsx";
 import SignIn from "./pages/SignIn.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import RecruitersLanding from "./pages/Recruiters.tsx";
+import { RecruiterLayout } from "./components/recruiter/RecruiterLayout";
+import RecruiterDashboard from "./pages/recruiter/Dashboard.tsx";
+import RecruiterDiscover from "./pages/recruiter/Discover.tsx";
+import RecruiterShortlist from "./pages/recruiter/Shortlist.tsx";
+import RecruiterMessages from "./pages/recruiter/Messages.tsx";
+import RecruiterAnalytics from "./pages/recruiter/Analytics.tsx";
+import RecruiterStudentProfile from "./pages/recruiter/StudentProfile.tsx";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
+      <ScrollInertiaController />
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/recruiters" element={<RecruitersLanding />} />
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/results" element={<Results />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/recruiter" element={<RecruiterLayout />}>
+            <Route index element={<RecruiterDashboard />} />
+            <Route path="dashboard" element={<RecruiterDashboard />} />
+            <Route path="discover" element={<RecruiterDiscover />} />
+            <Route path="shortlist" element={<RecruiterShortlist />} />
+            <Route path="student/:id" element={<RecruiterStudentProfile />} />
+            <Route path="messages" element={<RecruiterMessages />} />
+            <Route path="analytics" element={<RecruiterAnalytics />} />
+          </Route>
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/discover" element={<Discover />} />
