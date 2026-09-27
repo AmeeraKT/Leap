@@ -4,13 +4,13 @@ import jumpyDefault from "@/assets/jumpy-default.png";
 import jumpyHappy from "@/assets/jumpy-happy.png";
 import { cn } from "@/lib/utils";
 
-/** Floating Jumpy launcher — opens Career Vision chat tab. */
+/** Floating Jumpy launcher — opens the student chat page. */
 export const JumpyChatLauncher = () => {
   const [hovered, setHovered] = useState(false);
 
   return (
     <Link
-      to="/career-vision?tab=coach"
+      to="/chat"
       aria-label="Open Jumpy buddy chat"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

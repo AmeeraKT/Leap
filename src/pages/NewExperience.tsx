@@ -67,7 +67,7 @@ const NewExperience = () => {
     toast.success("Quick fill ready — edit anything that feels off");
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !description.trim()) {
       toast.error("Title and description are required");
@@ -86,9 +86,13 @@ const NewExperience = () => {
       peopleMet: [],
       posted: { linkedin: false, instagram: false, tiktok: false, twitter: false },
     };
-    experiencesStore.add(exp);
-    toast.success("Experience logged 🐸");
-    navigate(`/journey/${exp.id}`);
+    try {
+      const saved = await experiencesStore.add(exp);
+      toast.success("Experience logged 🐸");
+      navigate(`/journey/${saved.id}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't save that experience");
+    }
   };
 
   return (
@@ -100,7 +104,7 @@ const NewExperience = () => {
       <h1 className="font-display text-3xl font-normal md:text-4xl">Log a new experience</h1>
       <p className="mb-6 text-sm text-muted-foreground">A few minutes now → a portfolio + LinkedIn post later.</p>
 
-      <form onSubmit={submit} className="space-y-5 rounded-xl border border-border bg-surface p-6">
+      <form onSubmit={submit} className="space-y-5 rounded-xl border border-border bg-surface p-4 sm:p-6">
         <div>
           <Label htmlFor="title">Title *</Label>
           <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. UQ Innovation Summit 2026" />

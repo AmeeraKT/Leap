@@ -43,6 +43,15 @@ export type ContentVariant =
   | "post"
   | "short-script";
 
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ""));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
 const ExperienceDetail = () => {
   const { id } = useParams();
   const experiences = useExperiences();
@@ -87,14 +96,18 @@ const ExperienceDetail = () => {
   };
 
   const saveEdits = async () => {
-    await experiencesStore.update(exp.id, {
-      title: title.trim() || exp.title,
-      reflection: description.trim() || exp.reflection,
-      location: location.trim() || undefined,
-      impact: impact.trim() || undefined,
-    });
-    setEditing(false);
-    toast.success("Experience updated");
+    try {
+      await experiencesStore.update(exp.id, {
+        title: title.trim() || exp.title,
+        reflection: description.trim(),
+        location: location.trim() || undefined,
+        impact: impact.trim() || undefined,
+      });
+      setEditing(false);
+      toast.success("Experience updated");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't save changes");
+    }
   };
 
   const cancelEdits = () => {
@@ -109,23 +122,37 @@ const ExperienceDetail = () => {
     if (!files?.length) return;
     const nextItems: { url: string; kind: "image" | "video" }[] = [];
     for (const file of Array.from(files)) {
-      if (file.type.startsWith("image/")) {
-        nextItems.push({ url: URL.createObjectURL(file), kind: "image" });
-      } else if (file.type.startsWith("video/")) {
-        nextItems.push({ url: URL.createObjectURL(file), kind: "video" });
-      } else {
+      const isImage = file.type.startsWith("image/");
+      const isVideo = file.type.startsWith("video/");
+      if (!isImage && !isVideo) {
         toast.error("Only photos and videos are supported.");
+        continue;
+      }
+      // Blob URLs die on refresh. Keep files small enough to store with the log.
+      if (file.size > 1_500_000) {
+        toast.error(`${file.name} is over 1.5MB. Use a smaller file so it stays in your log.`);
+        continue;
+      }
+      try {
+        const url = await readFileAsDataUrl(file);
+        nextItems.push({ url, kind: isVideo ? "video" : "image" });
+      } catch {
+        toast.error(`Couldn't read ${file.name}.`);
       }
     }
     if (!nextItems.length) return;
 
     const nextMedia = [...media, ...nextItems];
     const firstImage = nextItems.find((m) => m.kind === "image");
-    await experiencesStore.update(exp.id, {
-      media: nextMedia,
-      photoUrl: exp.photoUrl || firstImage?.url || exp.photoUrl,
-    });
-    toast.success("Media added");
+    try {
+      await experiencesStore.update(exp.id, {
+        media: nextMedia,
+        photoUrl: exp.photoUrl || firstImage?.url || exp.photoUrl,
+      });
+      toast.success("Media added");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't save media");
+    }
   };
 
   return (
@@ -205,7 +232,7 @@ const ExperienceDetail = () => {
               aria-label="Experience title"
             />
           ) : (
-            <h1 className="mt-3 font-display text-3xl font-normal md:text-4xl">{exp.title}</h1>
+            <h1 className="mt-3 break-words font-display text-3xl font-normal md:text-4xl">{exp.title}</h1>
           )}
 
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
@@ -245,7 +272,7 @@ const ExperienceDetail = () => {
       </div>
 
       {/* Create bar */}
-      <div className="my-6 flex flex-wrap gap-2 rounded-xl border border-border bg-surface p-3">
+      <div className="my-6 flex max-w-full flex-wrap gap-2 rounded-xl border border-border bg-surface p-3">
         <span className="self-center pl-2 pr-1 font-display text-sm font-normal">✨ Create:</span>
 
         <button

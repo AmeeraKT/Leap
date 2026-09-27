@@ -14,7 +14,6 @@ const links = [
   { to: "/discover", label: "Discover" },
   { to: "/journey", label: "Journey Log" },
   { to: "/roadmap", label: "Roadmap" },
-  { to: "/career-vision", label: "Career Vision" },
 ];
 
 export const Navbar = () => {

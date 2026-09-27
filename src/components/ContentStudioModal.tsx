@@ -47,6 +47,104 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
+function draftFromExperience(
+  experience: Experience,
+  format: Format,
+  variant: ContentVariant,
+  tone: "professional" | "casual",
+): { text: string; hashtags: string[] } {
+  const title = experience.title;
+  const when = experience.date;
+  const where = experience.location ? ` in ${experience.location}` : "";
+  const reflection = experience.reflection?.trim() ?? "";
+  const takeaways = (experience.takeaways ?? []).filter(Boolean);
+  const skills = (experience.skills ?? []).filter(Boolean);
+  const people = (experience.peopleMet ?? []).map((p) => p.name).filter(Boolean);
+  const hashtags = skills.slice(0, 4).map((s) => s.replace(/[^\w]/g, ""));
+  const bullets = takeaways.map((t) => `• ${t}`).join("\n");
+  const lesson = takeaways[0] || reflection || "Showing up and writing it down.";
+  const casual = tone === "casual";
+
+  if (variant === "seal" || variant === "star") {
+    const lines =
+      variant === "seal"
+        ? [
+            `Situation: ${reflection || `I took part in ${title}${where} on ${when}.`}`,
+            `Effect: ${experience.impact || lesson}`,
+            `Action: ${takeaways[1] || "I joined in, asked questions, and followed through."}`,
+            `Learning: ${takeaways[2] || lesson}`,
+          ]
+        : [
+            `Situation: ${reflection || `During ${title}${where} (${when}).`}`,
+            "Task: I needed to contribute and leave with something I could point to.",
+            `Action: ${takeaways[0] || "I participated and wrote down what changed for me."}`,
+            `Result: ${experience.impact || takeaways[1] || "I can name the skills I practiced and what I'd do next."}`,
+          ];
+    return {
+      text: `${variant === "seal" ? "SEAL" : "STAR"} — ${title}\n\n${lines.join("\n\n")}`,
+      hashtags,
+    };
+  }
+
+  if (format === "twitter") {
+    return {
+      text: casual
+        ? `Just logged "${title}" 🐸\n\n1/ ${lesson}\n2/ Skills I used: ${skills.slice(0, 3).join(", ") || "showing up"}.\n\n${when}${where}`
+        : `Logged ${title} (${when}${where}).\n\nKey takeaway: ${lesson}\nSkills: ${skills.slice(0, 3).join(", ") || "—"}.`,
+      hashtags,
+    };
+  }
+
+  if (format === "instagram" || format === "tiktok") {
+    if (variant === "script" || variant === "short-script") {
+      return {
+        text: `HOOK: I just finished ${title}.\n\nBEAT 1: ${reflection || lesson}\nBEAT 2: ${takeaways[0] || "The useful part wasn't what I expected."}\nBEAT 3: ${experience.impact || takeaways[1] || "Here's what I'm doing next."}\n\nCTA: Save this if you're logging your own wins.`,
+        hashtags,
+      };
+    }
+    if (variant === "story") {
+      return {
+        text: `Frame 1: ${title}\nFrame 2: ${when}${where}\nFrame 3: ${lesson}\nFrame 4: ${skills.slice(0, 3).join(" · ") || "new skills"}`,
+        hashtags,
+      };
+    }
+    return {
+      text: `${casual ? "Okay so —" : "Sharing"} ${title} (${when}).\n\n${reflection || lesson}${bullets ? `\n\n${bullets}` : ""}`.trim(),
+      hashtags,
+    };
+  }
+
+  if (format === "portfolio") {
+    return {
+      text: [
+        title,
+        `${experience.type} · ${when}${where}`,
+        "",
+        reflection || lesson,
+        experience.impact ? `\nImpact: ${experience.impact}` : "",
+        skills.length ? `\nSkills: ${skills.join(", ")}` : "",
+      ]
+        .filter((line) => line !== "")
+        .join("\n")
+        .replace(/\n{3,}/g, "\n\n"),
+      hashtags: [],
+    };
+  }
+
+  const opener = casual ? "Quick win to share:" : "Sharing a recent experience:";
+  return {
+    text: [
+      `${opener} ${title} (${when}${where}).`,
+      reflection,
+      bullets ? `What I'm taking with me:\n${bullets}` : "",
+      people.length ? `Grateful for conversations with ${people.slice(0, 3).join(", ")}.` : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n"),
+    hashtags,
+  };
+}
+
 export const ContentStudioModal = ({
   experience,
   initialFormat = "linkedin",
@@ -71,31 +169,54 @@ export const ContentStudioModal = ({
 
   const tone = toneValue[0] < 50 ? "professional" : "casual";
 
+  const applyLocalDraft = () => {
+    if (!experience) return;
+    const draft = draftFromExperience(experience, format, variant, tone);
+    setText(draft.text);
+    setHashtags(draft.hashtags);
+    progressionStore.grantContentGenerated(experience.id, format);
+  };
+
   const generate = async () => {
     if (!experience) return;
     setLoading(true);
     setText("");
     setHashtags([]);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-content", {
+      const functionsApi = (supabase as { functions?: { invoke?: (name: string, args: { body: unknown }) => Promise<{ data?: { text?: string; hashtags?: string[]; error?: string }; error?: { message?: string } }> } }).functions;
+      if (!functionsApi?.invoke) {
+        applyLocalDraft();
+        return;
+      }
+      const { data, error } = await functionsApi.invoke("generate-content", {
         body: { experience, format, variant, tone },
       });
       if (error) {
-        const msg = (error as { message?: string }).message ?? "Failed to generate";
-        if (msg.includes("429")) toast.error("Too many requests — try again in a moment.");
-        else if (msg.includes("402")) toast.error("AI credits exhausted. Add credits in Settings → Workspace.");
-        else toast.error(msg);
+        const msg = error.message ?? "Failed to generate";
+        if (msg.includes("429")) {
+          toast.error("Too many requests — try again in a moment.");
+          return;
+        }
+        if (msg.includes("402")) {
+          toast.error("AI credits exhausted. Add credits in Settings → Workspace.");
+          return;
+        }
+        applyLocalDraft();
         return;
       }
       if (data?.error) {
         toast.error(data.error);
         return;
       }
-      setText(data?.text ?? "");
-      setHashtags(Array.isArray(data?.hashtags) ? data.hashtags : []);
+      if (!data?.text) {
+        applyLocalDraft();
+        return;
+      }
+      setText(data.text);
+      setHashtags(Array.isArray(data.hashtags) ? data.hashtags : []);
       progressionStore.grantContentGenerated(experience.id, format);
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Something went wrong");
+    } catch {
+      applyLocalDraft();
     } finally {
       setLoading(false);
     }
@@ -111,21 +232,25 @@ export const ContentStudioModal = ({
     }
   };
 
-  const markPosted = () => {
+  const markPosted = async () => {
     if (!experience) return;
     if (format === "portfolio") {
       toast.success("Saved to portfolio");
       return;
     }
-    experiencesStore.markPosted(experience.id, format);
-    toast.success(`Marked as posted to ${FORMATS.find((f) => f.id === format)?.label} 🚀`);
+    try {
+      await experiencesStore.markPosted(experience.id, format);
+      toast.success(`Marked as posted to ${FORMATS.find((f) => f.id === format)?.label} 🚀`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't update that post");
+    }
   };
 
   if (!experience) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-h-[85vh] w-[calc(100%-1.5rem)] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display text-xl font-normal">
             <Jumpy size="xs" animate="float" />
@@ -213,12 +338,12 @@ export const ContentStudioModal = ({
           </div>
         )}
 
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
+        <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <Button onClick={generate} disabled={loading} variant={text ? "outline" : "default"} className="rounded-full">
             {text ? <RefreshCw className="mr-2 h-4 w-4" /> : <Jumpy size="xs" animate="none" className="mr-1 scale-50" />}
             {loading ? "Generating..." : text ? "Regenerate" : "Generate ✨"}
           </Button>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button variant="ghost" onClick={copyAll} disabled={!text}>
               <Copy className="mr-2 h-4 w-4" /> Copy
             </Button>

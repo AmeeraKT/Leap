@@ -198,20 +198,44 @@ const mapToDb = (exp: Partial<Experience>) => {
   return dbObj;
 };
 
+const EMPTY_POSTED: Experience["posted"] = {
+  linkedin: false,
+  instagram: false,
+  tiktok: false,
+  twitter: false,
+};
+
+function normalizeExperience(exp: Experience): Experience {
+  return {
+    ...exp,
+    takeaways: exp.takeaways ?? [],
+    peopleMet: exp.peopleMet ?? [],
+    skills: exp.skills ?? [],
+    posted: { ...EMPTY_POSTED, ...exp.posted },
+  };
+}
+
 function loadLocal(): Experience[] {
   if (typeof window === "undefined") return EXPERIENCES_SEED;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return EXPERIENCES_SEED;
     const parsed = JSON.parse(raw) as Experience[];
-    return Array.isArray(parsed) && parsed.length ? parsed : EXPERIENCES_SEED;
+    // An empty list is a real state (everything was deleted). Only fall back
+    // to the seed when nothing has been saved yet.
+    return Array.isArray(parsed) ? parsed.map(normalizeExperience) : EXPERIENCES_SEED;
   } catch {
     return EXPERIENCES_SEED;
   }
 }
 
 function saveLocal(items: Experience[]) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch {}
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 const listeners = new Set<() => void>();
@@ -230,8 +254,11 @@ function getAll(): Experience[] {
 }
 
 function setAllLocal(next: Experience[]) {
+  const saved = saveLocal(next);
+  if (!saved) {
+    throw new Error("Couldn't store that on this device. Try a smaller photo.");
+  }
   cache = next;
-  save(next);
   notify();
 }
 
@@ -310,17 +337,21 @@ export const experiencesStore = {
 
   update: async (id: string, patch: Partial<Experience>) => {
     if (currentUser) {
-      const dbPatch = mapToDb(patch);
-      const { error } = await supabase
-        .from("experiences")
-        .update(dbPatch)
-        .eq("id", id);
-      
-      if (!error) {
-        cache = getAll().map((e) => (e.id === id ? { ...e, ...patch } : e));
-        listeners.forEach((l) => l());
+      try {
+        const dbPatch = mapToDb(patch);
+        const { error } = await supabase
+          .from("experiences")
+          .update(dbPatch)
+          .eq("id", id);
+
+        if (!error) {
+          cache = getAll().map((e) => (e.id === id ? { ...e, ...patch } : e));
+          listeners.forEach((l) => l());
+          return;
+        }
+      } catch {
+        // Remote update isn't available; persist on this device instead.
       }
-      return;
     }
 
     const next = getAll().map((e) => (e.id === id ? { ...e, ...patch } : e));
@@ -363,11 +394,15 @@ export const experiencesStore = {
     if (idSet.size === 0) return;
 
     if (currentUser) {
-      const { error } = await supabase.from("experiences").delete().in("id", [...idSet]);
-      if (!error) {
-        cache = getAll().filter((e) => !idSet.has(e.id));
-        listeners.forEach((l) => l());
-        return;
+      try {
+        const { error } = await supabase.from("experiences").delete().in("id", [...idSet]);
+        if (!error) {
+          cache = getAll().filter((e) => !idSet.has(e.id));
+          listeners.forEach((l) => l());
+          return;
+        }
+      } catch {
+        // Remote delete isn't available; remove the rows locally.
       }
     }
 

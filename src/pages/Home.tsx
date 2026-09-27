@@ -2,7 +2,6 @@ import {
   ArrowRight,
   Target,
   BookOpen,
-  Brain,
   Route,
   CheckCircle,
   Zap,
@@ -58,12 +57,6 @@ const features = [
     title: "Journey log",
     body: "Log your wins, draft social posts, keep your streak, and earn XP as your brand grows.",
     to: "/journey",
-  },
-  {
-    icon: Brain,
-    title: "Career Vision",
-    body: "AI job matches, resume feedback, and Jumpy on call when you're stuck.",
-    to: "/career-vision",
   },
 ];
 
@@ -186,7 +179,7 @@ const imageReveal = {
 
 const featureBands = [
   [features[0], features[1]],
-  [features[2], features[3]],
+  [features[2]],
 ] as const;
 
 function FeatureCard({
@@ -260,7 +253,7 @@ function RecipeSuccessSection() {
       ref={sectionRef}
       className="leap-band-deep relative md:h-[200vh]"
     >
-      {/* Mobile: all four cards visible — no sticky clip */}
+      {/* Mobile: all cards visible — no sticky clip */}
       <div className="container py-16 md:hidden">
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <h2 className="font-display text-3xl font-normal text-white">

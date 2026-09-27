@@ -3,12 +3,15 @@ import { Calendar, MapPin, Sparkles, Users, Check } from "lucide-react";
 import type { Experience } from "@/lib/experiences-store";
 import { cn } from "@/lib/utils";
 
+/** Opaque light coral with dark text so the label stays readable on photos. */
+const LIGHT_CORAL_TAG = "bg-[hsl(14_100%_86%)] text-[hsl(0_0%_13%)]";
+
 const TYPE_STYLES: Record<Experience["type"], string> = {
-  Event: "bg-secondary/30 text-foreground",
-  Workshop: "bg-primary/15 text-primary",
-  Volunteer: "bg-coral/20 text-coral",
+  Event: LIGHT_CORAL_TAG,
+  Workshop: LIGHT_CORAL_TAG,
+  Volunteer: LIGHT_CORAL_TAG,
   Project: "bg-foreground/10 text-foreground",
-  Internship: "bg-coral/15 text-coral",
+  Internship: LIGHT_CORAL_TAG,
   Competition: "bg-secondary/40 text-foreground",
 };
 
@@ -74,14 +77,15 @@ export const ExperienceCard = ({
       </div>
 
       <div className="space-y-2 p-4">
-        <h3 className="line-clamp-2 font-display text-base font-normal leading-tight">{e.title}</h3>
+        <h3 className="line-clamp-2 break-words font-display text-base font-normal leading-tight">{e.title}</h3>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
-            <Calendar className="h-3 w-3" /> {e.date}
+            <Calendar className="h-3 w-3 shrink-0" /> {e.date}
           </span>
           {e.location && (
-            <span className="inline-flex items-center gap-1">
-              <MapPin className="h-3 w-3" /> {e.location}
+            <span className="inline-flex min-w-0 items-center gap-1">
+              <MapPin className="h-3 w-3 shrink-0" />
+              <span className="break-words">{e.location}</span>
             </span>
           )}
         </div>

@@ -39,7 +39,7 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 100,
       damping: 15,
     },
@@ -98,12 +98,22 @@ const JourneyLog = () => {
     }, 1200);
   };
 
-  const copyToClipboard = (text: string, platform: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied!",
-      description: `${platform} draft copied to clipboard.`,
-    });
+  const copyToClipboard = async (text: string, platform: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: "Copied!",
+        description:
+          platform === "Portfolio link"
+            ? "Preview link copied. This demo doesn't host a live site."
+            : `${platform} draft copied to clipboard.`,
+      });
+    } catch {
+      toast({
+        title: "Couldn't copy",
+        description: "Select the draft and copy it manually.",
+      });
+    }
   };
 
   const publishPortfolio = () => {
@@ -132,7 +142,20 @@ const JourneyLog = () => {
   const deleteSelected = async () => {
     if (selectedIds.length === 0) return;
     const count = selectedIds.length;
-    await experiencesStore.removeMany(selectedIds);
+    const remaining = experiences.filter((e) => !selectedIds.includes(e.id));
+    try {
+      await experiencesStore.removeMany(selectedIds);
+    } catch (err) {
+      toast({
+        title: "Couldn't delete",
+        description: err instanceof Error ? err.message : "Try again in a moment.",
+      });
+      return;
+    }
+    if (!remaining.some((e) => e.id === studioExpId)) {
+      setStudioExpId(remaining[0]?.id ?? "");
+      setDrafts(null);
+    }
     toast({
       title: count === 1 ? "Experience deleted" : `${count} experiences deleted`,
       description: "Removed from your journey log.",
@@ -182,15 +205,19 @@ const JourneyLog = () => {
       </div>
 
       <Tabs defaultValue="wins" className="w-full">
-        <TabsList className="flex w-full sm:w-fit justify-start gap-1 rounded-2xl border border-border bg-surface p-1">
-          <TabsTrigger value="wins" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
+        <TabsList className="flex h-auto w-full max-w-full justify-start gap-1 overflow-x-auto rounded-2xl border border-border bg-surface p-1 sm:w-fit">
+          <TabsTrigger value="wins" className="shrink-0 rounded-xl px-3 py-2 font-display text-sm font-bold transition-all data-[state=active]:bg-foreground data-[state=active]:text-background sm:px-4">
             My Wins
           </TabsTrigger>
-          <TabsTrigger value="portfolio" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
-            <Laptop className="h-4 w-4 mr-2 inline" /> Portfolio Builder
+          <TabsTrigger value="portfolio" className="shrink-0 rounded-xl px-3 py-2 font-display text-sm font-bold transition-all data-[state=active]:bg-foreground data-[state=active]:text-background sm:px-4">
+            <Laptop className="mr-1.5 inline h-4 w-4 sm:mr-2" />
+            <span className="sm:hidden">Portfolio</span>
+            <span className="hidden sm:inline">Portfolio Builder</span>
           </TabsTrigger>
-          <TabsTrigger value="studio" className="rounded-xl px-4 py-2 font-display text-sm font-bold data-[state=active]:bg-foreground data-[state=active]:text-background transition-all">
-            <FileText className="h-4 w-4 mr-2 inline" /> Content Studio
+          <TabsTrigger value="studio" className="shrink-0 rounded-xl px-3 py-2 font-display text-sm font-bold transition-all data-[state=active]:bg-foreground data-[state=active]:text-background sm:px-4">
+            <FileText className="mr-1.5 inline h-4 w-4 sm:mr-2" />
+            <span className="sm:hidden">Studio</span>
+            <span className="hidden sm:inline">Content Studio</span>
           </TabsTrigger>
         </TabsList>
 
@@ -225,7 +252,7 @@ const JourneyLog = () => {
                     className={cn(
                       "rounded-full border px-4 py-1.5 text-xs font-bold transition-all",
                       filter === f.value
-                        ? "border-foreground bg-foreground text-background"
+                        ? "border-[hsl(14_70%_72%)] bg-[hsl(14_100%_86%)] text-[hsl(0_0%_13%)]"
                         : "border-border bg-surface text-muted-foreground hover:border-foreground/40",
                     )}
                   >
@@ -387,14 +414,15 @@ const JourneyLog = () => {
                       className="rounded-xl bg-background border border-border p-3 text-center space-y-1.5 overflow-hidden"
                     >
                       <p className="text-[10px] font-bold text-muted-foreground uppercase">Your site is live</p>
-                      <a
-                        href="https://leap.me/explorer-dev"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs font-normal text-primary hover:underline block truncate"
+                      <button
+                        type="button"
+                        onClick={() =>
+                          copyToClipboard("https://leap.me/explorer-dev", "Portfolio link")
+                        }
+                        className="block w-full truncate text-xs font-normal text-primary hover:underline"
                       >
                         leap.me/explorer-dev
-                      </a>
+                      </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -420,11 +448,11 @@ const JourneyLog = () => {
                 )}
               >
                 {/* Simulated browser bar */}
-                <div className="absolute top-0 left-0 right-0 h-8 bg-black/20 flex items-center px-4 gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-rose-500" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-amber-500" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                  <span className="text-[10px] opacity-50 ml-4 font-mono">https://leap.me/explorer-dev</span>
+                <div className="absolute top-0 left-0 right-0 flex h-8 items-center gap-1.5 overflow-hidden bg-black/20 px-4">
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-rose-500" />
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-amber-500" />
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500" />
+                  <span className="ml-2 min-w-0 truncate font-mono text-[10px] opacity-50">https://leap.me/explorer-dev</span>
                 </div>
 
                 {/* Simulated Content */}
@@ -499,20 +527,27 @@ const JourneyLog = () => {
               </p>
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground block mb-2">Select Win</label>
-                <select
-                  value={studioExpId}
-                  onChange={(e) => {
-                    setStudioExpId(e.target.value);
-                    setDrafts(null);
-                  }}
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-bold focus-visible:outline-none focus-visible:border-secondary"
-                >
-                  {experiences.map((exp) => (
-                    <option key={exp.id} value={exp.id}>
-                      {exp.title} ({exp.type})
-                    </option>
-                  ))}
-                </select>
+                {experiences.length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-border bg-background px-3 py-2.5 text-xs text-muted-foreground">
+                    Log a win first, then draft a post from it.
+                  </p>
+                ) : (
+                  <select
+                    value={studioExpId}
+                    onChange={(e) => {
+                      const nextId = e.target.value;
+                      setStudioExpId(nextId);
+                      if (nextId !== studioExpId) setDrafts(null);
+                    }}
+                    className="w-full max-w-full rounded-xl border border-border bg-background px-3 py-2.5 text-xs font-bold focus-visible:outline-none focus-visible:border-secondary"
+                  >
+                    {experiences.map((exp) => (
+                      <option key={exp.id} value={exp.id}>
+                        {exp.title} ({exp.type})
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
@@ -529,32 +564,19 @@ const JourneyLog = () => {
 
             {/* Generated output */}
             <div className="space-y-5">
-              <AnimatePresence mode="wait">
-                {drafts === null ? (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    key="empty"
-                    className="rounded-xl border border-dashed border-border bg-surface p-16 text-center space-y-4"
-                  >
+              {drafts === null ? (
+                  <div className="space-y-4 rounded-xl border border-dashed border-border bg-surface p-6 text-center sm:p-16">
                     <div className="text-5xl">✍️</div>
                     <h3 className="font-display text-xl font-normal">Ready to share your achievements?</h3>
                     <p className="text-sm text-muted-foreground max-w-md mx-auto">
                       Select a logged win on the left and click "Generate AI Drafts". Jumpy will write platform-optimized copy based on your reflection and takeaways.
                     </p>
-                  </motion.div>
+                  </div>
                 ) : (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    key="drafts"
-                    className="grid gap-6"
-                  >
+                  <div className="grid gap-6">
                     {/* LinkedIn */}
                     <div className="rounded-xl border border-border bg-surface p-5 space-y-3 relative">
-                      <div className="flex items-center justify-between border-b border-border pb-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
                         <span className="text-xs font-normal text-muted-foreground uppercase flex items-center gap-1">
                           <Send className="h-4 w-4" /> LinkedIn Post
                         </span>
@@ -562,7 +584,7 @@ const JourneyLog = () => {
                           <Button
                             onClick={() => copyToClipboard(drafts.linkedin, "LinkedIn")}
                             variant="outline"
-                            size="xs"
+                            size="sm"
                             className="font-bold gap-1 text-[11px]"
                           >
                             <Copy className="h-3.5 w-3.5" /> Copy Draft
@@ -578,7 +600,7 @@ const JourneyLog = () => {
 
                     {/* Twitter / X */}
                     <div className="rounded-xl border border-border bg-surface p-5 space-y-3 relative">
-                      <div className="flex items-center justify-between border-b border-border pb-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
                         <span className="text-xs font-normal text-muted-foreground uppercase flex items-center gap-1">
                           <Send className="h-4 w-4" /> Twitter/X Tweet
                         </span>
@@ -586,7 +608,7 @@ const JourneyLog = () => {
                           <Button
                             onClick={() => copyToClipboard(drafts.twitter, "Twitter")}
                             variant="outline"
-                            size="xs"
+                            size="sm"
                             className="font-bold gap-1 text-[11px]"
                           >
                             <Copy className="h-3.5 w-3.5" /> Copy Draft
@@ -602,7 +624,7 @@ const JourneyLog = () => {
 
                     {/* Blog outline */}
                     <div className="rounded-xl border border-border bg-surface p-5 space-y-3 relative">
-                      <div className="flex items-center justify-between border-b border-border pb-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
                         <span className="text-xs font-normal text-muted-foreground uppercase flex items-center gap-1">
                           <FileText className="h-4 w-4" /> Blog/Medium Outline
                         </span>
@@ -610,7 +632,7 @@ const JourneyLog = () => {
                           <Button
                             onClick={() => copyToClipboard(drafts.blog, "Medium Blog")}
                             variant="outline"
-                            size="xs"
+                            size="sm"
                             className="font-bold gap-1 text-[11px]"
                           >
                             <Copy className="h-3.5 w-3.5" /> Copy Outline
@@ -623,9 +645,8 @@ const JourneyLog = () => {
                         className="min-h-[160px] text-sm bg-background border-none resize-none focus-visible:ring-0 leading-relaxed font-mono"
                       />
                     </div>
-                  </motion.div>
+                  </div>
                 )}
-              </AnimatePresence>
             </div>
           </div>
         </TabsContent>

@@ -18,7 +18,6 @@ import Chat from "./pages/Chat.tsx";
 import JourneyLog from "./pages/JourneyLog.tsx";
 import ExperienceDetail from "./pages/ExperienceDetail.tsx";
 import NewExperience from "./pages/NewExperience.tsx";
-import CareerVision from "./pages/CareerVision.tsx";
 import Rewards from "./pages/Rewards.tsx";
 import Waitlist from "./pages/Waitlist.tsx";
 import SignIn from "./pages/SignIn.tsx";
@@ -68,7 +67,6 @@ const App = () => (
             <Route path="/journey" element={<JourneyLog />} />
             <Route path="/journey/new" element={<NewExperience />} />
             <Route path="/journey/:id" element={<ExperienceDetail />} />
-            <Route path="/career-vision" element={<CareerVision />} />
             <Route path="/rewards" element={<Rewards />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
