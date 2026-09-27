@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ScrollInertiaController } from "@/components/ScrollInertiaController";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -26,12 +26,19 @@ import RecruitersLanding from "./pages/Recruiters.tsx";
 import { RecruiterLayout } from "./components/recruiter/RecruiterLayout";
 import RecruiterDashboard from "./pages/recruiter/Dashboard.tsx";
 import RecruiterDiscover from "./pages/recruiter/Discover.tsx";
-import RecruiterShortlist from "./pages/recruiter/Shortlist.tsx";
-import RecruiterMessages from "./pages/recruiter/Messages.tsx";
+import RecruiterMyTalent from "./pages/recruiter/MyTalent.tsx";
 import RecruiterAnalytics from "./pages/recruiter/Analytics.tsx";
 import RecruiterStudentProfile from "./pages/recruiter/StudentProfile.tsx";
 
 const queryClient = new QueryClient();
+
+function PreserveQueryRedirect({ to, filter }: { to: string; filter?: string }) {
+  const [params] = useSearchParams();
+  const next = new URLSearchParams(params);
+  if (filter) next.set("filter", filter);
+  const qs = next.toString();
+  return <Navigate to={qs ? `${to}?${qs}` : to} replace />;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -53,9 +60,10 @@ const App = () => (
             <Route index element={<RecruiterDashboard />} />
             <Route path="dashboard" element={<RecruiterDashboard />} />
             <Route path="discover" element={<RecruiterDiscover />} />
-            <Route path="shortlist" element={<RecruiterShortlist />} />
+            <Route path="talent" element={<RecruiterMyTalent />} />
+            <Route path="shortlist" element={<PreserveQueryRedirect to="/recruiter/talent" filter="shortlist" />} />
             <Route path="student/:id" element={<RecruiterStudentProfile />} />
-            <Route path="messages" element={<RecruiterMessages />} />
+            <Route path="messages" element={<PreserveQueryRedirect to="/recruiter/talent" />} />
             <Route path="analytics" element={<RecruiterAnalytics />} />
           </Route>
           <Route element={<AppLayout />}>

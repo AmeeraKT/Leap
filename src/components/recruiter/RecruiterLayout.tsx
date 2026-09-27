@@ -87,8 +87,7 @@ function RecruiterShellInner() {
           <nav className="hidden items-center gap-2 md:flex">
             <RecruiterNavLink to="/recruiter/dashboard" label="Dashboard" />
             <RecruiterNavLink to="/recruiter/discover" label="Discover" />
-            <RecruiterNavLink to="/recruiter/shortlist" label="Shortlist" />
-            <RecruiterNavLink to="/recruiter/messages" label="Messages" />
+            <RecruiterNavLink to="/recruiter/talent" label="My Talent" />
             <RecruiterNavLink to="/recruiter/analytics" label="Analytics" />
           </nav>
 
@@ -127,8 +126,7 @@ function RecruiterShellInner() {
         <div className="no-scrollbar flex gap-2 overflow-x-auto">
           <RecruiterNavLink to="/recruiter/dashboard" label="Dashboard" />
           <RecruiterNavLink to="/recruiter/discover" label="Discover" />
-          <RecruiterNavLink to="/recruiter/shortlist" label="Shortlist" />
-          <RecruiterNavLink to="/recruiter/messages" label="Messages" />
+          <RecruiterNavLink to="/recruiter/talent" label="My Talent" />
           <RecruiterNavLink to="/recruiter/analytics" label="Analytics" />
         </div>
         <div className="mt-2 flex justify-end">

@@ -241,7 +241,7 @@ const RecruiterStudentProfile = () => {
               </Button>
 
               <Link
-                to={`/recruiter/messages?student=${student.id}${params.get("plan") ? `&plan=${params.get("plan")}` : ""}`}
+                to={`/recruiter/talent?student=${student.id}${params.get("plan") ? `&plan=${params.get("plan")}` : ""}`}
               >
                 <Button variant="hero" className="rounded-full">
                   <MessageSquare className="mr-1 h-4 w-4" /> Message
